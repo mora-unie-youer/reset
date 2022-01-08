@@ -84,6 +84,24 @@ flush:
 1:
 	ret
 
+/* Appends char to wrbuf */
+.global putc
+putc:
+	movb 1(%ebp), %al /* char to print */
+	movl wrbuf_idx, %ebx
+	movb %al, wrbuf(%ebx) /* storing the char in wrbuf */
+	leal 1(%ebx), %ebx /* incrementing index */
+	movl %ebx, wrbuf_idx /* storing it */
+	/* Checking if we have to flush */
+	cmpl $WRBUFSZ, %ebx
+	je 1f /* if buffer is full -> flushing */
+	cmpb $'\n, %al
+	jne 2f /* if char newline -> flushing */
+1:
+	call flush
+2:
+	ret
+
 .global exit
 exit:
 	movl $0x1, %eax    /* syscall=0x1 (exit) */
