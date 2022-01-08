@@ -3,28 +3,29 @@
 .section .rodata
 
 /* Character types */
-.equ CHAR_NULL,    0 /* \0 */
-.equ CHAR_INVALID, 1 /* invalid characters */
-.equ CHAR_SPACES,  2 /* [\t\r ] */
-.equ CHAR_NEWLINE, 3 /* \n */
-.equ CHAR_NUMBER,  4 /* [0-9] */
-.equ CHAR_ALPHA,   5 /* [A-Za-z_] */
-.equ CHAR_A_OR_X,  6 /* a|x */
-.equ CHAR_SQUOTE,  7 /* \' */
-.equ CHAR_DQUOTE,  8 /* \" */
-.equ CHAR_SYMBOL,  9 /* other characters */
+.equ CHAR_NULL,      0  /* \0 */
+.equ CHAR_INVALID,   1  /* invalid characters */
+.equ CHAR_SPACES,    2  /* [\t\r ] */
+.equ CHAR_NEWLINE,   3  /* \n */
+.equ CHAR_NUMBER,    4  /* [0-9] */
+.equ CHAR_ALPHA,     5  /* [A-Za-z_] */
+.equ CHAR_A_OR_X,    6  /* a|x */
+.equ CHAR_SQUOTE,    7  /* \' */
+.equ CHAR_DQUOTE,    8  /* \" */
+.equ CHAR_BACKSLASH, 9  /* \\ */
+.equ CHAR_SYMBOL,    10 /* other characters */
 
 /* Char table for easier char type guessing */
 char_table:
 	/*    x0  x1  x2  x3  x4  x5  x6  x7  x8  x9  xA  xB  xC  xD  xE  xF */
 	.byte  0,  1,  1,  1,  1,  1,  1,  1,  1,  2,  3,  1,  1,  2,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
-	.byte  2,  9,  8,  9,  9,  9,  9,  7,  9,  9,  9,  9,  9,  9,  9,  9
-	.byte  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  9,  9,  9,  9,  9,  9
-	.byte  9,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5
-	.byte  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  9,  9,  9,  9,  5
-	.byte  9,  6,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5
-	.byte  5,  5,  5,  5,  5,  5,  5,  5,  6,  5,  5,  9,  9,  9,  9,  1
+	.byte  2, 10,  8, 10, 10, 10, 10,  7, 10, 10, 10, 10, 10, 10, 10, 10
+	.byte  4,  4,  4,  4,  4,  4,  4,  4,  4,  4, 10, 10, 10, 10, 10, 10
+	.byte 10,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5
+	.byte  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 10,  9, 10, 10,  5
+	.byte 10,  6,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5
+	.byte  5,  5,  5,  5,  5,  5,  5,  5,  6,  5,  5, 10, 10, 10, 10,  1
 	/* E-ASCII is always invalid for us */
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
@@ -34,6 +35,17 @@ char_table:
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0 /*EOF*/
+
+char_to_escape:
+	/*    x0  x1  x2  x3  x4  x5  x6  x7  x8  x9  xA  xB  xC  xD  xE  xF */
+	.byte  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+	.byte  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+	.byte  0,  0, 34,  0,  0,  0,  0, 39,  0,  0,  0,  0,  0,  0,  0,  0
+	.byte  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 63
+	.byte  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+	.byte  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 92,  0,  0,  0
+	.byte  0,  7,  8,  0,  0, 27, 12,  0,  0,  0,  0,  0,  0,  0, 10,  0
+	.byte  0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 
 reserved_words:
 	/* Conditionals */
@@ -158,12 +170,12 @@ _skip:
 
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10,  s3,  s3
-s5_next:  .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s2
-s6_next:  .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
-s8_next:  .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s7
-s9_next:  .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s2
-s10_next: .long  s3,  s3, s11, s11, s11, s11, s11, s11, s11, s11
+s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10,  s3,  s3,  s3
+s5_next:  .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s3,  s2
+s6_next:  .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s3,  s7
+s8_next:  .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s3,  s7
+s9_next:  .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s3,  s2
+s10_next: .long  s3,  s3, s11, s11, s11, s11, s11, s11, s11,  s3, s11
 
 .global lex
 lex:
