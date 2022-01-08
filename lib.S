@@ -84,7 +84,7 @@ flush:
 1:
 	ret
 
-/* Appends char to wrbuf */
+/* Print char */
 .global putc
 putc:
 	pushl %ebp
@@ -105,6 +105,7 @@ putc:
 	leave
 	ret
 
+/* Print string */
 .global puts
 puts:
 	pushl %ebp
@@ -125,6 +126,38 @@ puts:
 	addl $1, %ebx       /* moving to next char */
 	jmp 1b
 2:
+	leave
+	ret
+
+/* Buffer for storing integer */
+.comm putd_buf, 10, 1
+/* Print decimal number */
+.global putd
+putd:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $5, %esp /* digit, offset */
+	movl 8(%ebp), %eax /* number */
+	xorl %ecx, %ecx /* putd_buf offset */
+1:
+	/* Dividing number by 10 */
+	xorl %edx, %edx
+	movl $10, %ebx
+	idiv %ebx
+	movb %dl, putd_buf(%ecx) /* Store number in buffer */
+	incl %ecx /* increase offset */
+	cmpl $0, %eax /* if %eax != 0, then next iteration */
+	jne 1b
+2:
+	decl %ecx /* decreasing offset */
+	movl %ecx, -4(%ebp) /* backing up offset */
+	movb putd_buf(%ecx), %al /* fetching digit */
+	addb $'0, %al /* adding '0 to get digit character */
+	movb %al, -5(%ebp) /* passing digit as argument */
+	call putc /* printing digit */
+	movl -4(%ebp), %ecx /* restoring offset */
+	cmpl $0, %ecx /* if offset != 0, then next iteration */
+	jne 2b
 	leave
 	ret
 
