@@ -47,7 +47,7 @@ getc:
 	movl %ebx, rdbuf_idx /* storing it */
 	ret
 2:
-	movl $-1, %eax /* returning EOF */
+	movb $-1, %al /* returning EOF */
 	ret
 
 /* Looks ahead next character */
@@ -67,7 +67,7 @@ nextc:
 	movb rdbuf(%ebx), %al /* ebx stores either 0 or rdbuf_idx */
 	ret
 2:
-	movl $-1, %eax /* returning EOF */
+	movb $-1, %al /* returning EOF */
 	ret
 
 /* Prints to output fd */
