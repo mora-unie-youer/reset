@@ -175,7 +175,8 @@ s5_next:  .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s3,  s2
 s6_next:  .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s3,  s7
 s8_next:  .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s3,  s7
 s9_next:  .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s3,  s2
-s10_next: .long  s3,  s3, s11, s11, s11, s11, s11, s11, s11,  s3, s11
+s10_next: .long  s3,  s3, s11, s11, s11, s11, s11, s11, s11, s13, s11
+s13_next: .long  s3,  s3,  s3,  s3, s14, s14, s14, s14, s14, s14,  s3
 
 .global lex
 lex:
@@ -287,12 +288,29 @@ s10:
 	jmp *%eax
 s11:
 	/* Parsing single quote content */
-	/* TODO: Implement backslash escape codes */
 	call _consume
 	movl %eax, token_val
 	call _lookahead
 	cmpl $CHAR_SQUOTE, %eax
 	jne s3 /* if next char is not single quote -> incorrect syntax */
+s12:
+	/* Consume single quote and set token type */
 	call _consume
 	movw $TOKEN_INTEGER, token_tag /* the value is integer */
 	jmp s2
+s13:
+	/* Parsing backslash in single quotes */
+	call _consume
+	call _lookahead
+	movl s13_next(,%eax,4), %eax
+	jmp *%eax
+s14:
+	/* Parsing escape code in single quotes */
+	xorl %eax, %eax
+	call _consume
+	movb char_to_escape(%eax), %al /* convert char to escape code */
+	movl %eax, token_val
+	call _lookahead
+	cmpl $CHAR_SQUOTE, %eax
+	je s12 /* Finalizing single quote parsing */
+	jmp s3 /* If not single quote -> incorrect syntax */
