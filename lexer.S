@@ -46,7 +46,7 @@ too_long_token_string: .string "Too long token\n"
 
 .comm token_text, MAX_TOKEN_LEN, 1
 .global token_tag, token_len, token_val
-token_tag: .byte 0
+token_tag: .short 0
 token_len: .long 0
 token_val: .long 0
 
