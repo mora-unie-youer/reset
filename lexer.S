@@ -35,6 +35,21 @@ char_table:
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0 /*EOF*/
 
+reserved_words:
+	/* Conditionals */
+	.long if_text, else_text
+	/* Loops */
+	.long while_text
+	/* Functions */
+	.long alloc_text, return_text, syscall_text
+
+if_text:       .string "if"
+else_text:     .string "else"
+while_text:    .string "while"
+alloc_text:    .string "alloc"
+return_text:   .string "return"
+syscall_text:  .string "syscall"
+
 /* Messages */
 line_string: .string "line "
 error_string: .string ": ERROR: "
