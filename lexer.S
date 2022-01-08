@@ -31,9 +31,13 @@ char_table:
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
-	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
+	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0 /*EOF*/
+
 
 .data
+.equ MAX_TOKEN_LEN, 64 /* NOTE: in future may be changed */
+
+.comm token_text, MAX_TOKEN_LEN, 1
 .global token_tag, token_len, token_val
 token_tag: .byte 0
 token_len: .long 0
@@ -42,7 +46,51 @@ token_val: .long 0
 .global line
 line: .long 1
 
+
 .text
+/* Get type of next char */
+_lookahead:
+	/* NOTE: 0xff char and EOF are acting like the same */
+	/* Zeroing %eax to use it as offset */
+	xorl %eax, %eax
+	/* Fetiching next char */
+	call nextc
+	/* Finding its type using table */
+	movb char_table(%eax), %al
+	ret
+
+_consume:
+	/* Fetching char */
+	call getc
+	/* If char is newline, increment counter */
+	cmpb $'\n, %al
+	jne 1f
+	incl line
+1:
+	/* Getting token length */
+	movl token_len, %ebx
+	/* If >= max size, then printing error */
+	cmpl $MAX_TOKEN_LEN-1, %ebx
+	jae 2f
+	movb %al, token_text(%ebx) /* Appending char to token text */
+	addl $1, %ebx              /* Incrementing length */
+	movb $0, token_text(%ebx)  /* Ending string with \0 */
+	movl %ebx, token_len       /* Setting new token length */
+	ret
+2:
+	/* Printing error and skipping */
+	/* TODO: error printing */
+
+_skip:
+	/* Fetching char */
+	call getc
+	/* If newline, incrementing counter */
+	cmpb $'\n, %al
+	jne 1f
+	incl line
+1:
+	ret
+
 .global lex
 lex:
 	pushl %ebp
