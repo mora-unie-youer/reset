@@ -6,6 +6,7 @@
 
 /* File descriptor to which output will be written */
 .global output_fd
+output_fd: .long 1 /* stdout */
 
 /* Read buffer */
 .comm rdbuf, RDBUFSZ, 1
@@ -67,6 +68,20 @@ nextc:
 	ret
 2:
 	movl $-1, %eax /* returning EOF */
+	ret
+
+/* Prints to output fd */
+.global flush
+flush:
+	cmpl $0, wrbuf_idx
+	je 1f
+	movl $0x4, %eax /* syscall=0x4 (write) */
+	movl output_fd, %ebx /* fd=output_fd */
+	movl $wrbuf, %ecx /* buf=wrbuf */
+	movl wrbuf_idx, %edx /* count=wrbuf_idx */
+	int $0x80 /* calling the interrupt */
+	movl $0, wrbuf_idx /* resetting index */
+1:
 	ret
 
 .global exit
