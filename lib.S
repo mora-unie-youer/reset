@@ -105,6 +105,29 @@ putc:
 	leave
 	ret
 
+.global puts
+puts:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $5, %esp /* (ch, str) */
+	movl 8(%ebp), %ebx /* string to print */
+1:
+	/* Getting char from string */
+	movb (%ebx), %al
+	/* If zero -> string ended */
+	cmpb $0, %al
+	je 2f
+	/* Printing char */
+	movl %ebx, -4(%ebp) /* backing up %ebx */
+	movb %al, -5(%ebp)  /* passing char as argument */
+	call putc           /* printing the char */
+	movl -4(%ebp), %ebx /* restoring the %ebx */
+	addl $1, %ebx       /* moving to next char */
+	jmp 1b
+2:
+	leave
+	ret
+
 .global exit
 exit:
 	movl $0x1, %eax    /* syscall=0x1 (exit) */
