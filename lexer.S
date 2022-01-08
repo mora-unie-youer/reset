@@ -55,6 +55,7 @@ line_string: .string "line "
 error_string: .string ": ERROR: "
 /* Error messages */
 too_long_token_string: .string "Too long token\n"
+undefined_token_string: .string "Undefined token\n"
 
 .data
 .equ MAX_TOKEN_LEN, 64 /* NOTE: in future may be changed */
@@ -106,6 +107,9 @@ _print_error:
 _too_long_token:
 	pushl $too_long_token_string
 	call _print_error
+_undefined_token:
+	pushl $undefined_token_string
+	call _print_error
 
 /* Get type of next char */
 _lookahead:
@@ -150,10 +154,32 @@ _skip:
 1:
 	ret
 
+/* Tables to manage which subroutine for which char type we should use */
+/* The order is as char type order (see CHAR_NULL and etc.) */
+s0_next: .long  s1,  s2,  s3,  s3,  s2,  s2,  s2,  s2,  s2,  s2
+
 .global lex
 lex:
 	pushl %ebp
 	movl %esp, %ebp
+/* Entry point of lexer */
+s0:
+	movl $0, token_len
+	movl $0, token_val
+	call _lookahead
+	movl s0_next(,%eax,4), %eax
+	jmp *%eax
+s1:
+	/* Setting end of token */
+	movw $TOKEN_END, token_tag
+	jmp lex_ret
+s2:
+	/* Throwing exception of undefined token */
+	call _undefined_token
+s3:
+	/* Skipping this character */
+	call _consume
+	jmp s0
 lex_ret:
 	leave
 	ret
