@@ -158,11 +158,12 @@ _skip:
 
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next: .long  s1,  s3,  s4,  s4,  s5,  s6,  s8,  s3,  s3,  s3
-s5_next: .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s2
-s6_next: .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
-s8_next: .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s7
-s9_next: .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s2
+s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10,  s3,  s3
+s5_next:  .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s2
+s6_next:  .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
+s8_next:  .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s7
+s9_next:  .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s2
+s10_next: .long  s3,  s3, s11, s11, s11, s11, s11, s11, s11, s11
 
 .global lex
 lex:
@@ -266,3 +267,20 @@ s9:
 	call _lookahead
 	movl s9_next(,%eax,4), %eax
 	jmp *%eax
+s10:
+	/* Parsing single quote */
+	call _consume
+	call _lookahead
+	movl s10_next(,%eax,4), %eax
+	jmp *%eax
+s11:
+	/* Parsing single quote content */
+	/* TODO: Implement backslash escape codes */
+	call _consume
+	movl %eax, token_val
+	call _lookahead
+	cmpl $CHAR_SQUOTE, %eax
+	jne s3 /* if next char is not single quote -> incorrect syntax */
+	call _consume
+	movw $TOKEN_INTEGER, token_tag /* the value is integer */
+	jmp s2
