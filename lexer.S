@@ -72,7 +72,7 @@ too_long_token_string: .string "Too long token\n"
 undefined_token_string: .string "Undefined token\n"
 
 .data
-.equ MAX_TOKEN_LEN, 64 /* NOTE: in future may be changed */
+.equ MAX_TOKEN_LEN, 128 /* NOTE: in future may be changed */
 
 .comm token_text, MAX_TOKEN_LEN, 1
 .global token_tag, token_len, token_val
@@ -170,13 +170,15 @@ _skip:
 
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10,  s3,  s3,  s3
+s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10, s15,  s3,  s3
 s5_next:  .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s3,  s2
 s6_next:  .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s3,  s7
 s8_next:  .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s3,  s7
 s9_next:  .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s3,  s2
 s10_next: .long  s3,  s3, s11, s11, s11, s11, s11, s11, s11, s13, s11
 s13_next: .long  s3,  s3,  s3,  s3, s14, s14, s14, s14, s14, s14,  s3
+s15_next: .long  s3,  s3, s15, s15, s15, s15, s15, s15, s16, s17, s15
+s17_next: .long  s3,  s3,  s3,  s3, s15, s15, s15, s15, s15, s15,  s3
 
 .global lex
 lex:
@@ -314,3 +316,20 @@ s14:
 	cmpl $CHAR_SQUOTE, %eax
 	je s12 /* Finalizing single quote parsing */
 	jmp s3 /* If not single quote -> incorrect syntax */
+s15:
+	/* Parsing double quotes */
+	call _consume
+	call _lookahead
+	movl s15_next(,%eax,4), %eax
+	jmp *%eax
+s16:
+	/* Ending string in double quotes */
+	call _consume
+	movw $TOKEN_STRING, token_tag /* the value is string */
+	jmp s2
+s17:
+	/* Parsing backslash in double quotes */
+	call _consume
+	call _lookahead
+	movl s17_next(,%eax,4), %eax
+	jmp *%eax
