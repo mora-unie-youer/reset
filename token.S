@@ -10,7 +10,7 @@
 /* Loops */
 .equ TOKEN_WHILE,      263
 /* Functions */
-.equ TOKEN_ALLOC,      264
+.equ TOKEN_ALLOCATE,   264
 .equ TOKEN_RETURN,     265
 .equ TOKEN_SYSCALL,    266
 /* Symbols */

@@ -41,12 +41,12 @@ reserved_words:
 	/* Loops */
 	.long while_text
 	/* Functions */
-	.long alloc_text, return_text, syscall_text
+	.long allocate_text, return_text, syscall_text
 
 if_text:       .string "if"
 else_text:     .string "else"
 while_text:    .string "while"
-alloc_text:    .string "alloc"
+allocate_text: .string "allocate"
 return_text:   .string "return"
 syscall_text:  .string "syscall"
 
