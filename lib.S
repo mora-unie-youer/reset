@@ -40,6 +40,7 @@ getc:
 	/* If nothing was read, return EOF */
 	cmpl $0, %eax
 	jbe 2f
+	movl %eax, rdbuf_end
 1:
 	xorl %eax, %eax /* we are storing char in %eax */
 	movb rdbuf(%ebx), %al /* ebx stores either 0 or rdbuf_idx */
@@ -65,6 +66,7 @@ nextc:
 	/* If nothing was read, return EOF */
 	cmpl $0, %eax
 	jbe 2f
+	movl %eax, rdbuf_end
 1:
 	xorl %eax, %eax /* we are storing char in %eax */
 	movb rdbuf(%ebx), %al /* ebx stores either 0 or rdbuf_idx */
