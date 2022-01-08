@@ -168,9 +168,18 @@ _skip:
 1:
 	ret
 
+_skip_line:
+	/* Fetching char */
+	call getc
+	/* If not newline, continue loop */
+	cmpb $'\n, %al
+	jne _skip_line
+	incl line
+	ret
+
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10, s15,  s3,  s3
+s0_next:  .long  s1,  s3,  s4,  s4,  s5,  s6,  s8, s10, s15,  s3, s18
 s5_next:  .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s3,  s2
 s6_next:  .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s3,  s7
 s8_next:  .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s3,  s7
@@ -333,3 +342,53 @@ s17:
 	call _lookahead
 	movl s17_next(,%eax,4), %eax
 	jmp *%eax
+s18:
+	/* Parsing symbols */
+	call _consume
+	movl %eax, token_tag
+	/* Checking for multiple-char symbols */
+	cmpl $'=, %eax
+	je 1f
+	cmpl $'!, %eax
+	je 2f
+	cmpl $'<, %eax
+	je 3f
+	cmpl $'>, %eax
+	je 4f
+	/* Checking for comment */
+	cmpl $'#, %eax
+	je 5f
+	/* If not a above-listed char -> success */
+	jmp s2
+1:
+	call nextc
+	cmpl $'=, %eax /* == */
+	jne s2 /* if not ==, return */
+	call _consume
+	movl $TOKEN_EQUAL, token_tag
+	jmp s2
+2:
+	call nextc
+	cmpl $'=, %eax
+	jne s2 /* if not !=, return */
+	call _consume
+	movl $TOKEN_NOTEQUAL, token_tag
+	jmp s2
+3:
+	call nextc
+	cmpl $'=, %eax
+	jne s2 /* if not <=, return */
+	call _consume
+	movl $TOKEN_LE, token_tag
+	jmp s2
+4:
+	call nextc
+	cmpl $'=, %eax
+	jne s2 /* if not >=, return */
+	call _consume
+	movl $TOKEN_GE, token_tag
+	jmp s2
+5:
+	/* When comment, skip this line, and start again */
+	call _skip_line
+	jmp s0
