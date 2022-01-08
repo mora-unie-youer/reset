@@ -87,7 +87,9 @@ flush:
 /* Appends char to wrbuf */
 .global putc
 putc:
-	movb 1(%ebp), %al /* char to print */
+	pushl %ebp
+	movl %esp, %ebp
+	movb 8(%ebp), %al /* char to print */
 	movl wrbuf_idx, %ebx
 	movb %al, wrbuf(%ebx) /* storing the char in wrbuf */
 	leal 1(%ebx), %ebx /* incrementing index */
@@ -100,6 +102,7 @@ putc:
 1:
 	call flush
 2:
+	leave
 	ret
 
 .global exit
