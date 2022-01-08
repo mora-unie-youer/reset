@@ -10,7 +10,7 @@ rtc: main.o lib.o lexer.o
 
 main.o: main.S
 lib.o: lib.S
-lexer.o: lexer.S
+lexer.o: lexer.S token.S
 
 .S.o:
 	$(AS) $(ASFLAGS) -o $@ $<

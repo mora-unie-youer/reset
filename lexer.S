@@ -1,3 +1,5 @@
+.include "token.S"
+
 .section .rodata
 
 /* Character types */
@@ -137,5 +139,6 @@ _skip:
 lex:
 	pushl %ebp
 	movl %esp, %ebp
+lex_ret:
 	leave
 	ret
