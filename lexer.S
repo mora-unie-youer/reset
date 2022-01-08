@@ -42,6 +42,8 @@ reserved_words:
 	.long while_text
 	/* Functions */
 	.long allocate_text, return_text, syscall_text
+	/* End of list */
+	.long 0
 
 if_text:       .string "if"
 else_text:     .string "else"
@@ -205,5 +207,33 @@ s6:
 	movl s6_next(,%eax,4), %eax
 	jmp *%eax
 s7:
-	/* TODO: check for reserved keywords */
+	subl $12, %esp /* str1, str2, counter */
+	movl $token_text, -12(%ebp) /* First string */
+	xorl %eax, %eax
+	movl %eax, -4(%ebp)
+1:
+	/* Current index of reserved_words */
+	movl -4(%ebp), %eax
+	movl reserved_words(,%eax,4), %eax /* Getting reserved word */
+	/* %eax == 0 (end of list), identifier is not a reserved word */
+	cmpl $0, %eax
+	je 1f
+	/* Storing reserved word to argument */
+	movl %eax, -8(%ebp)
+	/* Comparing strings */
+	call strcmp
+	/* If equal -> breaking loop */
+	cmpl $1, %eax
+	je 2f
+	/* Making next iteration */
+	incl -4(%ebp)
+	jmp 1b
+1:
+	addl $12, %esp /* removing local variables */
+	jmp s2
+2:
+	movl -4(%ebp), %eax  /* restoring index */
+	addl $TOKEN_IF, %eax /* TOKEN_IF is first reserved word */
+	movl %eax, token_tag /* storing token type */
+	addl $12, %esp /* removeing local variables */
 	jmp s2
