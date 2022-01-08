@@ -345,7 +345,7 @@ s17:
 s18:
 	/* Parsing symbols */
 	call _consume
-	movl %eax, token_tag
+	movw %ax, token_tag
 	/* Checking for multiple-char symbols */
 	cmpl $'=, %eax
 	je 1f
@@ -365,28 +365,28 @@ s18:
 	cmpl $'=, %eax /* == */
 	jne s2 /* if not ==, return */
 	call _consume
-	movl $TOKEN_EQUAL, token_tag
+	movw $TOKEN_EQUAL, token_tag
 	jmp s2
 2:
 	call nextc
 	cmpl $'=, %eax
 	jne s2 /* if not !=, return */
 	call _consume
-	movl $TOKEN_NOTEQUAL, token_tag
+	movw $TOKEN_NOTEQUAL, token_tag
 	jmp s2
 3:
 	call nextc
 	cmpl $'=, %eax
 	jne s2 /* if not <=, return */
 	call _consume
-	movl $TOKEN_LE, token_tag
+	movw $TOKEN_LE, token_tag
 	jmp s2
 4:
 	call nextc
 	cmpl $'=, %eax
 	jne s2 /* if not >=, return */
 	call _consume
-	movl $TOKEN_GE, token_tag
+	movw $TOKEN_GE, token_tag
 	jmp s2
 5:
 	/* When comment, skip this line, and start again */
