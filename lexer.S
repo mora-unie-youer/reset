@@ -162,6 +162,7 @@ s0_next: .long  s1,  s3,  s4,  s4,  s5,  s6,  s8,  s3,  s3,  s3
 s5_next: .long  s2,  s2,  s2,  s3,  s5,  s3,  s3,  s3,  s3,  s2
 s6_next: .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
 s8_next: .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s7
+s9_next: .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s2
 
 .global lex
 lex:
@@ -255,5 +256,13 @@ s8:
 	movl s8_next(,%eax,4), %eax
 	jmp *%eax
 s9:
-	/* TODO: Parsing `a[0-9]+|x[0-9]+` variables */
-	jmp s2
+	/* Parsing `a[0-9]+|x[0-9]+` variables */
+	call _consume
+	subl $'0, %eax /* Converting to value */
+	movl token_val, %ebx /* loading value */
+	imul $10, %ebx
+	addl %ebx, %eax      /* Adding digit to number */
+	movl %eax, token_val /* Setting value */
+	call _lookahead
+	movl s9_next(,%eax,4), %eax
+	jmp *%eax
