@@ -33,3 +33,18 @@ char_table:
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 
+.data
+.global token_tag, token_len, token_val
+token_tag: .byte 0
+token_len: .long 0
+token_val: .long 0
+
+.global
+line: .long 1
+
+.text
+lex:
+	pushl %ebp
+	movl %esp, %ebp
+	leave
+	ret
