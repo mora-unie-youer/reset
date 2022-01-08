@@ -158,9 +158,10 @@ _skip:
 
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next: .long  s1,  s3,  s4,  s4,  s5,  s6,  s3,  s3,  s3,  s3
+s0_next: .long  s1,  s3,  s4,  s4,  s5,  s6,  s8,  s3,  s3,  s3
 s5_next: .long  s2,  s2,  s2,  s3,  s5,  s3,  s3,  s3,  s3,  s2
 s6_next: .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
+s8_next: .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s7
 
 .global lex
 lex:
@@ -231,10 +232,28 @@ s7:
 	jmp 1b
 1:
 	addl $12, %esp /* removing local variables */
+	movw $TOKEN_IDENTIFIER, token_tag /* for cases, when it was arg/var */
 	jmp s2
 2:
 	movl -4(%ebp), %eax  /* restoring index */
 	addl $TOKEN_IF, %eax /* TOKEN_IF is first reserved word */
 	movl %eax, token_tag /* storing token type */
 	addl $12, %esp /* removeing local variables */
+	jmp s2
+s8:
+	/* Parsing `a|x` variables (or identifiers starting with a or x) */
+	call _consume
+	cmpb $'a, %al
+	je 1f
+	movw $TOKEN_VARIABLE, token_tag
+	jmp 2f
+1:
+	movw $TOKEN_ARGUMENT, token_tag
+2:
+	movl $0, token_val
+	call _lookahead
+	movl s8_next(,%eax,4), %eax
+	jmp *%eax
+s9:
+	/* TODO: Parsing `a[0-9]+|x[0-9]+` variables */
 	jmp s2
