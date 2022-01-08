@@ -156,8 +156,8 @@ _skip:
 
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next: .long  s1,  s2,  s3,  s3,  s4,  s2,  s2,  s2,  s2,  s2
-s4_next: .long  s5,  s5,  s5,  s2,  s4,  s2,  s2,  s2,  s2,  s5
+s0_next: .long  s1,  s3,  s4,  s4,  s5,  s3,  s3,  s3,  s3,  s3
+s5_next: .long  s2,  s2,  s2,  s3,  s5,  s3,  s3,  s3,  s3,  s2
 
 .global lex
 lex:
@@ -173,17 +173,17 @@ s0:
 s1:
 	/* Setting end of tokens */
 	movw $TOKEN_END, token_tag
-s5:
+s2:
 	/* Ending parsing */
 	jmp lex_ret
-s2:
+s3:
 	/* Throwing exception of undefined token */
 	call _undefined_token
-s3:
+s4:
 	/* Skipping this character */
 	call _consume
 	jmp s0
-s4:
+s5:
 	/* Parsing digit */
 	movw $TOKEN_INTEGER, token_tag
 	call _consume
@@ -193,7 +193,7 @@ s4:
 	addl %ebx, %eax      /* Adding digit to number */
 	movl %eax, token_val /* Setting value */
 	call _lookahead
-	movl s4_next(,%eax,4), %eax
+	movl s5_next(,%eax,4), %eax
 	jmp *%eax
 lex_ret:
 	leave
