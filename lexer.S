@@ -33,6 +33,11 @@ char_table:
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 	.byte  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0 /*EOF*/
 
+/* Messages */
+line_string: .string "line "
+error_string: .string ": ERROR: "
+/* Error messages */
+too_long_token_string: .string "Too long token\n"
 
 .data
 .equ MAX_TOKEN_LEN, 64 /* NOTE: in future may be changed */
@@ -48,6 +53,43 @@ line: .long 1
 
 
 .text
+/* Print line */
+_print_line:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $4, %esp /* string/line_number */
+	/* Printing line_string */
+	movl $line_string, -4(%ebp)
+	call puts
+	/* Printing line number */
+	movl line, %ebx
+	movl %ebx, -4(%ebp)
+	call putd
+	leave
+	ret
+
+/* Print error and exit */
+_print_error:
+	pushl %ebp
+	movl %esp, %ebp
+	call flush /* Print all the output */
+	call _print_line /* Printing line number */
+	movl $error_string, (%ebp) /* error string */
+	call puts /* Printing error string */
+	movl 8(%ebp), %ebx /* error message */
+	movl %ebx, (%ebp) /* passing message as argument */
+	call puts /* Printing error message */
+	movl $2, output_fd /* Writing error to `stderr` */
+	call flush /* Print to stderr */
+	/* As error occured, exitting */
+	pushl $1
+	call exit
+
+/* Errors (they are not returning, so no reason writing `ret`) */
+_too_long_token:
+	pushl $too_long_token_string
+	call _print_error
+
 /* Get type of next char */
 _lookahead:
 	/* NOTE: 0xff char and EOF are acting like the same */
@@ -79,7 +121,7 @@ _consume:
 	ret
 2:
 	/* Printing error and skipping */
-	/* TODO: error printing */
+	call _too_long_token
 
 _skip:
 	/* Fetching char */
