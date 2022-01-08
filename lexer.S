@@ -207,6 +207,7 @@ s6:
 	movl s6_next(,%eax,4), %eax
 	jmp *%eax
 s7:
+	/* Checking if identifier is reserved keyword */
 	subl $12, %esp /* str1, str2, counter */
 	movl $token_text, -12(%ebp) /* First string */
 	xorl %eax, %eax
