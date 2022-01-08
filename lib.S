@@ -161,6 +161,37 @@ putd:
 	leave
 	ret
 
+/* Compare two strings */
+.global strcmp
+strcmp:
+	pushl %ebp
+	movl %esp, %ebp
+	/* Two strings in arguments */
+	movl 8(%ebp), %eax
+	movl 12(%ebp), %ebx
+1:
+	/* Fetching two chars */
+	movb (%eax), %cl
+	movb (%ebx), %dl
+	/* If they are not equal -> return 0 */
+	cmpb %cl, %dl
+	jne 1f
+	/* If they are ended (then equal) -> return 1 */
+	cmpb $0, %cl
+	je 2f
+	/* Making next iteration */
+	incl %eax
+	incl %ebx
+	jmp 1b
+1:
+	movl $0, %eax
+	jmp 1f
+2:
+	movl $1, %eax
+1:
+	leave
+	ret
+
 .global exit
 exit:
 	movl $0x1, %eax    /* syscall=0x1 (exit) */
