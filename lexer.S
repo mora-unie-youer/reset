@@ -156,8 +156,9 @@ _skip:
 
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
-s0_next: .long  s1,  s3,  s4,  s4,  s5,  s3,  s3,  s3,  s3,  s3
+s0_next: .long  s1,  s3,  s4,  s4,  s5,  s6,  s3,  s3,  s3,  s3
 s5_next: .long  s2,  s2,  s2,  s3,  s5,  s3,  s3,  s3,  s3,  s2
+s6_next: .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
 
 .global lex
 lex:
@@ -175,7 +176,8 @@ s1:
 	movw $TOKEN_END, token_tag
 s2:
 	/* Ending parsing */
-	jmp lex_ret
+	leave
+	ret
 s3:
 	/* Throwing exception of undefined token */
 	call _undefined_token
@@ -195,6 +197,13 @@ s5:
 	call _lookahead
 	movl s5_next(,%eax,4), %eax
 	jmp *%eax
-lex_ret:
-	leave
-	ret
+s6:
+	/* Parsing letter and underscore (and numbers, after first char is alpha) */
+	movw $TOKEN_IDENTIFIER, token_tag
+	call _consume   /* Adding letter/underscore/number to token_text */
+	call _lookahead
+	movl s6_next(,%eax,4), %eax
+	jmp *%eax
+s7:
+	/* TODO: check for reserved keywords */
+	jmp s2
