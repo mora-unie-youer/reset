@@ -1,16 +1,16 @@
 .section .rodata
 
 /* Character types */
-.equ CHAR_NULL    0 /* \0 */
-.equ CHAR_INVALID 1 /* invalid characters */
-.equ CHAR_SPACES  2 /* [\t\r ] */
-.equ CHAR_NEWLINE 3 /* \n */
-.equ CHAR_NUMBER  4 /* [0-9] */
-.equ CHAR_ALPHA   5 /* [A-Za-z_] */
-.equ CHAR_A_OR_X  6 /* a|x */
-.equ CHAR_SQUOTE  7 /* \' */
-.equ CHAR_DQUOTE  8 /* \" */
-.equ CHAR_SYMBOL  9 /* other characters */
+.equ CHAR_NULL,    0 /* \0 */
+.equ CHAR_INVALID, 1 /* invalid characters */
+.equ CHAR_SPACES,  2 /* [\t\r ] */
+.equ CHAR_NEWLINE, 3 /* \n */
+.equ CHAR_NUMBER,  4 /* [0-9] */
+.equ CHAR_ALPHA,   5 /* [A-Za-z_] */
+.equ CHAR_A_OR_X,  6 /* a|x */
+.equ CHAR_SQUOTE,  7 /* \' */
+.equ CHAR_DQUOTE,  8 /* \" */
+.equ CHAR_SYMBOL,  9 /* other characters */
 
 /* Char table for easier char type guessing */
 char_table:
@@ -39,10 +39,11 @@ token_tag: .byte 0
 token_len: .long 0
 token_val: .long 0
 
-.global
+.global line
 line: .long 1
 
 .text
+.global lex
 lex:
 	pushl %ebp
 	movl %esp, %ebp
