@@ -159,7 +159,7 @@ _skip:
 /* Tables to manage which subroutine for which char type we should use */
 /* The order is as char type order (see CHAR_NULL and etc.) */
 s0_next: .long  s1,  s3,  s4,  s4,  s5,  s6,  s8,  s3,  s3,  s3
-s5_next: .long  s2,  s2,  s2,  s3,  s5,  s3,  s3,  s3,  s3,  s2
+s5_next: .long  s2,  s3,  s2,  s2,  s5,  s3,  s3,  s3,  s3,  s2
 s6_next: .long  s7,  s3,  s7,  s7,  s6,  s6,  s6,  s3,  s3,  s7
 s8_next: .long  s7,  s3,  s7,  s7,  s9,  s6,  s6,  s3,  s3,  s7
 s9_next: .long  s2,  s3,  s2,  s2,  s9,  s6,  s6,  s3,  s3,  s2
