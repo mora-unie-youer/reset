@@ -5,12 +5,13 @@ LDFLAGS = -melf_i386 --nostdlib
 
 all: rtc
 
-rtc: main.o lib.o codegen.o lexer.o
+rtc: main.o lib.o codegen.o compile.o lexer.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
 main.o: main.S
 lib.o: lib.S
-codegen.o: codegen.S token.S
+codegen.o: codegen.S
+compile.o: compile.S token.S
 lexer.o: lexer.S token.S
 
 .S.o:
