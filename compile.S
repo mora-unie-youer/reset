@@ -248,7 +248,23 @@ _while_expr:
 
 /* Parse and compile allocate expression */
 _allocate_expr:
-	/* TODO: implement `allocate` expression parsing */
+	/* Fetching next expression */
+	call lex
+	call _simple_expr
+	/* Constructing imul instruction */
+	call imul
+	pushl $4
+	call value
+	addl $4, %esp
+	call comma
+	call eax
+	call newline
+	/* Constructing subl instruction */
+	call subl
+	call eax
+	call comma
+	call esp
+	call newline
 	ret
 
 /* Parse and compile syscall expression */
