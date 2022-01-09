@@ -150,7 +150,44 @@ _function_definition:
 	call putc
 	addl $4, %esp
 	call newline
+	/* Parsing function arguments */
+	call _function_args
 	/* TODO: parse function content */
+	ret
+
+/* Parse function arguments */
+_function_args:
+	subl $4, %esp /* counter */
+	movl $0, (%esp) /* counter=0 */
+	/* Fetching next token */
+	call lex
+	/* If next token is ), no args, exiting */
+	cmpw $'), token_tag
+	je 2f
+1:
+	/* Checking that token is argument. If not, erroring */
+	cmpw $TOKEN_ARGUMENT, token_tag
+	jne _syntax_error
+	/* Checking if counter and argument number are equal. If not, erroring */
+	movl (%esp), %eax
+	cmpl token_val, %eax
+	jne _syntax_error
+	/* Incrementing counter */
+	incl (%esp)
+	/* Fetching next token */
+	call lex
+	/* If not equal to comma symbol, trying to exit. */
+	jne 2f
+	/* Fetching next token and iterating again */
+	call lex
+	jmp 1b
+2:
+	/* Trying to exit. Checking if token is ). If not, erroring */
+	cmpw $'), token_tag
+	jne _syntax_error
+	/* Returning argument count */
+	movl (%esp), %eax
+	addl $4, %esp
 	ret
 
 /* Parse and compile consant expressions */
