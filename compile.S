@@ -12,13 +12,17 @@ identbuf_depth: .long 0
 
 .section .rodata
 /* Error messages */
-identbuf_overflow_error: .string "Identifier buffer overflow\n"
+identbuf_empty_error:    .string "Identifier stack is empty\n"
+identbuf_overflow_error: .string "Identifier stack overflow\n"
 string_literals_error:   .string "Too many string literals\n"
 syntax_error:            .string "Syntax error\n"
 
 .text
 /* Errors */
-_identbuf_overflow_error:
+_identbuf_empty:
+	pushl $identbuf_empty_error
+	call print_error
+_identbuf_overflow:
 	pushl $identbuf_overflow_error
 	call print_error
 _string_literals:
@@ -31,7 +35,7 @@ _syntax_error:
 /* Identifier stack */
 _push_ident:
 	cmpl $IDENTBUFSZ, identbuf_depth
-	je _identbuf_overflow_error
+	je _identbuf_overflow
 	movl 4(%esp), %eax /* identifier */
 	pushl %eax /* Pushing identifier as argument */
 	movl identbuf_depth, %eax /* Loading stack depth */
@@ -41,6 +45,11 @@ _push_ident:
 	pushl %eax /* Pushing address as argument */
 	call strcpy /* Copying data */
 	addl $8, %esp
+	ret
+_pop_ident:
+	cmpl $0, identbuf_depth
+	je _identbuf_empty
+	decl identbuf_depth
 	ret
 
 /* Entry point of compiler */
