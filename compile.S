@@ -100,7 +100,7 @@ _expr:
 /* Parse and compile top-level expressions */
 _toplevel_expr:
 	/* TODO: implement expressions like identifiers, arguments and variables */
-	movw $TOKEN_IDENTIFIER, token_tag
+	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
 	call _constant_expr
 	ret
@@ -111,7 +111,7 @@ _toplevel_expr:
 	/* Checking, what is the next character */
 	call lex
 	cmpw $':, token_tag
-	je 2f
+	je _function_definition
 	cmpw $'(, token_tag
 	je 3f
 	cmpw $'[, token_tag
@@ -120,9 +120,6 @@ _toplevel_expr:
 	je 5f
 	/* If none of above listed, erroring */
 	call _syntax_error
-2:
-	/* TODO: implement function definition */
-	ret
 3:
 	/* TODO: implement function call */
 	ret
@@ -131,6 +128,29 @@ _toplevel_expr:
 	ret
 5:
 	/* TODO: implement identifier assigning */
+	ret
+
+/* Parse and compile function definition */
+_function_definition:
+	/* Fetching next token */
+	call lex
+	/* Checking if next token is (. If not -> error */
+	cmpw $'(, token_tag
+	jne _syntax_error
+	/* Functions are written to text segment */
+	call enter_text_segment
+	/* Fetching identifier */
+	pushl $0
+	call _get_ident
+	/* Printing identifier */
+	movl %eax, (%esp)
+	call puts
+	/* Appending colon symbol */
+	movb $':, (%esp)
+	call putc
+	addl $4, %esp
+	call newline
+	/* TODO: parse function content */
 	ret
 
 /* Parse and compile consant expressions */
