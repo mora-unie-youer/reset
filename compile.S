@@ -142,6 +142,8 @@ _get_ident:
 /* Entry point of compiler */
 .global compile
 compile:
+	/* We start at .text segment */
+	call enter_text_segment
 	/* Read first token */
 	call lex
 	/* If EOF, ending */

@@ -4,7 +4,7 @@
 .equ DATA_SEGMENT, 1
 .equ RODATA_SEGMENT, 2
 /* Current segment */
-segment: .long TEXT_SEGMENT
+segment: .long -1 /* -1 here to print first segment too */
 
 .section .rodata
 /* Segments */
