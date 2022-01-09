@@ -101,7 +101,8 @@ _print_line:
 	ret
 
 /* Print error and exit */
-_print_error:
+.global print_error
+print_error:
 	pushl %ebp
 	movl %esp, %ebp
 	call flush /* Print all the output */
@@ -120,10 +121,10 @@ _print_error:
 /* Errors (they are not returning, so no reason writing `ret`) */
 _too_long_token:
 	pushl $too_long_token_string
-	call _print_error
+	call print_error
 _undefined_token:
 	pushl $undefined_token_string
-	call _print_error
+	call print_error
 
 /* Get type of next char */
 _lookahead:
