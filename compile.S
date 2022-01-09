@@ -154,7 +154,8 @@ _function_definition:
 	call _function_args
 	/* Initializing stack pointer */
 	call enter_stack
-	/* TODO: parse function content */
+	/* Parse function content */
+	call _function_block
 	/* Leaving the function */
 	call leave
 	call newline
@@ -195,6 +196,35 @@ _function_args:
 	/* Returning argument count */
 	movl (%esp), %eax
 	addl $4, %esp
+	ret
+
+/* Parse and compile function block */
+_function_block:
+	/* Fetching next token */
+	call lex
+	/* Checking if token is {. If not, erroring */
+	cmpw $'{, token_tag
+	jne _syntax_error
+	/* Fetching next token */
+	call lex
+1:
+	/* If token is }, exitting */
+	cmpw $'}, token_tag
+	je 1f
+	/* Parsing and compiling expression */
+	call _expr
+	/* Fetching next token */
+	call lex
+	/* If token is not ;, and not }, it's syntax error. Trying to exit */
+	cmpw $';, token_tag
+	jne 1f
+	/* Fetching next token and iterating again */
+	call lex
+	jmp 1b
+1:
+	/* Trying to exit. Checking if token is }. If not, erroring */
+	cmpw $'}, token_tag
+	jne _syntax_error
 	ret
 
 /* Parse and compile consant expressions */
