@@ -233,13 +233,37 @@ _function_block:
 
 /* Parse and compile function call */
 _function_call:
+	subl $8, %esp
 	call _function_call_args
+	movl %eax, 4(%esp) /* saving number of arguments */
 	/* If no arguments passed, go to function calling */
 	cmpl $0, %eax
 	je 1f
 	/* TODO: push args */
 1:
-	/* TODO: call function */
+	/* Printing call instruction */
+	call call
+	movl $0, (%esp)
+	call _get_ident /* Fetching identifier */
+	movl %eax, (%esp)
+	call puts /* Printing identifier */
+	call _pop_ident /* Removing identifier from stack */
+	call newline
+	/* If no arguments passed, exiting */
+	cmpl $0, 4(%esp)
+	je 2f
+	/* As we passed arguments, we must fix stack */
+	call addl
+	movl 4(%esp), %eax /* loading number of arguments */
+	imul $4, %eax /* each argument takes 4 bytes */
+	movl %eax, (%esp)
+	/* Finishing instruction */
+	call value
+	call comma
+	call esp
+	call newline
+2:
+	addl $8, %esp
 	ret
 
 /* Parse function call arguments */
