@@ -213,6 +213,23 @@ strcpy:
 	leave
 	ret
 
+/* Get length of string */
+.global strlen
+strlen:
+	xorl %eax, %eax /* length=0 */
+	movl 4(%esp), %ebx /* string */
+1:
+	/* Fetching char from string */
+	movb (%ebx), %cl
+	/* If char is \0, breaking the loop */
+	je 1f
+	/* Incrementing length, doing next iteration */
+	incl %ebx
+	incl %eax
+	jmp 1b
+1:
+	ret
+
 .global exit
 exit:
 	movl $0x1, %eax    /* syscall=0x1 (exit) */
