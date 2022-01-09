@@ -288,7 +288,19 @@ _function_call_args:
 
 /* Parse and compile consant expressions */
 _constant_expr:
-	/* TODO: implement expressions like integers and strings */
-
+	cmpw $TOKEN_INTEGER, token_tag
+	je _constant_expr_integer
+	/* TODO: string parsing */
 	/* If nothing was parsed, syntax erroring */
 	call _syntax_error
+
+_constant_expr_integer:
+	/* Storing integer value to %eax */
+	call movl /* Printing movl instruction */
+	pushl token_val
+	call value /* Printing token_val */
+	addl $4, %esp
+	call comma
+	call eax
+	call newline
+	ret
