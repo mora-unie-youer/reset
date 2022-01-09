@@ -202,3 +202,14 @@ _keyword esi
 _keyword edi
 _keyword esp
 _keyword ebp
+
+/* Works like `enter` instruction without subtracting */
+.global enter_stack
+enter_stack:
+	call pushl_ebp
+	call movl
+	call esp
+	call _comma
+	call ebp
+	call _newline
+	ret
