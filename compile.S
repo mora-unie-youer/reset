@@ -47,6 +47,7 @@ _push_string:
 	movl 12(%esp), %eax /* string */
 	movl %eax, (%esp) /* Passing it as argument to strlen */
 	call strlen /* Get length of string */
+	incl %eax /* Between strings there are one byte - \0 */
 	addl %eax, strbuf_offset /* New string offset = old offset + string length */
 	addl strbuf_length, %eax /* New string buffer length */
 	cmpl $STRBUFSZ, %eax /* If new length > buffer size, erroring */
@@ -104,6 +105,8 @@ _put_strings:
 	/* Printing string */
 	call puts
 	call newline
+	/* Making next iteration */
+	incl 4(%esp)
 	jmp 1b
 2:
 	addl $8, %esp
