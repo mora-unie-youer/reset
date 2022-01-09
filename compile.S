@@ -224,7 +224,6 @@ _expr:
 
 /* Parse and compile top-level expressions */
 _toplevel_expr:
-	/* TODO: implement expressions like identifiers, arguments and variables */
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
 	cmpw $TOKEN_ARGUMENT, token_tag
