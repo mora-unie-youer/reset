@@ -3,7 +3,7 @@
 # a0 - some argument
 foo: (a0) {
 	# We can allocate a local variable in stack
-	alloc(1);
+	allocate(1);
 	# Returning local variable
 	return x0;
 };
