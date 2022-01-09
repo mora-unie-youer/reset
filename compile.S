@@ -41,14 +41,39 @@ _syntax_error:
 	pushl $syntax_error
 	call print_error
 
+_strlen_escape:
+	xorl %eax, %eax /* length=0 */
+	movl 4(%esp), %ebx /* string */
+1:
+	/* Fetching char from string */
+	movb (%ebx), %cl
+	/* If char is \0, breaking the loop */
+	cmpb $0, %cl
+	je 2f
+	/* If escape code, skipping two chars */
+	cmpb $'\\, %cl
+	je 3f
+	/* Incrementing length, doing next iteration */
+	incl %ebx
+	incl %eax
+	jmp 1b
+2:
+	ret
+3:
+	incl %eax
+	addl $2, %ebx
+	jmp 1b
+
 /* String buffer */
 _push_string:
 	subl $8, %esp
 	movl 12(%esp), %eax /* string */
 	movl %eax, (%esp) /* Passing it as argument to strlen */
-	call strlen /* Get length of string */
-	incl %eax /* Between strings there are one byte - \0 */
+	call _strlen_escape /* Get length of string with escapes */
+	decl %eax /* Decrementing length because we remove last " char */
 	addl %eax, strbuf_offset /* New string offset = old offset + string length */
+	call strlen /* Get length of string without escapes */
+	decl %eax /* Decrementing length because we remove last " char */
 	addl strbuf_length, %eax /* New string buffer length */
 	cmpl $STRBUFSZ, %eax /* If new length > buffer size, erroring */
 	ja _string_literals
@@ -58,8 +83,14 @@ _push_string:
 	addl %ebx, %eax /* Calculating string offset */
 	movl %eax, (%esp) /* Using it as dest in strcpy */
 	movl 12(%esp), %eax /* string */
+	incl %eax /* Incrementing to skip first " char */
 	movl %eax, 4(%esp) /* Using it as src in strcpy */
 	call strcpy /* Copying string */
+	/* Removing last " char */
+	movl strbuf_length, %eax
+	addl $strbuf, %eax
+	decl %eax
+	movb $0, (%eax)
 	addl $8, %esp
 	ret
 /* Return address to next string */
@@ -102,8 +133,22 @@ _put_strings:
 	addl %eax, 4(%esp) /* adding length to offset */
 	/* Printing .string macro */
 	call string
+	/* Printing " */
+	pushl %eax
+	subl $1, %esp
+	movb $'", (%esp)
+	call putc
+	addl $1, %esp
+	popl %eax
 	/* Printing string */
 	call puts
+	/* Printing " */
+	pushl %eax
+	subl $1, %esp
+	movb $'", (%esp)
+	call putc
+	addl $1, %esp
+	popl %eax
 	call newline
 	/* Making next iteration */
 	incl 4(%esp)
