@@ -142,6 +142,7 @@ _function_definition:
 	/* Printing identifier */
 	movl %eax, (%esp)
 	call puts
+	call _pop_ident /* Removing identifier from stack */
 	/* Appending colon symbol */
 	movb $':, (%esp)
 	call putc
