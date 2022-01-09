@@ -89,3 +89,56 @@ enter_rodata_segment:
 	call _change_segment
 	addl $4, %esp
 	ret
+
+_newline:
+	subl $1, %esp /* newline_char */
+	movb $'\n, (%esp)
+	call putc /* printing char */
+	addl $1, %esp
+	ret
+
+/* Prints full pushl instruction */
+pushl:
+	subl $4, %esp /* pushl_text/register_text */
+	movl $pushl_text, (%esp)
+	call puts /* printing pushl instruction */
+	movl 8(%esp), %eax /* fetching register text */
+	movl %eax, (%esp)
+	call puts /* printing instruction */
+	call _newline
+	addl $4, %esp
+	ret
+
+/* Prints full popl instruction */
+popl:
+	subl $4, %esp /* popl_text/register_text */
+	movl $popl_text, (%esp)
+	call puts /* printing popl instruction */
+	movl 8(%esp), %eax /* fetching register text */
+	movl %eax, (%esp)
+	call puts /* printing instruction */
+	call _newline
+	addl $4, %esp
+	ret
+
+/* Creates pushl and popl instruction for register */
+.macro _push_pop reg
+.global pushl_\reg, popl_\reg
+pushl_\reg:
+	pushl $\reg\()_text
+	call pushl
+	addl $4, %esp
+	ret
+popl_\reg:
+	pushl $\reg\()_text
+	call popl
+	addl $4, %esp
+	ret
+.endm
+_push_pop eax
+_push_pop ebx
+_push_pop ecx
+_push_pop edx
+_push_pop esi
+_push_pop edi
+_push_pop ebp
