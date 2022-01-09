@@ -13,6 +13,7 @@ identbuf_depth: .long 0
 .section .rodata
 /* Error messages */
 identbuf_empty_error:    .string "Identifier stack is empty\n"
+identbuf_index_error:    .string "Identifier stack is smaller than index\n"
 identbuf_overflow_error: .string "Identifier stack overflow\n"
 string_literals_error:   .string "Too many string literals\n"
 syntax_error:            .string "Syntax error\n"
@@ -21,6 +22,9 @@ syntax_error:            .string "Syntax error\n"
 /* Errors */
 _identbuf_empty:
 	pushl $identbuf_empty_error
+	call print_error
+_identbuf_index:
+	pushl $identbuf_index_error
 	call print_error
 _identbuf_overflow:
 	pushl $identbuf_overflow_error
@@ -47,9 +51,19 @@ _push_ident:
 	addl $8, %esp
 	ret
 _pop_ident:
-	cmpl $0, identbuf_depth
+	cmpl $0, identbuf_depth /* If stack is empty, erroring */
 	je _identbuf_empty
-	decl identbuf_depth
+	decl identbuf_depth /* Decrementing depth */
+	ret
+_get_ident:
+	movl 4(%esp), %ebx /* Fetching index */
+	cmpl identbuf_depth, %ebx /* If index is bigger than depth, erroring */
+	jae _identbuf_index
+	movl identbuf_depth, %eax /* Fetching depth */
+	subl %ebx, %eax /* Storing difference */
+	decl %eax
+	imul $MAX_TOKEN_LEN, %eax /* Getting offset of identifier */
+	addl $identbuf, %eax /* Getting identifier address */
 	ret
 
 /* Entry point of compiler */
