@@ -72,8 +72,7 @@ too_long_token_string: .string "Too long token\n"
 undefined_token_string: .string "Undefined token\n"
 
 .data
-.equ MAX_TOKEN_LEN, 128 /* NOTE: in future may be changed */
-
+/* Token attributes */
 .comm token_text, MAX_TOKEN_LEN, 1
 .global token_tag, token_len, token_val
 token_tag: .short 0

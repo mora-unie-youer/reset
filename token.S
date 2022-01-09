@@ -20,3 +20,6 @@
 .equ TOKEN_GE,         270 /* >= */
 /* End of token */
 .equ TOKEN_END,        271
+
+/* Maximum token size */
+.equ MAX_TOKEN_LEN, 128 /* NOTE: in future may be changed */
