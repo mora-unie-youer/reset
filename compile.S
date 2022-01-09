@@ -233,6 +233,27 @@ _function_block:
 
 /* Parse and compile function call */
 _function_call:
+	call _function_call_args
+	/* TODO: push args */
+	/* TODO: call function */
+	ret
+
+/* Parse function call arguments */
+_function_call_args:
+	subl $4, %esp   /* number of args */
+	movl $0, (%esp) /* count=0 */
+	/* Checking if current token is (. If not, _syntax_error */
+	cmpw $'(, token_tag
+	jne _syntax_error
+	/* Fetching next token */
+	call lex
+	/* Checking if current token is ). If so, exitting. */
+	cmpw $'), token_tag
+	je 2f
+1:
+	/* TODO: argument parsing */
+2:
+	addl $4, %esp
 	ret
 
 /* Parse and compile consant expressions */
