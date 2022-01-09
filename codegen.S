@@ -1,5 +1,3 @@
-.include "token.S"
-
 .data
 /* Program segments */
 .equ TEXT_SEGMENT, 0
