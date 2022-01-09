@@ -227,7 +227,11 @@ _toplevel_expr:
 	/* TODO: implement expressions like identifiers, arguments and variables */
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
-	call _constant_expr
+	cmpw $TOKEN_ARGUMENT, token_tag
+	je 4f
+	cmpw $TOKEN_VARIABLE, token_tag
+	je 5f
+	call _simple_expr
 	ret
 1:
 	pushl $token_text
@@ -240,16 +244,21 @@ _toplevel_expr:
 	cmpw $'(, token_tag
 	je _function_call
 	cmpw $'[, token_tag
-	je 4f
+	je 2f
 	cmpw $'=, token_tag
-	je 5f
+	je 3f
 	/* If none of above listed, erroring */
 	call _syntax_error
-4:
+2:
 	/* TODO: implement variable offsetting (indexing) */
-	ret
-5:
+3:
 	/* TODO: implement identifier assigning */
+4:
+	/* TODO: implement argument parsing */
+5:
+	/* TODO: implement varibale parsing */
+6:
+	/* Exit point of _toplevel_expr */
 	ret
 
 /* Parse and compile function definition */
@@ -409,6 +418,30 @@ _function_call_args:
 2:
 	movl (%esp), %eax
 	addl $4, %esp
+	ret
+
+/* Parse and compile 'simple' expressions */
+_simple_expr:
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	je 1f
+	cmpw $TOKEN_ARGUMENT, token_tag
+	je 2f
+	cmpw $TOKEN_VARIABLE, token_tag
+	je 3f
+	cmpw $TOKEN_SYSCALL, token_tag
+	je 4f
+	call _constant_expr
+	jmp 5f
+1:
+	/* TODO: implement identifier parsing */
+2:
+	/* TODO: implement argument parsing */
+3:
+	/* TODO: implement variable parsing */
+4:
+	/* TODO: implement syscall parsing */
+5:
+	/* Exit point of _simple_expr */
 	ret
 
 /* Parse and compile consant expressions */
