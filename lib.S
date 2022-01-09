@@ -192,6 +192,27 @@ strcmp:
 	leave
 	ret
 
+/* Copy one string to another */
+.global strcpy
+strcpy:
+	pushl %ebp
+	movl %esp, %ebp
+	/* Two strings in arguments */
+	movl 8(%ebp), %eax /* dest */
+	movl 12(%ebp), %ebx /* src */
+1:
+	movb (%ebx), %cl
+	movb %cl, (%eax) /* Copying char */
+	cmpb $0, %cl /* Checking if string ended */
+	je 1f
+	/* Making next iteration */
+	incl %eax
+	incl %ebx
+	jmp 1b
+1:
+	leave
+	ret
+
 .global exit
 exit:
 	movl $0x1, %eax    /* syscall=0x1 (exit) */
