@@ -234,7 +234,11 @@ _function_block:
 /* Parse and compile function call */
 _function_call:
 	call _function_call_args
+	/* If no arguments passed, go to function calling */
+	cmpl $0, %eax
+	je 1f
 	/* TODO: push args */
+1:
 	/* TODO: call function */
 	ret
 
@@ -253,6 +257,7 @@ _function_call_args:
 1:
 	/* TODO: argument parsing */
 2:
+	movl (%esp), %eax
 	addl $4, %esp
 	ret
 
