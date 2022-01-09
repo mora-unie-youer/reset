@@ -208,6 +208,13 @@ _function_block:
 	/* Fetching next token */
 	call lex
 1:
+	/* If token is ;, we should skip it. */
+	cmpw $';, token_tag
+	jne 2f
+	/* Fetching new token, and trying again */
+	call lex
+	jmp 1b
+2:
 	/* If token is }, exitting */
 	cmpw $'}, token_tag
 	je 1f
