@@ -222,6 +222,7 @@ strlen:
 	/* Fetching char from string */
 	movb (%ebx), %cl
 	/* If char is \0, breaking the loop */
+	cmpb $0, %cl
 	je 1f
 	/* Incrementing length, doing next iteration */
 	incl %ebx
