@@ -4,8 +4,11 @@
 /* String literals buffer */
 .equ STRBUFSZ, 16384 /* NOTE: may be changed in future */
 .comm strbuf, STRBUFSZ, 1
+/* Offset to current string */
 strbuf_offset: .long 0
+/* Current string buffer length */
 strbuf_length: .long 0
+strbuf_text:   .string "strbuf"
 
 /* Identifier stack */
 .equ IDENTBUFSZ, 16
@@ -41,7 +44,18 @@ _syntax_error:
 /* String buffer */
 _push_string:
 	ret
+/* Return address to current string */
 _get_string:
+	subl $4, %esp
+	movl $strbuf_text, (%esp) /* Base address is located at this label */
+	call puts
+	movb $'+, (%esp) /* We want to add offset */
+	call putc
+	/* Print current string offset */
+	movl strbuf_offset, %eax
+	movl %eax, (%esp)
+	call putd
+	addl $4, %esp
 	ret
 _put_strings:
 	ret
