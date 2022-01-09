@@ -4,6 +4,8 @@
 /* String literals buffer */
 .equ STRBUFSZ, 16384 /* NOTE: may be changed in future */
 .comm strbuf, STRBUFSZ, 1
+strbuf_offset: .long 0
+strbuf_length: .long 0
 
 /* Identifier stack */
 .equ IDENTBUFSZ, 16
@@ -35,6 +37,14 @@ _string_literals:
 _syntax_error:
 	pushl $syntax_error
 	call print_error
+
+/* String buffer */
+_push_string:
+	ret
+_get_string:
+	ret
+_put_strings:
+	ret
 
 /* Identifier stack */
 _push_ident:
