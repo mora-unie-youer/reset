@@ -213,3 +213,39 @@ enter_stack:
 	call ebp
 	call _newline
 	ret
+
+_address_stack:
+	subl $1, %esp
+	movb $'(, (%esp)
+	call putc
+	call ebp
+	movb $'), (%esp)
+	call putc
+	addl $1, %esp
+	ret
+
+/* Variables definition */
+.global argument, variable
+argument:
+	subl $4, %esp /* string_var/char_var/number_var */
+	movl 8(%esp), %eax /* number of argument */
+	addl $2, %eax /* we have to skip 2 places in stack */
+	imul $4, %eax /* getting offset in stack */
+	movl %eax, (%esp)
+	call putd /* printing offset */
+	call _address_stack /* we are applying offset to stack */
+	addl $4, %esp
+	ret
+variable:
+	subl $4, %esp /* string_var/char_var/number_var */
+	movl $'-, %eax /* variables are on negative side */
+	movb %al, (%esp)
+	call putc /* printing minus sign */
+	movl 8(%esp), %eax /* number of argument */
+	addl $1, %eax /* we have to offset 4 bytes for variable */
+	imul $4, %eax /* getting offset in stack */
+	movl %eax, (%esp)
+	call putd /* printing offset */
+	call _address_stack /* we are applying offset to stack */
+	addl $4, %esp
+	ret
