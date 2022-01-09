@@ -110,13 +110,13 @@ _toplevel_expr:
 	addl $4, %esp
 	/* Checking, what is the next character */
 	call lex
-	cmpl $':, token_tag
+	cmpw $':, token_tag
 	je 2f
-	cmpl $'(, token_tag
+	cmpw $'(, token_tag
 	je 3f
-	cmpl $'[, token_tag
+	cmpw $'[, token_tag
 	je 4f
-	cmpl $'=, token_tag
+	cmpw $'=, token_tag
 	je 5f
 	/* If none of above listed, erroring */
 	call _syntax_error
