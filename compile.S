@@ -4,7 +4,7 @@
 /* String literals buffer */
 .equ STRBUFSZ, 16384 /* NOTE: may be changed in future */
 .comm strbuf, STRBUFSZ, 1
-/* Offset to current string */
+/* Offset to next string */
 strbuf_offset: .long 0
 /* Current string buffer length */
 strbuf_length: .long 0
@@ -43,15 +43,32 @@ _syntax_error:
 
 /* String buffer */
 _push_string:
+	subl $8, %esp
+	movl 12(%esp), %eax /* string */
+	movl %eax, (%esp) /* Passing it as argument to strlen */
+	call strlen /* Get length of string */
+	addl %eax, strbuf_offset /* New string offset = old offset + string length */
+	addl strbuf_length, %eax /* New string buffer length */
+	cmpl $STRBUFSZ, %eax /* If new length > buffer size, erroring */
+	ja _string_literals
+	movl strbuf_length, %ebx /* Old string buffer length */
+	movl %eax, strbuf_length /* Storing new buffer length */
+	movl $strbuf, %eax /* Storing base address to %eax */
+	addl %ebx, %eax /* Calculating string offset */
+	movl %eax, (%esp) /* Using it as dest in strcpy */
+	movl 12(%esp), %eax /* string */
+	movl %eax, 4(%esp) /* Using it as src in strcpy */
+	call strcpy /* Copying string */
+	addl $8, %esp
 	ret
-/* Return address to current string */
-_get_string:
+/* Return address to next string */
+_get_string_address:
 	subl $4, %esp
 	movl $strbuf_text, (%esp) /* Base address is located at this label */
 	call puts
 	movb $'+, (%esp) /* We want to add offset */
 	call putc
-	/* Print current string offset */
+	/* Print next string offset */
 	movl strbuf_offset, %eax
 	movl %eax, (%esp)
 	call putd
