@@ -17,6 +17,7 @@ rodata_text:   .string ".section .rodata\n"
 /* Assembler instructions */
 /* GAS macros */
 comm_text:     .string ".comm "
+global_text:   .string ".global "
 long_text:     .string ".long "
 string_text:   .string ".string "
 /* Arithmetic/bit operations */
@@ -152,6 +153,11 @@ _push_pop ebp
 	addl $4, %esp
 	ret
 .endm
+/* GAS macros */
+_keyword comm
+_keyword global
+_keyword long
+_keyword string
 /* Arithmetic/bit operations */
 _keyword addl
 _keyword subl
