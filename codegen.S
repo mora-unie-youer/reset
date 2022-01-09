@@ -101,7 +101,7 @@ _newline:
 /* Print comma char */
 _comma:
 	subl $1, %esp /* comma_char */
-	movb $'\n, (%esp)
+	movb $',, (%esp)
 	call putc /* printing char */
 	addl $1, %esp
 	ret
