@@ -91,8 +91,16 @@ enter_rodata_segment:
 	addl $4, %esp
 	ret
 
+/* Print newline char */
 _newline:
 	subl $1, %esp /* newline_char */
+	movb $'\n, (%esp)
+	call putc /* printing char */
+	addl $1, %esp
+	ret
+/* Print comma char */
+_comma:
+	subl $1, %esp /* comma_char */
 	movb $'\n, (%esp)
 	call putc /* printing char */
 	addl $1, %esp
