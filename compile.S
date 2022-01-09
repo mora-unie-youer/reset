@@ -74,7 +74,39 @@ _get_string_address:
 	call putd
 	addl $4, %esp
 	ret
+/* Put strings to compiled file */
 _put_strings:
+	subl $8, %esp /* str/char, offset */
+	/* If buffer is empty, exitting */
+	cmpl $0, strbuf_length
+	je 2f
+	/* String are in rodata segment */
+	call enter_rodata_segment
+	/* Printing base address label */
+	movl $strbuf_text, (%esp)
+	call puts
+	movb $':, (%esp)
+	call putc
+	call newline
+	movl $0, 4(%esp)
+1:
+	/* Checking if all buffer was printed. If so, exitting */
+	movl 4(%esp), %eax
+	cmpl %eax, strbuf_length
+	je 2f
+	movl 4(%esp), %eax /* string */
+	addl $strbuf, %eax /* Getting address of the string */
+	movl %eax, (%esp) /* passing string as argument */
+	call strlen /* getting length of the string */
+	addl %eax, 4(%esp) /* adding length to offset */
+	/* Printing .string macro */
+	call string
+	/* Printing string */
+	call puts
+	call newline
+	jmp 1b
+2:
+	addl $8, %esp
 	ret
 
 /* Identifier stack */
@@ -130,6 +162,8 @@ compile:
 	cmpw $TOKEN_END, token_tag
 	jne 2b
 1:
+	/* After all, put string buffer */
+	call _put_strings
 	ret
 
 /* Parse and compile expressions */
