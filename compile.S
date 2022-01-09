@@ -48,6 +48,27 @@ compile:
 1:
 	ret
 
-/* Parse and compile expression */
+/* Parse and compile expressions */
 _expr:
+	/* TODO: implement expressions like if, else, allocate in this function */
+	call _toplevel_expr
 	ret
+
+/* Parse and compile top-level expressions */
+_toplevel_expr:
+	/* TODO: implement expressions like identifiers, arguments and variables */
+	call _simple_expr
+	ret
+
+/* Parse and compile 'simple' expressions */
+_simple_expr:
+	/* TODO: implement expressions like function calling */
+	call _constant_expr
+	ret
+
+/* Parse and compile consant expressions */
+_constant_expr:
+	/* TODO: implement expressions like integers and strings */
+
+	/* If nothing was parsed, syntax erroring */
+	call _syntax_error
