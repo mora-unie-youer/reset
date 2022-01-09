@@ -91,15 +91,16 @@ enter_rodata_segment:
 	addl $4, %esp
 	ret
 
+.global newline, comma
 /* Print newline char */
-_newline:
+newline:
 	subl $1, %esp /* newline_char */
 	movb $'\n, (%esp)
 	call putc /* printing char */
 	addl $1, %esp
 	ret
 /* Print comma char */
-_comma:
+comma:
 	subl $1, %esp /* comma_char */
 	movb $',, (%esp)
 	call putc /* printing char */
@@ -114,7 +115,7 @@ _pushl:
 	movl 8(%esp), %eax /* fetching register text */
 	movl %eax, (%esp)
 	call puts /* printing instruction */
-	call _newline
+	call newline
 	addl $4, %esp
 	ret
 
@@ -126,7 +127,7 @@ _popl:
 	movl 8(%esp), %eax /* fetching register text */
 	movl %eax, (%esp)
 	call puts /* printing instruction */
-	call _newline
+	call newline
 	addl $4, %esp
 	ret
 
@@ -209,9 +210,9 @@ enter_stack:
 	call pushl_ebp
 	call movl
 	call esp
-	call _comma
+	call comma
 	call ebp
-	call _newline
+	call newline
 	ret
 
 _address_stack:
