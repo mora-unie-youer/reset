@@ -113,16 +113,13 @@ _toplevel_expr:
 	cmpw $':, token_tag
 	je _function_definition
 	cmpw $'(, token_tag
-	je 3f
+	je _function_call
 	cmpw $'[, token_tag
 	je 4f
 	cmpw $'=, token_tag
 	je 5f
 	/* If none of above listed, erroring */
 	call _syntax_error
-3:
-	/* TODO: implement function call */
-	ret
 4:
 	/* TODO: implement variable offsetting (indexing) */
 	ret
@@ -232,6 +229,10 @@ _function_block:
 	/* Trying to exit. Checking if token is }. If not, erroring */
 	cmpw $'}, token_tag
 	jne _syntax_error
+	ret
+
+/* Parse and compile function call */
+_function_call:
 	ret
 
 /* Parse and compile consant expressions */
