@@ -100,13 +100,37 @@ _expr:
 /* Parse and compile top-level expressions */
 _toplevel_expr:
 	/* TODO: implement expressions like identifiers, arguments and variables */
-	call _simple_expr
-	ret
-
-/* Parse and compile 'simple' expressions */
-_simple_expr:
-	/* TODO: implement expressions like function calling */
+	movw $TOKEN_IDENTIFIER, token_tag
+	je 1f
 	call _constant_expr
+	ret
+1:
+	pushl $token_text
+	call _push_ident /* Pushing identifier to stack */
+	addl $4, %esp
+	/* Checking, what is the next character */
+	call lex
+	cmpl $':, token_tag
+	je 2f
+	cmpl $'(, token_tag
+	je 3f
+	cmpl $'[, token_tag
+	je 4f
+	cmpl $'=, token_tag
+	je 5f
+	/* If none of above listed, erroring */
+	call _syntax_error
+2:
+	/* TODO: implement function definition */
+	ret
+3:
+	/* TODO: implement function call */
+	ret
+4:
+	/* TODO: implement variable offsetting (indexing) */
+	ret
+5:
+	/* TODO: implement identifier assigning */
 	ret
 
 /* Parse and compile consant expressions */
