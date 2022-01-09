@@ -252,12 +252,45 @@ variable:
 	ret
 
 /* Print value literal */
+.global value
 value:
-	subl $4, %esp
+	subl $4, %esp /* char/value */
 	movb $'$, (%esp)
 	call putc /* Printing dollar sign */
 	movl 8(%esp), %eax /* loading value */
 	movl %eax, (%esp)
 	call putd /* printing number */
+	addl $4, %esp
+	ret
+
+/* Labels */
+.global label, label_def, label_address
+/* Print label name */
+label:
+	subl $4, %esp /* label_text/label_id */
+	movl $label_text, (%esp)
+	call puts /* printing label_text */
+	movl 8(%esp), %eax /* fetching label_id */
+	movl %eax, (%esp)
+	call putd /* printing label_id */
+	addl $4, %esp
+	ret
+/* Define label */
+label_def:
+	subl $4, %esp /* label_id/char */
+	movl 8(%esp), %eax /* fetching label_id */
+	movl %eax, (%esp)
+	call label /* printing label name */
+	movb $':, (%esp)
+	call putc /* printing colon symbol */
+	addl $4, %esp
+	ret
+label_address:
+	subl $4, %esp /* char/label_id */
+	movb $'$, (%esp)
+	call putc /* printing dollar sign */
+	movl 8(%esp), %eax /* fetching label_id */
+	movl %eax, (%esp)
+	call label /* printing label name */
 	addl $4, %esp
 	ret
