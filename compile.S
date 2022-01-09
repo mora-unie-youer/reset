@@ -425,24 +425,54 @@ _simple_expr:
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
 	cmpw $TOKEN_ARGUMENT, token_tag
-	je 2f
+	je _return_argument
 	cmpw $TOKEN_VARIABLE, token_tag
-	je 3f
+	je _return_variable
 	cmpw $TOKEN_SYSCALL, token_tag
-	je 4f
+	je 2f
 	call _constant_expr
-	jmp 5f
+	jmp 3f
 1:
 	/* TODO: implement identifier parsing */
+	pushl $token_text
+	call _push_ident /* Pushing identifier to stack */
+	addl $4, %esp
+	/* Checking, what is the next character */
+	call lex
+	cmpw $'(, token_tag
+	je _function_call
+	/* If none of above listed, erroring */
+	call _syntax_error
 2:
-	/* TODO: implement argument parsing */
-3:
-	/* TODO: implement variable parsing */
-4:
 	/* TODO: implement syscall parsing */
-5:
+	jmp 3f
+3:
 	/* Exit point of _simple_expr */
 	ret
+
+/* Parse and compile argument */
+_return_argument:
+	/* Constructing `movl` instruction */
+	call movl
+	pushl token_val
+	call argument
+	addl $4, %esp
+	call comma
+	call eax
+	call newline
+	jmp 3b
+
+/* Parse and compile variable */
+_return_variable:
+	/* Constructing `movl` instruction */
+	call movl
+	pushl token_val
+	call variable
+	addl $4, %esp
+	call comma
+	call eax
+	call newline
+	jmp 3b
 
 /* Parse and compile consant expressions */
 _constant_expr:
