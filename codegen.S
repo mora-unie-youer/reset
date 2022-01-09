@@ -250,3 +250,14 @@ variable:
 	call _address_stack /* we are applying offset to stack */
 	addl $4, %esp
 	ret
+
+/* Print value literal */
+value:
+	subl $4, %esp
+	movb $'$, (%esp)
+	call putc /* Printing dollar sign */
+	movl 8(%esp), %eax /* loading value */
+	movl %eax, (%esp)
+	call putd /* printing number */
+	addl $4, %esp
+	ret
