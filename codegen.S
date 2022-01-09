@@ -57,8 +57,8 @@ edi_text:       .string "%edi"
 esp_text:       .string "%esp"
 ebp_text:       .string "%ebp"
 
-.text
 
+.text
 _change_segment:
 	pushl %ebp
 	movl %esp, %ebp
@@ -97,8 +97,8 @@ _newline:
 	addl $1, %esp
 	ret
 
-/* Prints full pushl instruction */
-pushl:
+/* Prints full pushl instruction (with register) */
+_pushl:
 	subl $4, %esp /* pushl_text/register_text */
 	movl $pushl_text, (%esp)
 	call puts /* printing pushl instruction */
@@ -109,8 +109,8 @@ pushl:
 	addl $4, %esp
 	ret
 
-/* Prints full popl instruction */
-popl:
+/* Prints full popl instruction (with register) */
+_popl:
 	subl $4, %esp /* popl_text/register_text */
 	movl $popl_text, (%esp)
 	call puts /* printing popl instruction */
@@ -126,12 +126,12 @@ popl:
 .global pushl_\reg, popl_\reg
 pushl_\reg:
 	pushl $\reg\()_text
-	call pushl
+	call _pushl
 	addl $4, %esp
 	ret
 popl_\reg:
 	pushl $\reg\()_text
-	call popl
+	call _popl
 	addl $4, %esp
 	ret
 .endm
@@ -142,3 +142,49 @@ _push_pop edx
 _push_pop esi
 _push_pop edi
 _push_pop ebp
+
+/* Creates function that prints instruction/register */
+.macro _keyword keyword
+.global \keyword
+\keyword:
+	pushl $\keyword\()_text
+	call puts
+	addl $4, %esp
+	ret
+.endm
+/* Arithmetic/bit operations */
+_keyword addl
+_keyword subl
+_keyword imul
+_keyword idiv
+_keyword negl
+_keyword shll
+_keyword shrl
+_keyword andl
+_keyword orl
+_keyword xorl
+_keyword notl
+/* Calls/functions/jumps */
+_keyword call
+_keyword int
+_keyword leave
+_keyword ret
+_keyword jmp
+_keyword je
+/* Stack */
+_keyword pushf
+_keyword pushl
+_keyword popl
+/* Register/memory operations */
+_keyword decl
+_keyword incl
+_keyword movl
+/* Registers */
+_keyword eax
+_keyword ebx
+_keyword ecx
+_keyword edx
+_keyword esi
+_keyword edi
+_keyword esp
+_keyword ebp
