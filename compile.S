@@ -367,7 +367,8 @@ _function_call_args:
 _constant_expr:
 	cmpw $TOKEN_INTEGER, token_tag
 	je _constant_expr_integer
-	/* TODO: string parsing */
+	cmpw $TOKEN_STRING, token_tag
+	je _constant_expr_string
 	/* If nothing was parsed, syntax erroring */
 	call _syntax_error
 
@@ -380,4 +381,21 @@ _constant_expr_integer:
 	call comma
 	call eax
 	call newline
+	ret
+
+_constant_expr_string:
+	/* Storing string address to %eax */
+	subl $1, %esp /* char */
+	call movl /* Printing movl instruction */
+	movb $'$, (%esp)
+	call putc /* Printing dollar sign */
+	addl $1, %esp
+	call _get_string_address /* Print string address */
+	call comma
+	call eax
+	call newline
+	/* Store new string in buffer */
+	pushl $token_text
+	call _push_string
+	addl $4, %esp
 	ret
