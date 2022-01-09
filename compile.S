@@ -152,7 +152,14 @@ _function_definition:
 	call newline
 	/* Parsing function arguments */
 	call _function_args
+	/* Initializing stack pointer */
+	call enter_stack
 	/* TODO: parse function content */
+	/* Leaving the function */
+	call leave
+	call newline
+	call ret
+	call newline
 	ret
 
 /* Parse function arguments */
