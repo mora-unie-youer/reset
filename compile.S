@@ -218,8 +218,42 @@ compile:
 
 /* Parse and compile expressions */
 _expr:
-	/* TODO: implement expressions like if, else, allocate in this function */
+	cmpw $TOKEN_IF, token_tag
+	je _if_expr
+	cmpw $TOKEN_ELSE, token_tag
+	je _else_expr
+	cmpw $TOKEN_WHILE, token_tag
+	je _while_expr
+	cmpw $TOKEN_ALLOCATE, token_tag
+	je _allocate_expr
+	cmpw $TOKEN_SYSCALL, token_tag
+	je _syscall_expr
 	call _toplevel_expr
+	ret
+
+/* Parse and compile if expression */
+_if_expr:
+	/* TODO: implement `if` expression parsing */
+	ret
+
+/* Parse and compile else expression */
+_else_expr:
+	/* TODO: implement `else` expression parsing */
+	ret
+
+/* Parse and compile while expression */
+_while_expr:
+	/* TODO: implement `while` expression parsing */
+	ret
+
+/* Parse and compile allocate expression */
+_allocate_expr:
+	/* TODO: implement `allocate` expression parsing */
+	ret
+
+/* Parse and compile syscall expression */
+_syscall_expr:
+	/* TODO: implement `syscall` expression parsing */
 	ret
 
 /* Parse and compile top-level expressions */
