@@ -523,6 +523,25 @@ _xor_expr:
 _and_expr:
 	/* Fetching first operand */
 	call _equal_expr
+1:
+	/* Trying to parse '&' (and) expression */
+	call lex /* Fetching next token */
+	cmpw $'&, token_tag /* If token is not '&', exitting */
+	jne 1f
+	/* Contructing 'andl' instruction */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _equal_expr /* Fetching second operand in %eax */
+	call popl_ebx /* Loading first operand in %ebx */
+	call andl
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '^' (xor) expression again */
+	jmp 1b
+1:
+	call lex_hold
 	ret
 
 /* Try to parse '==' and '!=' expressions. */
