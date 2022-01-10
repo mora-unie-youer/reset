@@ -538,7 +538,7 @@ _and_expr:
 	call comma
 	call eax
 	call newline
-	/* Trying to parse '^' (xor) expression again */
+	/* Trying to parse '&' (and) expression again */
 	jmp 1b
 1:
 	call lex_hold
@@ -666,7 +666,7 @@ _compare_expr:
 	call comma
 	call eax
 	call newline
-	/* Trying to parse '==' or '!=' expressions again */
+	/* Trying to parse '<', '>', '<=' or '>=' expressions again */
 	jmp 1b
 	ret
 
@@ -674,7 +674,47 @@ _compare_expr:
 _add_sub_expr:
 	/* Fetching first operand */
 	call _mul_div_mod_expr
+1:
+	/* Checking if token is '+' or '-'. If not, exitting */
+	call lex
+	cmpw $'+, token_tag
+	je 2f
+	cmpw $'-, token_tag
+	je 3f
+	/* Exitting */
+	call lex_hold
 	ret
+2:
+	/* Parsing '+' expression */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _mul_div_mod_expr /* Fetching second operand in %eax */
+	call popl_ebx /* Loading first operand in %ebx */
+	call addl
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '+' or '-' expressions again */
+	jmp 1b
+3:
+	/* Parsing '-' expression */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _mul_div_mod_expr /* Fetching second operand in %eax */
+	call movl /* Loading second operand in %ebx */
+	call eax
+	call comma
+	call ebx
+	call newline
+	call popl_eax /* Loading first operand in %eax */
+	call subl
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '+' or '-' expressions again */
+	jmp 1b
 
 /* Try to parse '*', '/', '%' expressions. */
 _mul_div_mod_expr:
