@@ -471,7 +471,7 @@ _function_call_args:
 
 /* Try to parse '|' (or) expression. */
 _or_expr:
-	/* Trying to parse '^' (xor) expression because of order of operations */
+	/* Fetching first operand */
 	call _xor_expr
 1:
 	/* Trying to parse '|' (or) expression */
@@ -496,36 +496,62 @@ _or_expr:
 
 /* Try to parse '^' (xor) expression. */
 _xor_expr:
+	/* Fetching first operand */
 	call _and_expr
+1:
+	/* Trying to parse '^' (xor) expression */
+	call lex /* Fetching next token */
+	cmpw $'^, token_tag /* If token is not '^', exitting */
+	jne 1f
+	/* Contructing 'xorl' instruction */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _and_expr /* Fetching second operand in %eax */
+	call popl_ebx /* Loading first operand in %ebx */
+	call xorl
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '^' (xor) expression again */
+	jmp 1b
+1:
+	call lex_hold
 	ret
 
 /* Try to parse '&' (and) expression. */
 _and_expr:
+	/* Fetching first operand */
 	call _equal_expr
 	ret
 
 /* Try to parse '==' and '!=' expressions. */
 _equal_expr:
+	/* Fetching first operand */
 	call _compare_expr
 	ret
 
 /* Try to parse '<', '>', '<=', '>=' expressions. */
 _compare_expr:
+	/* Fetching first operand */
 	call _add_sub_expr
 	ret
 
 /* Try to parse '+', '-' expressions. */
 _add_sub_expr:
+	/* Fetching first operand */
 	call _mul_div_mod_expr
 	ret
 
 /* Try to parse '*', '/', '%' expressions. */
 _mul_div_mod_expr:
+	/* Fetching first operand */
 	call _prefix_expr
 	ret
 
 /* Try to parse '+', '-', '~', '*', '&' prefix expressions. */
 _prefix_expr:
+	/* Fetching operand */
 	call _simple_expr
 	ret
 
