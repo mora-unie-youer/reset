@@ -463,8 +463,21 @@ _function_call_args:
 	cmpw $'), token_tag
 	je 2f
 1:
-	/* TODO: argument parsing */
+	/* Parsing argument */
+	incl (%esp) /* Incrementing counter */
+	call _or_expr /* Parsing expression in it */
+	call pushl_eax /* Pushing result of expression to stack */
+	/* Checking if next token is ,. If not, trying to exit. */
+	call lex
+	cmpw $',, token_tag
+	jne 2f
+	/* Making next iteration */
+	call lex
+	jmp 1b
 2:
+	/* If function call is not ended with ), erroring */
+	cmpw $'), token_tag
+	jne _syntax_error
 	movl (%esp), %eax
 	addl $4, %esp
 	ret
