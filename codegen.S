@@ -30,6 +30,7 @@ andl_text:     .string "\tandl "
 orl_text:      .string "\torl "
 xorl_text:     .string "\txorl "
 notl_text:     .string "\tnotl "
+cmpl_text:     .string "\tcmpl "
 /* Calls/functions/jumps */
 call_text:     .string "\tcall "
 int_text:      .string "\tint "
@@ -187,6 +188,7 @@ _keyword andl
 _keyword orl
 _keyword xorl
 _keyword notl
+_keyword cmpl
 /* Calls/functions/jumps */
 _keyword call
 _keyword int
