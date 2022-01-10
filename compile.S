@@ -469,17 +469,37 @@ _function_call_args:
 	addl $4, %esp
 	ret
 
-/* Try to parse 'or' expression. */
+/* Try to parse '|' (or) expression. */
 _or_expr:
+	/* Trying to parse '^' (xor) expression because of order of operations */
 	call _xor_expr
+1:
+	/* Trying to parse '|' (or) expression */
+	call lex /* Fetching next token */
+	cmpw $'|, token_tag /* If token is not '|', exitting */
+	jne 1f
+	/* Contructing 'orl' instruction */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _xor_expr /* Fetching second operand in %eax */
+	call popl_ebx /* Loading first operand in %ebx */
+	call orl
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '|' (or) expression again */
+	jmp 1b
+1:
+	call lex_hold
 	ret
 
-/* Try to parse 'xor' expression. */
+/* Try to parse '^' (xor) expression. */
 _xor_expr:
 	call _and_expr
 	ret
 
-/* Try to parse 'and' expression. */
+/* Try to parse '&' (and) expression. */
 _and_expr:
 	call _equal_expr
 	ret
