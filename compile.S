@@ -539,6 +539,8 @@ _simple_expr:
 	je _return_variable
 	cmpw $TOKEN_SYSCALL, token_tag
 	je 2f
+	cmpw $'(, token_tag
+	je _parse_parantheses
 	call _constant_expr
 	jmp 3f
 1:
@@ -581,6 +583,19 @@ _return_variable:
 	call comma
 	call eax
 	call newline
+	jmp 3b
+
+/* Parse parantheses */
+_parse_parantheses:
+	/* Fetching next token */
+	call lex
+	/* Fetching next expression */
+	call _or_expr
+	/* Fetching next token */
+	call lex
+	/* Checking if token is ). If not, erroring */
+	cmpw $'), token_tag
+	jne _syntax_error
 	jmp 3b
 
 /* Parse and compile consant expressions */
