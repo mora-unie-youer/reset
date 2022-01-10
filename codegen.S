@@ -46,15 +46,22 @@ popl_text:     .string "\tpopl "
 decl_text:     .string "\tdecl "
 incl_text:     .string "\tincl "
 movl_text:     .string "\tmovl "
+/* Flag operations */
+setg_text:     .string "\tsetg "
+setge_text:    .string "\tsetge "
+setl_text:     .string "\tsetl "
+setle_text:    .string "\tsetle "
+sete_text:     .string "\tsete "
+setne_text:    .string "\tsetne "
 /* Registers */
-eax_text:       .string "%eax"
-ebx_text:       .string "%ebx"
-ecx_text:       .string "%ecx"
-edx_text:       .string "%edx"
-esi_text:       .string "%esi"
-edi_text:       .string "%edi"
-esp_text:       .string "%esp"
-ebp_text:       .string "%ebp"
+eax_text:      .string "%eax"
+ebx_text:      .string "%ebx"
+ecx_text:      .string "%ecx"
+edx_text:      .string "%edx"
+esi_text:      .string "%esi"
+edi_text:      .string "%edi"
+esp_text:      .string "%esp"
+ebp_text:      .string "%ebp"
 
 
 .text
@@ -192,6 +199,13 @@ _keyword popl
 _keyword decl
 _keyword incl
 _keyword movl
+/* Flag operations */
+_keyword setg
+_keyword setge
+_keyword setl
+_keyword setle
+_keyword sete
+_keyword setne
 /* Registers */
 _keyword eax
 _keyword ebx
