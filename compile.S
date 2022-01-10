@@ -821,7 +821,21 @@ _prefix_expr:
 	call newline
 	ret
 4:
-	/* TODO: implement '*' (dereferencing) prefix */
+	/* Parsing '*' (dereferencing) prefix */
+	subl $1, %esp /* char */
+	call lex
+	call _simple_expr /* Parsing expression to dereference */
+	/* Constructing instruction */
+	call movl
+	movb $'(, (%esp)
+	call putc
+	call eax
+	movb $'), (%esp)
+	call putc
+	call comma
+	call eax
+	call newline
+	addl $1, %esp
 	ret
 5:
 	/* TODO: implement '&' (addressof) prefix */
