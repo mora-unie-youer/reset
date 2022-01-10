@@ -838,7 +838,64 @@ _prefix_expr:
 	addl $1, %esp
 	ret
 5:
-	/* TODO: implement '&' (addressof) prefix */
+	/* Parsing '&' (addressof) prefix */
+	/* If next token is not identifier, argument or variable, erroring */
+	call lex
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	je 1f
+	cmpw $TOKEN_ARGUMENT, token_tag
+	je 2f
+	cmpw $TOKEN_VARIABLE, token_tag
+	jne _syntax_error
+	jmp 3f
+1:
+	/* Parsing addressof identifier */
+	subl $4, %esp /* char/str */
+	call movl
+	movb $'$, (%esp)
+	call putc
+	movl $token_text, (%esp)
+	call puts
+	call comma
+	call eax
+	call newline
+	addl $4, %esp
+	ret
+2:
+	/* Parsing addressof argument */
+	call movl /* Loading current stack offset value in %eax */
+	call ebp
+	call comma
+	call eax
+	call newline
+	call addl /* Adding to offset to get argument address */
+	movl token_val, %eax
+	addl $2, %eax
+	imul $4, %eax /* Offset of argument */
+	pushl %eax
+	call value
+	addl $4, %esp
+	call comma
+	call eax
+	call newline
+	ret
+3:
+	/* Parsing addressof variable */
+	call movl /* Loading current stack offset value in %eax */
+	call ebp
+	call comma
+	call eax
+	call newline
+	call subl /* Subtracting to offset to get argument address */
+	movl token_val, %eax
+	incl %eax
+	imul $4, %eax /* Offset of argument */
+	pushl %eax
+	call value
+	addl $4, %esp
+	call comma
+	call eax
+	call newline
 	ret
 
 /* Parse and compile 'simple' expressions */
