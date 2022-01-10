@@ -599,8 +599,75 @@ _equal_expr:
 
 /* Try to parse '<', '>', '<=', '>=' expressions. */
 _compare_expr:
+	/* NOTE: comparisons are signed. To add unsigned, we need to use more set*
+	 * instructions, what is not efficient in Assembler implementation. In
+	 * bootstrapped version I guess I will add unsigned comparison */
 	/* Fetching first operand */
 	call _add_sub_expr
+1:
+	/* Checking if token is '<', '>', '<=' or '>='. If not, exitting */
+	call lex
+	cmpw $'<, token_tag
+	je 2f
+	cmpw $'>, token_tag
+	je 2f
+	cmpw $TOKEN_LE, token_tag
+	je 2f
+	cmpw $TOKEN_GE, token_tag
+	je 2f
+	/* Exitting */
+	call lex_hold
+	ret
+2:
+	subl $2, %esp /* op_type */
+	movw token_tag, %ax
+	movw %ax, (%esp)
+	/* Parsing expression */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _add_sub_expr /* Fetching second operand in %eax */
+	call movl /* Loading second operand in %ebx */
+	call eax
+	call comma
+	call ebx
+	call newline
+	call popl_eax /* Restoring first operand */
+	call cmpl /* Comparing operands */
+	call eax
+	call comma
+	call ebx
+	call newline
+	/* If op is '<', setting less flag. */
+	/* If op is '>', setting greater flag. */
+	/* If op is '<=', setting less or equal flag. */
+	/* If op is '>=', setting greater or equal flag. */
+	cmpw $'<, (%esp)
+	je 2f
+	cmpw $'>, (%esp)
+	je 3f
+	cmpw $TOKEN_LE, (%esp)
+	je 4f
+	call setge /* Setting greater or equal flag */
+	jmp 5f
+2:
+	call setl /* Setting less flag */
+	jmp 5f
+3:
+	call setg /* Setting greater flag */
+	jmp 5f
+4:
+	call setle /* Setting less or equal flag */
+5:
+	addl $2, %esp /* We don't need op_type now */
+	call al /* Setting flag in %al */
+	call newline
+	call movzbl /* Move %al to %eax with zeroing */
+	call al
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '==' or '!=' expressions again */
+	jmp 1b
 	ret
 
 /* Try to parse '+', '-' expressions. */
