@@ -784,8 +784,47 @@ _mul_div_mod_expr:
 
 /* Try to parse '+', '-', '~', '*', '&' prefix expressions. */
 _prefix_expr:
-	/* Fetching operand */
+	cmpw $'+, token_tag
+	je 1f
+	cmpw $'-, token_tag
+	je 2f
+	cmpw $'~, token_tag
+	je 3f
+	cmpw $'*, token_tag
+	je 4f
+	cmpw $'&, token_tag
+	je 5f
+	/* Using _simple_expr if no prefix found */
 	call _simple_expr
+	ret
+1:
+	/* Parsing '+' prefix by simply skipping it */
+	call lex
+	call _simple_expr
+	ret
+2:
+	/* Parsing '-' prefix */
+	call lex
+	call _simple_expr
+	/* 'negl' on %eax */
+	call negl
+	call eax
+	call newline
+	ret
+3:
+	/* Parsing '~' prefix */
+	call lex
+	call _simple_expr
+	/* 'notl' on %eax */
+	call notl
+	call eax
+	call newline
+	ret
+4:
+	/* TODO: implement '*' (dereferencing) prefix */
+	ret
+5:
+	/* TODO: implement '&' (addressof) prefix */
 	ret
 
 /* Parse and compile 'simple' expressions */
