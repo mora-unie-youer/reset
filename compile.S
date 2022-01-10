@@ -548,6 +548,53 @@ _and_expr:
 _equal_expr:
 	/* Fetching first operand */
 	call _compare_expr
+1:
+	/* Checking if token is '==' or '!='. If not, exitting */
+	call lex
+	cmpw $TOKEN_EQUAL, token_tag
+	je 2f
+	cmpw $TOKEN_NOTEQUAL, token_tag
+	je 2f
+	/* Exitting */
+	call lex_hold
+	ret
+2:
+	subl $2, %esp /* op_type */
+	movw token_tag, %ax
+	movw %ax, (%esp)
+	/* Parsing expression */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _compare_expr /* Fetching second operand in %eax */
+	call movl /* Loading second operand in %ebx */
+	call eax
+	call comma
+	call ebx
+	call newline
+	call popl_eax /* Restoring first operand */
+	call cmpl /* Comparing operands */
+	call eax
+	call comma
+	call ebx
+	call newline
+	/* If op is '==', setting equal flag. Otherwise (!=), not equal flag. */
+	cmpw $TOKEN_NOTEQUAL, (%esp)
+	je 2f
+	call sete /* Setting equal flag */
+	jmp 3f
+2:
+	call setne /* Setting not equal flag */
+3:
+	addl $2, %esp /* We don't need op_type now */
+	call al /* Setting flag in %al */
+	call newline
+	call movzbl /* Move %al to %eax with zeroing */
+	call al
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '==' or '!=' expressions again */
+	jmp 1b
 	ret
 
 /* Try to parse '<', '>', '<=', '>=' expressions. */
