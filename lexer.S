@@ -68,6 +68,7 @@ syscall_text:  .string "syscall"
 line_string: .string "line "
 error_string: .string ": ERROR: "
 /* Error messages */
+hold_error_string: .string "Trying to hold two or more tokens\n"
 too_long_token_string: .string "Too long token\n"
 undefined_token_string: .string "Undefined token\n"
 
@@ -79,9 +80,12 @@ token_tag: .short 0
 token_len: .long 0
 token_val: .long 0
 
+/* Current source line */
 .global line
 line: .long 1
 
+/* Hold current token on `lex` calling */
+hold: .byte 0
 
 .text
 /* Print line */
@@ -118,6 +122,9 @@ print_error:
 	call exit
 
 /* Errors (they are not returning, so no reason writing `ret`) */
+_hold_error:
+	pushl $hold_error_string
+	call print_error
 _too_long_token:
 	pushl $too_long_token_string
 	call print_error
@@ -189,10 +196,27 @@ s13_next: .long  s3,  s3,  s3,  s3, s14, s14, s14, s14, s14, s14,  s3
 s15_next: .long  s3,  s3, s15, s15, s15, s15, s15, s15, s16, s17, s15
 s17_next: .long  s3,  s3,  s3,  s3, s15, s15, s15, s15, s15, s15,  s3
 
+/* Hold current token on `lex` calling */
+.global lex_hold
+lex_hold:
+	/* If already holding, erroring */
+	cmpb $0, hold
+	jne _hold_error
+	/* Setting holding to 'true' */
+	movb $1, hold
+	ret
+
 .global lex
 lex:
 	pushl %ebp
 	movl %esp, %ebp
+	/* Checking if we need to hold the token */
+	cmpb $1, hold
+	jne s0 /* Start lexing, if not */
+	/* Unsetting `hold` and returning */
+	movb $0, hold
+	leave
+	ret
 /* Entry point of lexer */
 s0:
 	movl $0, token_len
