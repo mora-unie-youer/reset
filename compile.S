@@ -718,9 +718,69 @@ _add_sub_expr:
 
 /* Try to parse '*', '/', '%' expressions. */
 _mul_div_mod_expr:
+	/* NOTE: for now, there is only integer division */
 	/* Fetching first operand */
 	call _prefix_expr
+1:
+	/* Checking if token is '*', '/' or '%'. If not, exitting */
+	call lex
+	cmpw $'*, token_tag
+	je 2f
+	cmpw $'/, token_tag
+	je 3f
+	cmpw $'%, token_tag
+	je 3f
+	/* Exitting */
+	call lex_hold
 	ret
+2:
+	/* Parsing '*' expression */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _prefix_expr /* Fetching second operand in %eax */
+	call popl_ebx /* Loading first operand in %ebx */
+	call imul
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Trying to parse '*', '/' or '%' expressions again */
+	jmp 1b
+3:
+	subl $2, %esp /* op_code */
+	movw token_tag, %ax
+	movw %ax, (%esp)
+	/* Parsing '/' or '%' expression */
+	call pushl_eax /* Backing up first operand */
+	call lex /* Fetching next token */
+	call _prefix_expr /* Fetching second operand in %eax */
+	call movl /* Loading second operand in %ebx */
+	call eax
+	call comma
+	call ebx
+	call newline
+	call popl_eax /* Loading first operand in %eax */
+	call xorl /* Zeroing %edx */
+	call edx
+	call comma
+	call edx
+	call newline
+	call idiv /* Making division */
+	call ebx
+	call newline
+	/* If op was '/', skipping storing modulus in %eax */
+	cmpw $'/, (%esp)
+	je 3f
+	/* Storing modulus in %eax */
+	call movl
+	call edx
+	call comma
+	call eax
+	call newline
+3:
+	addl $2, %esp /* op_code is not needed anymore */
+	/* Trying to parse '*', '/' or '%' expressions again */
+	jmp 1b
 
 /* Try to parse '+', '-', '~', '*', '&' prefix expressions. */
 _prefix_expr:
