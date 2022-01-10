@@ -469,6 +469,46 @@ _function_call_args:
 	addl $4, %esp
 	ret
 
+/* Try to parse 'or' expression. */
+_or_expr:
+	call _xor_expr
+	ret
+
+/* Try to parse 'xor' expression. */
+_xor_expr:
+	call _and_expr
+	ret
+
+/* Try to parse 'and' expression. */
+_and_expr:
+	call _equal_expr
+	ret
+
+/* Try to parse '==' and '!=' expressions. */
+_equal_expr:
+	call _compare_expr
+	ret
+
+/* Try to parse '<', '>', '<=', '>=' expressions. */
+_compare_expr:
+	call _add_sub_expr
+	ret
+
+/* Try to parse '+', '-' expressions. */
+_add_sub_expr:
+	call _mul_div_mod_expr
+	ret
+
+/* Try to parse '*', '/', '%' expressions. */
+_mul_div_mod_expr:
+	call _prefix_expr
+	ret
+
+/* Try to parse '+', '-', '~', '*', '&' prefix expressions. */
+_prefix_expr:
+	call _simple_expr
+	ret
+
 /* Parse and compile 'simple' expressions */
 _simple_expr:
 	cmpw $TOKEN_IDENTIFIER, token_tag
