@@ -911,7 +911,7 @@ _prefix_expr:
 	call newline
 	ret
 
-/* Parse and compile 'simple' expressions */
+/* Parse and compile expressions that return some result */
 _simple_expr:
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
@@ -920,11 +920,11 @@ _simple_expr:
 	cmpw $TOKEN_VARIABLE, token_tag
 	je _return_variable
 	cmpw $TOKEN_SYSCALL, token_tag
-	je 2f
+	je _syscall_expr
 	cmpw $'(, token_tag
 	je _parse_parantheses
 	call _constant_expr
-	jmp 3f
+	jmp 2f
 1:
 	/* TODO: implement identifier parsing */
 	pushl $token_text
@@ -937,9 +937,6 @@ _simple_expr:
 	/* If none of above listed, erroring */
 	call _syntax_error
 2:
-	/* TODO: implement syscall parsing */
-	jmp 3f
-3:
 	/* Exit point of _simple_expr */
 	ret
 
@@ -953,7 +950,7 @@ _return_argument:
 	call comma
 	call eax
 	call newline
-	jmp 3b
+	jmp 2b
 
 /* Parse and compile variable */
 _return_variable:
@@ -965,7 +962,7 @@ _return_variable:
 	call comma
 	call eax
 	call newline
-	jmp 3b
+	jmp 2b
 
 /* Parse parantheses */
 _parse_parantheses:
