@@ -15,6 +15,9 @@ strbuf_text:   .string "strbuf"
 .comm identbuf, MAX_TOKEN_LEN * IDENTBUFSZ, 1
 identbuf_depth: .long 0
 
+/* Label ID */
+label_id: .long 0
+
 .section .rodata
 /* Error messages */
 identbuf_empty_error:    .string "Identifier stack is empty\n"
@@ -40,6 +43,12 @@ _string_literals:
 _syntax_error:
 	pushl $syntax_error
 	call print_error
+
+/* Fetch label ID and increment it */
+_label_id:
+	movl label_id, %eax
+	incl label_id
+	ret
 
 _strlen_escape:
 	xorl %eax, %eax /* length=0 */
