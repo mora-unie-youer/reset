@@ -269,6 +269,31 @@ _if_expr:
 	call newline
 	/* Parsing 'if' block */
 	call _block
+	/* Parsing 'else' expression. (If it is not there, we have to hold token) */
+	call lex
+	cmpw $TOKEN_ELSE, token_tag
+	jne 1f
+	/* Compiling 'else' expression */
+	call jmp
+	call _label_id
+	movl %eax, (%esp)
+	call label
+	call newline
+	/* Defining 'else' label */
+	movl 4(%esp), %eax /* Exchanging 'if' label and 'else' label in stack */
+	movl (%esp), %ebx
+	movl %ebx, 4(%esp)
+	movl %eax, (%esp)
+	call label_def
+	call newline
+	/* Parsing 'else' block */
+	call _block
+	/* Ending 'if'/'else' expression */
+	jmp 2f
+1:
+	/* Holding token, fetched when tried to parse 'else' */
+	call lex_hold
+2:
 	/* Ending 'if' expression */
 	movl 4(%esp), %eax
 	movl %eax, (%esp)
