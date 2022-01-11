@@ -229,8 +229,6 @@ compile:
 _expr:
 	cmpw $TOKEN_IF, token_tag
 	je _if_expr
-	cmpw $TOKEN_ELSE, token_tag
-	je _else_expr
 	cmpw $TOKEN_WHILE, token_tag
 	je _while_expr
 	cmpw $TOKEN_ALLOCATE, token_tag
@@ -242,12 +240,41 @@ _expr:
 
 /* Parse and compile if expression */
 _if_expr:
-	/* TODO: implement `if` expression parsing */
-	ret
-
-/* Parse and compile else expression */
-_else_expr:
-	/* TODO: implement `else` expression parsing */
+	subl $8, %esp /* zero, ID */
+	/* Allocating label for branches */
+	call _label_id
+	movl %eax, 4(%esp)
+	/* Checking 'if' expression correctness */
+	call lex
+	cmpw $'(, token_tag
+	jne _syntax_error
+	/* Parsing condition */
+	call lex
+	call _or_expr
+	/* Checking 'if' expression correctness again */
+	call lex
+	cmpw $'), token_tag
+	jne _syntax_error
+	/* Compiling 'if' expression */
+	call cmpl /* Comparing result to zero */
+	movl $0, (%esp)
+	call value
+	call comma
+	call eax
+	call newline
+	call je /* Jump if equal */
+	movl 4(%esp), %eax /* Printing label_id */
+	movl %eax, (%esp)
+	call label
+	call newline
+	/* Parsing 'if' block */
+	call _block
+	/* Ending 'if' expression */
+	movl 4(%esp), %eax
+	movl %eax, (%esp)
+	call label_def
+	call newline
+	addl $8, %esp
 	ret
 
 /* Parse and compile while expression */
@@ -327,6 +354,42 @@ _syscall_expr:
 	addl $4, %esp
 	ret
 
+/* Parse and compile block */
+_block:
+	/* Fetching next token */
+	call lex
+	/* Checking if token is {. If not, erroring */
+	cmpw $'{, token_tag
+	jne _syntax_error
+	/* Fetching next token */
+	call lex
+1:
+	/* If token is ;, we should skip it. */
+	cmpw $';, token_tag
+	jne 2f
+	/* Fetching new token, and trying again */
+	call lex
+	jmp 1b
+2:
+	/* If token is }, exitting */
+	cmpw $'}, token_tag
+	je 1f
+	/* Parsing and compiling expression */
+	call _expr
+	/* Fetching next token */
+	call lex
+	/* If token is not ;, and not }, it's syntax error. Trying to exit */
+	cmpw $';, token_tag
+	jne 1f
+	/* Fetching next token and iterating again */
+	call lex
+	jmp 1b
+1:
+	/* Trying to exit. Checking if token is }. If not, erroring */
+	cmpw $'}, token_tag
+	jne _syntax_error
+	ret
+
 /* Parse and compile top-level expressions */
 _toplevel_expr:
 	cmpw $TOKEN_IDENTIFIER, token_tag
@@ -391,7 +454,7 @@ _function_definition:
 	/* Initializing stack pointer */
 	call enter_stack
 	/* Parse function content */
-	call _function_block
+	call _block
 	/* Leaving the function */
 	call leave
 	call newline
@@ -432,42 +495,6 @@ _function_args:
 	/* Returning argument count */
 	movl (%esp), %eax
 	addl $4, %esp
-	ret
-
-/* Parse and compile function block */
-_function_block:
-	/* Fetching next token */
-	call lex
-	/* Checking if token is {. If not, erroring */
-	cmpw $'{, token_tag
-	jne _syntax_error
-	/* Fetching next token */
-	call lex
-1:
-	/* If token is ;, we should skip it. */
-	cmpw $';, token_tag
-	jne 2f
-	/* Fetching new token, and trying again */
-	call lex
-	jmp 1b
-2:
-	/* If token is }, exitting */
-	cmpw $'}, token_tag
-	je 1f
-	/* Parsing and compiling expression */
-	call _expr
-	/* Fetching next token */
-	call lex
-	/* If token is not ;, and not }, it's syntax error. Trying to exit */
-	cmpw $';, token_tag
-	jne 1f
-	/* Fetching next token and iterating again */
-	call lex
-	jmp 1b
-1:
-	/* Trying to exit. Checking if token is }. If not, erroring */
-	cmpw $'}, token_tag
-	jne _syntax_error
 	ret
 
 /* Parse and compile function call */
