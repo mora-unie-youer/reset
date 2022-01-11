@@ -270,6 +270,52 @@ _allocate_expr:
 /* Parse and compile syscall expression */
 _syscall_expr:
 	/* TODO: implement `syscall` expression parsing */
+	subl $4, %esp /* interrupt number */
+	/* Backing up some registers */
+	call pushl_esi
+	call pushl_edi
+	call pushl_ebp
+	/* Parsing syscall arguments */
+	call lex
+	call _function_call_args
+	/* In %eax number of args stored. Depending on count, loading needed regs */
+	cmpl $7, %eax
+	je 1f
+	cmpl $6, %eax
+	je 2f
+	cmpl $5, %eax
+	je 3f
+	cmpl $4, %eax
+	je 4f
+	cmpl $3, %eax
+	je 5f
+	cmpl $2, %eax
+	je 6f
+	jmp 7f
+1:
+	call popl_ebp
+2:
+	call popl_edi
+3:
+	call popl_esi
+4:
+	call popl_edx
+5:
+	call popl_ecx
+6:
+	call popl_ebx
+7:
+	call popl_eax
+	/* Constructing 'int $0x80' */
+	call int
+	movl $0x80, (%esp)
+	call value
+	call newline
+	/* Restoring registers */
+	call popl_ebp
+	call popl_edi
+	call popl_esi
+	addl $4, %esp
 	ret
 
 /* Parse and compile top-level expressions */
