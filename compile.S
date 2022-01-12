@@ -523,7 +523,7 @@ _toplevel_expr:
 	call _or_expr /* Value stored in %eax */
 	/* Storing base address and offset (index) in %ebx and %ecx */
 	call popl_ecx
-	call popl_edx
+	call popl_ebx
 
 	/* *(%ebx + 4*%ecx) = %eax */
 	call imul
