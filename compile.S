@@ -19,6 +19,7 @@ identbuf_depth: .long 0
 label_id: .long 0
 
 .section .rodata
+entry_point: .string "_start"
 /* Error messages */
 identbuf_empty_error:    .string "Identifier stack is empty\n"
 identbuf_index_error:    .string "Identifier stack is smaller than index\n"
@@ -201,6 +202,12 @@ _get_ident:
 compile:
 	/* We start at .text segment */
 	call enter_text_segment
+	/* Defining entry point function as global */
+	call global
+	pushl $entry_point
+	call puts
+	addl $4, %esp
+	call newline
 	/* Read first token */
 	call lex
 	/* If EOF, ending */
