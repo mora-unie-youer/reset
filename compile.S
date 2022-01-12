@@ -383,7 +383,6 @@ _allocate_expr:
 
 /* Parse and compile syscall expression */
 _syscall_expr:
-	/* TODO: implement `syscall` expression parsing */
 	subl $4, %esp /* interrupt number */
 	/* Backing up some registers */
 	call pushl_esi
