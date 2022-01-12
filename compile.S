@@ -494,7 +494,7 @@ _toplevel_expr:
 	/* If none of above listed, erroring */
 	call _syntax_error
 2:
-	/* Parsing identifier indexing */
+	/* Parse identifier indexing */
 	subl $4, %esp /* int/zero */
 	/* Loading identifier address in %eax */
 	call movl
@@ -549,7 +549,22 @@ _toplevel_expr:
 	addl $4, %esp
 	ret
 3:
-	/* TODO: implement identifier assigning */
+	/* Parse identifier assigning */
+	/* Fetching value which we assign to */
+	call lex
+	call _or_expr
+	/* Compiling */
+	call movl
+	call eax
+	call comma
+	pushl $0
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	addl $4, %esp
+	call _pop_ident
+	call newline
+	ret
 4:
 	/* TODO: implement argument parsing */
 5:
