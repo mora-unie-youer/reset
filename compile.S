@@ -1135,7 +1135,7 @@ _parse_parantheses:
 	/* Checking if token is ). If not, erroring */
 	cmpw $'), token_tag
 	jne _syntax_error
-	jmp 3b
+	jmp 2b
 
 /* Parse and compile consant expressions */
 _constant_expr:
