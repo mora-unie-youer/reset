@@ -311,7 +311,53 @@ _if_expr:
 
 /* Parse and compile while expression */
 _while_expr:
-	/* TODO: implement `while` expression parsing */
+	subl $12, %esp /* zero/label_id, label_id1, label_id2 */
+	/* Allocating two labels for loop */
+	call _label_id
+	movl %eax, 8(%esp)
+	call _label_id
+	movl %eax, 4(%esp)
+	/* Start of loop (start of label_id1) */
+	movl %eax, (%esp)
+	call label_def
+	call newline
+	/* Checking 'while' expression correctness */
+	call lex
+	cmpw $'(, token_tag
+	jne _syntax_error
+	/* Parsing condition */
+	call lex
+	call _or_expr
+	/* Checking 'while' expression correctness again */
+	call lex
+	cmpw $'), token_tag
+	jne _syntax_error
+	/* Compiling 'while' expression */
+	call cmpl /* Comparing result to zero */
+	movl $0, (%esp)
+	call value
+	call comma
+	call eax
+	call newline
+	call je /* Jump if equal */
+	movl 8(%esp), %eax /* Printing label_id */
+	movl %eax, (%esp)
+	call label
+	call newline
+	/* Parsing 'while' block */
+	call _block
+	/* Compiling 'while' expression end */
+	call jmp
+	movl 4(%esp), %eax
+	movl %eax, (%esp)
+	call label
+	call newline
+	/* End of 'while' label */
+	movl 8(%esp), %eax
+	movl %eax, (%esp)
+	call label_def
+	call newline
+	addl $12, %esp
 	ret
 
 /* Parse and compile allocate expression */
