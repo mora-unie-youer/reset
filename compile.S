@@ -494,7 +494,60 @@ _toplevel_expr:
 	/* If none of above listed, erroring */
 	call _syntax_error
 2:
-	/* TODO: implement variable offsetting (indexing) */
+	/* Parsing identifier indexing */
+	subl $4, %esp /* int/zero */
+	/* Loading identifier address in %eax */
+	call movl
+	movl $0, (%esp)
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	call _pop_ident
+	call comma
+	call eax
+	call newline
+	call pushl_eax /* Backing up address */
+	/* Fetching expression in 'index' */
+	call lex
+	call _or_expr
+	call pushl_eax
+	/* Checking if it is correct expression */
+	call lex
+	cmpw $'], token_tag
+	jne _syntax_error
+	call lex
+	cmpw $'=, token_tag
+	jne _syntax_error
+	/* Parsing value to set */
+	call lex
+	call _or_expr /* Value stored in %eax */
+	/* Storing base address and offset (index) in %ebx and %ecx */
+	call popl_ecx
+	call popl_edx
+
+	/* *(%ebx + 4*%ecx) = %eax */
+	call imul
+	movl $4, (%esp)
+	call value
+	call comma
+	call ecx
+	call newline
+	call addl /* Adding 4*%ecx to %ebx */
+	call ecx
+	call comma
+	call ebx
+	call newline
+	call movl /* *(%ebx) = %eax */
+	call eax
+	call comma
+	movb $'(, (%esp)
+	call putc
+	call ebx
+	movb $'), (%esp)
+	call putc
+	call newline
+	addl $4, %esp
+	ret
 3:
 	/* TODO: implement identifier assigning */
 4:
