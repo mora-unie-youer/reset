@@ -19,7 +19,6 @@ identbuf_depth: .long 0
 label_id: .long 0
 
 .section .rodata
-entry_point: .string "_start"
 /* Error messages */
 identbuf_empty_error:    .string "Identifier stack is empty\n"
 identbuf_index_error:    .string "Identifier stack is smaller than index\n"
@@ -202,12 +201,6 @@ _get_ident:
 compile:
 	/* We start at .text segment */
 	call enter_text_segment
-	/* Defining entry point function as global */
-	call global
-	pushl $entry_point
-	call puts
-	addl $4, %esp
-	call newline
 	/* Read first token */
 	call lex
 	/* If EOF, ending */
@@ -242,6 +235,8 @@ _expr:
 	je _allocate_expr
 	cmpw $TOKEN_SYSCALL, token_tag
 	je _syscall_expr
+	cmpw $TOKEN_GLOBAL, token_tag
+	je _global_expr
 	call _toplevel_expr
 	ret
 
@@ -429,6 +424,22 @@ _syscall_expr:
 	call popl_edi
 	call popl_esi
 	addl $4, %esp
+	ret
+
+/* Parse and compile global expression */
+_global_expr:
+	/* TODO: implement multiple identifier exporting */
+	/* Parsing in .global macro */
+	call global
+	/* Fetching next token */
+	call lex
+	/* Checking if token is identifier */
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	jne _syntax_error
+	pushl $token_text
+	call puts
+	addl $4, %esp
+	call newline
 	ret
 
 /* Parse and compile block */
