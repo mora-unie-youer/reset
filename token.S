@@ -13,15 +13,15 @@
 .equ TOKEN_ALLOCATE,   264
 .equ TOKEN_RETURN,     265
 .equ TOKEN_SYSCALL,    266
-/* Symbols */
-.equ TOKEN_EQUAL,      267 /* == */
-.equ TOKEN_NOTEQUAL,   268 /* != */
-.equ TOKEN_LE,         269 /* <= */
-.equ TOKEN_GE,         270 /* >= */
 /* Labels */
-.equ TOKEN_GLOBAL,     271
-.equ TOKEN_GOTO,       272
-.equ TOKEN_LABEL,      273
+.equ TOKEN_GLOBAL,     267
+.equ TOKEN_GOTO,       268
+.equ TOKEN_LABEL,      269
+/* Symbols */
+.equ TOKEN_EQUAL,      270 /* == */
+.equ TOKEN_NOTEQUAL,   271 /* != */
+.equ TOKEN_LE,         272 /* <= */
+.equ TOKEN_GE,         273 /* >= */
 /* End of token */
 .equ TOKEN_END,        274
 
