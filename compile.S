@@ -233,6 +233,8 @@ _expr:
 	je _while_expr
 	cmpw $TOKEN_ALLOCATE, token_tag
 	je _allocate_expr
+	cmpw $TOKEN_RETURN, token_tag
+	je _return_expr
 	cmpw $TOKEN_SYSCALL, token_tag
 	je _syscall_expr
 	cmpw $TOKEN_GLOBAL, token_tag
@@ -373,6 +375,29 @@ _allocate_expr:
 	call eax
 	call comma
 	call esp
+	call newline
+	ret
+
+/* Parse and compile return expression */
+_return_expr:
+	/* Fetching next token */
+	call lex
+	/* If just semicolon, exitting */
+	cmpw $';, token_tag
+	je 1f
+	/* Returning value */
+	call _or_expr
+	call leave
+	call newline
+	call ret
+	call newline
+	ret
+1:
+	/* Holding token */
+	call lex_hold
+	call leave
+	call newline
+	call ret
 	call newline
 	ret
 
