@@ -709,6 +709,56 @@ _function_args:
 	addl $4, %esp
 	ret
 
+/* Parse and compile address call */
+_address_call:
+	subl $8, %esp /* arg, args_count */
+	call pushl_eax
+	movl $0, 4(%esp) /* args_count */
+	call _function_call_args
+	movl %eax, 4(%esp) /* Store number of arguments */
+	cmpl $0, %eax
+	je 1f
+	movl %eax, (%esp)
+	call _function_call_push_args
+1:
+	call movl
+	/* Calculating offset in stack */
+	movl 4(%esp), %eax
+	imul $8, %eax
+	movl %eax, (%esp)
+	call putd
+	/* Stack addressing */
+	movb $'(, (%esp)
+	call putc
+	call esp
+	movb $'), (%esp)
+	call putc
+	call comma
+	call eax
+	call newline
+	/* Calling address */
+	movl $'*, (%esp)
+	call putc
+	call eax
+	call newline
+	/* If args_count != 0, fixing% esp */
+	movl 4(%esp), %eax
+	cmpl $0, %eax
+	je 1f
+	/* Fixing stack pointer */
+	call addl
+	movl 4(%esp), %eax
+	imul $8, %eax
+	addl $4, %eax
+	movl %eax, (%esp)
+	call value
+	call comma
+	call esp
+	call newline
+1:
+	addl $8, %esp
+	ret
+
 /* Parse and compile function call */
 _function_call:
 	subl $8, %esp
