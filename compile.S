@@ -428,12 +428,43 @@ _syscall_expr:
 
 /* Parse and compile global expression */
 _global_expr:
-	/* TODO: implement multiple identifier exporting */
 	/* Parsing in .global macro */
 	call global
 	/* Fetching next token */
 	call lex
-	/* Checking if token is identifier */
+	/* Checking if token is (. If not, trying to compile one export */
+	cmpw $'(, token_tag
+	jne 1f
+	/* Parsing identifier list */
+	subl $4, %esp /* char/text */
+	/* Fetching next token */
+	call lex
+2:
+	/* Checking if token is identifier. If not, erroring */
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	jne _syntax_error
+	movl $token_text, (%esp) /* Printing identifier name */
+	call puts
+	/* Fetching next token */
+	call lex
+	/* Checking if token is ,. If not, trying to exit. */
+	cmpw $',, token_tag
+	jne 2f
+	/* Printing , char */
+	movb $',, (%esp)
+	call putc
+	/* Fetching next char and making next iteration */
+	call lex
+	jmp 2b
+2:
+	/* Checking if token is ). If not, erroring */
+	cmpw $'), token_tag
+	jne _syntax_error
+	call newline
+	addl $4, %esp
+	ret
+1:
+	/* Checking if token is identifier. If not, erroring */
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	jne _syntax_error
 	pushl $token_text
