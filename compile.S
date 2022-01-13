@@ -734,7 +734,7 @@ _function_call:
 	/* As we passed arguments, we must fix stack */
 	call addl
 	movl 4(%esp), %eax /* loading number of arguments */
-	imul $4, %eax /* each argument takes 4 bytes */
+	imul $8, %eax
 	movl %eax, (%esp)
 	/* Finishing instruction */
 	call value
