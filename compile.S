@@ -692,7 +692,8 @@ _function_call:
 	/* If no arguments passed, go to function calling */
 	cmpl $0, %eax
 	je 1f
-	/* TODO: push args */
+	movl %eax, (%esp)
+	call _function_call_push_args
 1:
 	/* Printing call instruction */
 	call call
@@ -749,6 +750,72 @@ _function_call_args:
 	jne _syntax_error
 	movl (%esp), %eax
 	addl $4, %esp
+	ret
+
+/* Push function call arguments to stack */
+_function_call_push_args:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $8, %esp /* arg, counter */
+
+	/* Allocate stack frame */
+	call subl
+	movl 8(%ebp), %eax
+	imul $4, %eax
+	movl %eax, (%esp) /* Amount of bytes to allocate */
+	call value
+	call comma
+	call esp
+	call newline
+	/* Copying arguments */
+	movl $0, -4(%ebp) /* counter=0 */
+1:
+	/* Checking if counter == number of argument. If so, exitting */
+	movl 8(%ebp), %eax
+	movl -4(%ebp), %ebx
+	cmpl %eax, %ebx
+	je 1f
+	/* Constructing instructions */
+	call movl
+	/* Calculating offset in stack */
+	movl 8(%ebp), %eax
+	imul $2, %eax
+	movl -4(%ebp), %ebx
+	subl %ebx, %eax
+	decl %eax
+	imul $4, %eax
+	movl %eax, (%esp)
+	call putd
+	/* Stack addressing */
+	movb $'(, (%esp)
+	call putc
+	call esp
+	movb $'), (%esp)
+	call putc
+	call comma
+	call eax
+	call newline
+	/* Storing argument in new place */
+	call movl
+	call eax
+	call comma
+	/* Calculating offset in stack */
+	movl -4(%ebp), %eax
+	imul $4, %eax
+	movl %eax, (%esp)
+	call putd
+	/* Stack addressing */
+	movb $'(, (%esp)
+	call putc
+	call esp
+	movb $'), (%esp)
+	call putc
+	call newline
+	/* Making next iteration */
+	incl -4(%ebp)
+	jmp 1b
+1:
+	leave
 	ret
 
 /* Try to parse '|' (or) expression. */
