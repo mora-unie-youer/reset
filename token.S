@@ -18,8 +18,12 @@
 .equ TOKEN_NOTEQUAL,   268 /* != */
 .equ TOKEN_LE,         269 /* <= */
 .equ TOKEN_GE,         270 /* >= */
+/* Labels */
+.equ TOKEN_GLOBAL,     271
+.equ TOKEN_GOTO,       272
+.equ TOKEN_LABEL,      273
 /* End of token */
-.equ TOKEN_END,        271
+.equ TOKEN_END,        274
 
 /* Maximum token size */
 .equ MAX_TOKEN_LEN, 128 /* NOTE: in future may be changed */

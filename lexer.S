@@ -54,6 +54,8 @@ reserved_words:
 	.long while_text
 	/* Functions */
 	.long allocate_text, return_text, syscall_text
+	/* Labels */
+	.long global_text, goto_text, label_text
 	/* End of list */
 	.long 0
 
@@ -63,6 +65,9 @@ while_text:    .string "while"
 allocate_text: .string "allocate"
 return_text:   .string "return"
 syscall_text:  .string "syscall"
+global_text:   .string "global"
+goto_text:     .string "goto"
+label_text:    .string "label"
 
 /* Messages */
 line_string: .string "line "
