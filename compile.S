@@ -1330,10 +1330,47 @@ _simple_expr:
 	call lex
 	cmpw $'(, token_tag
 	je _function_call
+	cmpw $'[, token_tag
+	je _return_array_value
 	/* If none of above listed, erroring */
 	call _syntax_error
 2:
 	/* Exit point of _simple_expr */
+	ret
+
+_return_array_value:
+	/* Parse identifier indexing */
+	subl $4, %esp /* int/char/zero */
+	/* Fetching expression in 'index' */
+	call lex
+	call _or_expr
+	call pushl_eax
+	/* Checking if it is correct expression */
+	call lex
+	cmpw $'], token_tag
+	jne _syntax_error
+	/* Storing index in %ebx */
+	call popl_ebx
+	/* Loading from identifier address + offset to %eax */
+	call movl
+	movl $0, (%esp)
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	call _pop_ident
+	movb $'(, (%esp)
+	call putc
+	call comma
+	call ebx
+	call comma
+	movl $4, (%esp)
+	call putd
+	movb $'), (%esp)
+	call putc
+	call comma
+	call eax
+	call newline
+	addl $4, %esp
 	ret
 
 /* Parse and compile argument */
