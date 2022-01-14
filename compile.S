@@ -562,18 +562,7 @@ _toplevel_expr:
 	call _syntax_error
 2:
 	/* Parse identifier indexing */
-	subl $4, %esp /* int/zero */
-	/* Loading identifier address in %eax */
-	call movl
-	movl $0, (%esp)
-	call _get_ident
-	movl %eax, (%esp)
-	call puts
-	call _pop_ident
-	call comma
-	call eax
-	call newline
-	call pushl_eax /* Backing up address */
+	subl $4, %esp /* int/char/zero */
 	/* Fetching expression in 'index' */
 	call lex
 	call _or_expr
@@ -588,28 +577,24 @@ _toplevel_expr:
 	/* Parsing value to set */
 	call lex
 	call _or_expr /* Value stored in %eax */
-	/* Storing base address and offset (index) in %ebx and %ecx */
-	call popl_ecx
+	/* Storing index in %ebx */
 	call popl_ebx
-
-	/* *(%ebx + 4*%ecx) = %eax */
-	call imul
-	movl $4, (%esp)
-	call value
-	call comma
-	call ecx
-	call newline
-	call addl /* Adding 4*%ecx to %ebx */
-	call ecx
-	call comma
-	call ebx
-	call newline
-	call movl /* *(%ebx) = %eax */
+	/* Loading from identifier address + offset to %eax */
+	call movl
 	call eax
 	call comma
+	movl $0, (%esp)
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	call _pop_ident
 	movb $'(, (%esp)
 	call putc
+	call comma
 	call ebx
+	call comma
+	movl $4, (%esp)
+	call putd
 	movb $'), (%esp)
 	call putc
 	call newline
