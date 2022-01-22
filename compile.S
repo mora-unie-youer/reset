@@ -1630,6 +1630,7 @@ _simple_expr:
 	cmpw $'[, token_tag
 	je _return_label_index_value
 	/* If none of above listed, reading value from label */
+	call lex_hold
 	jmp _return_label_value
 2:
 	/* Exit point of _simple_expr */
