@@ -936,6 +936,10 @@ _declaration:
 	je _array_declaration
 	cmpw $'(, token_tag
 	je _function_declaration
+	cmpw $TOKEN_CHAR, token_tag
+	je _reserved_char_array_declaration
+	cmpw $TOKEN_INT, token_tag
+	je _reserved_int_array_declaration
 
 	/* If none of above listed, parsing as global variable */
 	call enter_data_segment
@@ -1015,6 +1019,13 @@ _function_declaration:
 	call newline
 	call ret
 	call newline
+	ret
+
+_reserved_char_array_declaration:
+	/* TODO: implement char array reservation */
+	ret
+_reserved_int_array_declaration:
+	/* TODO: implement int array reservation */
 	ret
 
 /* Parse value */
