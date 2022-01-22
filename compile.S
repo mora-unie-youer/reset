@@ -593,6 +593,8 @@ _toplevel_expr:
 	je 2f
 	cmpw $'=, token_tag
 	je 3f
+	cmpw $TOKEN_ARROW, token_tag
+	je 12f
 	/* If none of above listed, erroring */
 	call _syntax_error
 2:
@@ -770,6 +772,46 @@ _toplevel_expr:
 	call eax
 	call newline
 	call _address_call
+	addl $4, %esp
+	ret
+12:
+	/* Parsing macro */
+	call equ
+	/* Fetching identifier */
+	pushl $0
+	call _get_ident
+	/* Printing identifier */
+	movl %eax, (%esp)
+	call puts
+	call _pop_ident
+	call comma
+	/* Setting value of macro */
+	call lex
+	cmpw $'-, token_tag
+	je 13f
+	cmpw $TOKEN_INTEGER, token_tag
+	je 14f
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	je 14f
+	addl $4, %esp
+	/* If value is not negative/integer/string, erroring */
+	jmp _syntax_error
+13:
+	movb $'-, (%esp)
+	call putc
+	call lex
+	cmpw $TOKEN_INTEGER, token_tag
+	je 14f
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	je 14f
+	addl $4, %esp
+	/* If value is not integer/string, erroring */
+	call _syntax_error
+14:
+	/* Printing macro value */
+	movl $token_text, (%esp)
+	call puts
+	call newline
 	addl $4, %esp
 	ret
 
