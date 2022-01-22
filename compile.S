@@ -244,6 +244,8 @@ _expr:
 	je _goto_expr
 	cmpw $TOKEN_LABEL, token_tag
 	je _label_expr
+	cmpw $TOKEN_WRITECHAR, token_tag
+	je _writechar_expr
 	call _toplevel_expr
 	ret
 
@@ -530,6 +532,56 @@ _label_expr:
 	movb $':, (%esp)
 	call putc
 	call newline
+	addl $4, %esp
+	ret
+
+/* Parse and compile 'writechar' expression */
+_writechar_expr:
+	subl $4, %esp
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'(, token_tag
+	jne _syntax_error
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	call pushl_eax
+	/* Checking for correct syntax */
+	call lex
+	cmpw $',, token_tag
+	jne _syntax_error
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Compiling address calculation */
+	call popl_ebx
+	call addl
+	call ebx
+	call comma
+	call eax
+	call newline
+	call pushl_eax
+	/* Checking for correct syntax */
+	call lex
+	cmpw $',, token_tag
+	jne _syntax_error
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Compiling writing to address */
+	call popl_ebx
+	call movb
+	call al
+	call comma
+	movb $'(, (%esp)
+	call putc
+	call ebx
+	movb $'), (%esp)
+	call putc
+	call newline
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'), token_tag
 	addl $4, %esp
 	ret
 
