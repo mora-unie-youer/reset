@@ -841,6 +841,19 @@ _declaration:
 	je _array_declaration
 	cmpw $'(, token_tag
 	je _function_declaration
+
+	/* If none of above listed, parsing as global variable */
+	call enter_data_segment
+	pushl $0
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	movb $':, (%esp)
+	call putc
+	addl $4, %esp
+	call long
+	call _simple_value
+	call newline
 	ret
 
 /* Parse and compile array declaration */
