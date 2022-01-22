@@ -1655,6 +1655,8 @@ _prefix_expr:
 _simple_expr:
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
+	cmpw $TOKEN_MACRO, token_tag
+	je 4f
 	cmpw $TOKEN_ARGUMENT, token_tag
 	je _return_argument
 	cmpw $TOKEN_VARIABLE, token_tag
@@ -1695,6 +1697,18 @@ _simple_expr:
 3:
 	call _address_call
 	jmp 2b
+4:
+	/* Using macro value */
+	call movl
+	pushl $'$
+	call putc
+	movl $token_text, (%esp)
+	call puts
+	call comma
+	call eax
+	call newline
+	addl $4, %esp
+	ret
 
 _return_label_value:
 	/* Reading value from label */
