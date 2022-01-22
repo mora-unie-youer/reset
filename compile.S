@@ -1364,12 +1364,26 @@ _simple_expr:
 	cmpw $'(, token_tag
 	je _function_call
 	cmpw $'[, token_tag
-	je _return_array_value
+	je _return_label_index_value
 	/* If none of above listed, reading value from label */
 	jmp _return_label_value
 2:
 	/* Exit point of _simple_expr */
+	/* Fetching next token */
+	call lex
+	/* Checking, what we should do now */
+	cmpw $'[, token_tag
+	je _return_array_value
+	cmpw $'{, token_tag
+	je _syntax_error
+	cmpw $'(, token_tag
+	je 3f
+	/* We don't have to do nothing - leaving. */
+	call lex_hold
 	ret
+3:
+	call _address_call
+	jmp 2b
 
 _return_label_value:
 	/* Reading value from label */
@@ -1385,7 +1399,7 @@ _return_label_value:
 	call newline
 	jmp 2b
 
-_return_array_value:
+_return_label_index_value:
 	/* Parse identifier indexing */
 	subl $4, %esp /* int/char/zero */
 	/* Fetching expression in 'index' */
@@ -1418,7 +1432,48 @@ _return_array_value:
 	call eax
 	call newline
 	addl $4, %esp
-	ret
+	jmp 2b
+
+/* Parse and compile variable/value indexing */
+_return_array_value:
+	subl $4, %esp
+	/* Backing up base to index */
+	call pushl_eax
+	/* Fetching index */
+	call lex
+	call _or_expr
+	call lex
+	/* Checking for correct syntax */
+	cmpw $'], token_tag
+	jne _syntax_error
+	/* Restoring base address */
+	call popl_ebx
+	/* Calculating offset */
+	call imul
+	movl $4, (%esp)
+	call value
+	call comma
+	call eax
+	call newline
+	/* Adding offset to base */
+	call addl
+	call ebx
+	call comma
+	call eax
+	call newline
+	/* Loading value from address */
+	call movl
+	movb $'(, (%esp)
+	call putc
+	call eax
+	movb $'), (%esp)
+	call putc
+	call comma
+	call eax
+	call newline
+
+	addl $4, %esp
+	jmp 2b
 
 /* Parse and compile argument */
 _return_argument:
