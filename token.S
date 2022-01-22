@@ -22,6 +22,7 @@
 .equ TOKEN_NOTEQUAL,   271 /* != */
 .equ TOKEN_LE,         272 /* <= */
 .equ TOKEN_GE,         273 /* >= */
+.equ TOKEN_ARROW,      274 /* => */
 /* End of token */
 .equ TOKEN_END,        274
 

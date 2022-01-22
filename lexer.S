@@ -392,7 +392,14 @@ s18:
 1:
 	call nextc
 	cmpl $'=, %eax /* == */
-	jne s2 /* if not ==, return */
+	je 1f
+	cmpl $'>, %eax /* => */
+	jne s2 /* if not == or =>, return */
+
+	call _consume
+	movw $TOKEN_ARROW, token_tag
+	jmp s2
+1:
 	call _consume
 	movw $TOKEN_EQUAL, token_tag
 	jmp s2
