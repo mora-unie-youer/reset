@@ -56,6 +56,8 @@ reserved_words:
 	.long allocate_text, return_text, syscall_text
 	/* Labels */
 	.long global_text, goto_text, label_text
+	/* Byte operations */
+	.long readchar_text, writechar_text
 	/* End of list */
 	.long 0
 
@@ -68,6 +70,8 @@ syscall_text:  .string "syscall"
 global_text:   .string "global"
 goto_text:     .string "goto"
 label_text:    .string "label"
+readchar_text: .string "readchar"
+writechar_text:.string "writechar"
 
 /* Messages */
 line_string: .string "line "
