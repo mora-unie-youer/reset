@@ -687,7 +687,17 @@ _toplevel_expr:
 	addl $4, %esp
 	ret
 6:
-	/* TODO: implement argument indexing */
+	/* Parsing argument indexing */
+	subl $4, %esp /* arg_num */
+	movl %eax, (%esp)
+	call movl
+	call argument
+	call comma
+	call eax
+	call newline
+	call _address_index
+	addl $4, %esp
+	ret
 7:
 	/* Parsing argument calling */
 	subl $4, %esp /* arg_num */
@@ -705,6 +715,65 @@ _toplevel_expr:
 	/* TODO: implement varibale parsing */
 9:
 	/* Exit point of _toplevel_expr */
+	ret
+
+/* Parse and compile address indexing */
+_address_index:
+	subl $4, %esp /* char/number */
+	/* Backing up base address */
+	call pushl_eax
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Backing up index */
+	call pushl_eax
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'], token_tag
+	jne _syntax_error
+	call lex
+	cmpw $'=, token_tag
+	jne _syntax_error
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Recovering base and index */
+	call popl_ecx
+	call popl_ebx
+	/* Compiling */
+	call leal
+	movl $0, (%esp)
+	call putd
+	movb $'(, (%esp)
+	call putc
+	call comma
+	call ecx
+	call comma
+	movl $4, (%esp)
+	call putd
+	movb $'), (%esp)
+	call putc
+	call comma
+	call ecx
+	call newline
+
+	call addl
+	call ecx
+	call comma
+	call ebx
+	call newline
+
+	call movl
+	call eax
+	call comma
+	movb $'(, (%esp)
+	call putc
+	call ebx
+	movb $'), (%esp)
+	call putc
+	call newline
+
+	addl $4, %esp
 	ret
 
 /* Parse and compile function definition */
