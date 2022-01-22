@@ -46,6 +46,7 @@ popl_text:     .string "\tpopl "
 /* Register/memory operations */
 decl_text:     .string "\tdecl "
 incl_text:     .string "\tincl "
+leal_text:     .string "\tleal "
 movl_text:     .string "\tmovl "
 movsbl_text:   .string "\tmovsbl "
 movzbl_text:   .string "\tmovzbl "
@@ -203,6 +204,7 @@ _keyword popl
 /* Register/memory operations */
 _keyword decl
 _keyword incl
+_keyword leal
 _keyword movl
 _keyword movsbl
 _keyword movzbl
