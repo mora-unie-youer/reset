@@ -845,7 +845,39 @@ _declaration:
 
 /* Parse and compile array declaration */
 _array_declaration:
-	/* TODO: implement array declaration */
+	/* Arrays are written to data segment */
+	call enter_data_segment
+	/* Fetching identifier */
+	pushl $0
+	call _get_ident
+	/* Printing identifier */
+	movl %eax, (%esp)
+	call puts
+	call _pop_ident /* Removing identifier from stack */
+	/* Appending colon symbol */
+	movb $':, (%esp)
+	call putc
+	/* Listing all values */
+	call long
+	call lex
+1:
+	/* Parsing value */
+	call _simple_value
+	/* Fetching next token */
+	call lex
+	/* Checking if array is ended */
+	cmpw $'], token_tag
+	je 1f
+	/* Checking if next token is , */
+	cmpw $',, token_tag
+	jne _syntax_error
+	/* Preparing and making next iteration */
+	call comma
+	call lex
+	jmp 1b
+1:
+	call newline
+	addl $4, %esp
 	ret
 
 /* Parse and compile function declaration */
