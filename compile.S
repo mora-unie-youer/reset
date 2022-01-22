@@ -712,9 +712,64 @@ _toplevel_expr:
 	addl $4, %esp
 	ret
 8:
-	/* TODO: implement varibale parsing */
+	/* Parse variable */
+	subl $4, %esp /* arg_num */
+	/* Backing up argument number */
+	movl token_val, %eax
+	movl %eax, (%esp)
+	/* Fetching next token */
+	call lex
+	/* Restoring argument number */
+	movl (%esp), %eax
+	addl $4, %esp
+	/* Checking what we need to do */
+	cmpw $'=, token_tag
+	je 9f
+	cmpw $'[, token_tag
+	je 10f
+	cmpw $'(, token_tag
+	je 11f
+	/* If none from listed above - erroring */
+	call _syntax_error
 9:
-	/* Exit point of _toplevel_expr */
+	/* Parsing variable assigning */
+	subl $4, %esp /* arg_num */
+	movl %eax, (%esp)
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Compiling assigning */
+	call movl
+	call eax
+	call comma
+	call variable
+	call newline
+	addl $4, %esp
+	ret
+10:
+	/* Parsing variable indexing */
+	subl $4, %esp /* arg_num */
+	movl %eax, (%esp)
+	call movl
+	call variable
+	call comma
+	call eax
+	call newline
+	call _address_index
+	addl $4, %esp
+	ret
+11:
+	/* Parsing variable calling */
+	subl $4, %esp /* arg_num */
+	movl %eax, (%esp)
+	/* Compiling calling */
+	call movl
+	call variable
+	call comma
+	call eax
+	call newline
+	call _address_call
+	addl $4, %esp
 	ret
 
 /* Parse and compile address indexing */
