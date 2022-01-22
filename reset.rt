@@ -1,0 +1,13 @@
+# System calls
+SYS_exit => 1;
+
+# Exit with code
+# a0 - exit code
+exit : (a0) {
+	syscall(SYS_exit, a0);
+};
+
+global _start;
+_start : () {
+	exit(0);
+};
