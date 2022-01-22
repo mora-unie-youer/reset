@@ -2,6 +2,7 @@
 .equ TOKEN_INTEGER,    256
 .equ TOKEN_STRING,     257
 .equ TOKEN_IDENTIFIER, 258
+.equ TOKEN_MACRO,      275
 .equ TOKEN_ARGUMENT,   259 /* argument (a-var) */
 .equ TOKEN_VARIABLE,   260 /* local variable (x-var) */
 /* Conditionals */
@@ -24,7 +25,7 @@
 .equ TOKEN_GE,         273 /* >= */
 .equ TOKEN_ARROW,      274 /* => */
 /* End of token */
-.equ TOKEN_END,        274
+.equ TOKEN_END,        276
 
 /* Maximum token size */
 .equ MAX_TOKEN_LEN, 128 /* NOTE: in future may be changed */

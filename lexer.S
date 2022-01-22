@@ -233,6 +233,15 @@ s1:
 	/* Setting end of tokens */
 	movw $TOKEN_END, token_tag
 s2:
+	/* Checking if token is identifier, to check if it's macro */
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	jne 1f
+	/* If identifier's first char is capital, it's macro */
+	movb token_text, %al
+	cmpb $'Z, %al
+	ja 1f
+	movw $TOKEN_MACRO, token_tag
+1:
 	/* Ending parsing */
 	leave
 	ret
