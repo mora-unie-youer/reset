@@ -672,6 +672,7 @@ _toplevel_expr:
 	/* If none from listed above - erroring */
 	call _syntax_error
 5:
+	/* Parsing argument assigning */
 	subl $4, %esp /* arg_num */
 	movl %eax, (%esp)
 	/* Fetching next token and expression */
@@ -688,7 +689,18 @@ _toplevel_expr:
 6:
 	/* TODO: implement argument indexing */
 7:
-	/* TODO: implement argument calling as address */
+	/* Parsing argument calling */
+	subl $4, %esp /* arg_num */
+	movl %eax, (%esp)
+	/* Compiling calling */
+	call movl
+	call argument
+	call comma
+	call eax
+	call newline
+	call _address_call
+	addl $4, %esp
+	ret
 8:
 	/* TODO: implement varibale parsing */
 9:
