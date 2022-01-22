@@ -239,6 +239,8 @@ _expr:
 	je _syscall_expr
 	cmpw $TOKEN_GLOBAL, token_tag
 	je _global_expr
+	cmpw $TOKEN_LABEL, token_tag
+	je _label_expr
 	call _toplevel_expr
 	ret
 
@@ -496,6 +498,21 @@ _global_expr:
 	call puts
 	addl $4, %esp
 	call newline
+	ret
+
+_label_expr:
+	/* Fetching next token */
+	call lex
+	/* Checking if token is identifier. If not, erroring */
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	jne _syntax_error
+	/* Creating label */
+	pushl $token_text
+	call puts
+	movb $':, (%esp)
+	call putc
+	call newline
+	addl $4, %esp
 	ret
 
 /* Parse and compile block */
