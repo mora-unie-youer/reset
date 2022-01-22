@@ -15,6 +15,7 @@ rodata_text:   .string ".section .rodata\n"
 /* Assembler instructions */
 /* GAS macros */
 comm_text:     .string ".comm "
+equ_text:      .string ".equ "
 global_text:   .string ".global "
 long_text:     .string ".long "
 string_text:   .string ".string "
@@ -181,6 +182,7 @@ _push_pop ebp
 .endm
 /* GAS macros */
 _keyword comm
+_keyword equ
 _keyword global
 _keyword long
 _keyword string
