@@ -239,6 +239,8 @@ _expr:
 	je _syscall_expr
 	cmpw $TOKEN_GLOBAL, token_tag
 	je _global_expr
+	cmpw $TOKEN_GOTO, token_tag
+	je _goto_expr
 	cmpw $TOKEN_LABEL, token_tag
 	je _label_expr
 	call _toplevel_expr
@@ -500,6 +502,21 @@ _global_expr:
 	call newline
 	ret
 
+/* Parse and compile 'goto' expression */
+_goto_expr:
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Compiling jump */
+	call jmp
+	pushl $'*
+	call putc
+	addl $4, %esp
+	call eax
+	call newline
+	ret
+
+/* Parse and compile 'label' expression */
 _label_expr:
 	/* Fetching next token */
 	call lex
