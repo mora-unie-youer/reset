@@ -586,7 +586,7 @@ _toplevel_expr:
 	/* Checking, what is the next character */
 	call lex
 	cmpw $':, token_tag
-	je _function_definition
+	je _declaration
 	cmpw $'(, token_tag
 	je _function_call
 	cmpw $'[, token_tag
@@ -832,13 +832,24 @@ _address_index:
 	addl $4, %esp
 	ret
 
-/* Parse and compile function definition */
-_function_definition:
+/* Parse and compile declaration */
+_declaration:
 	/* Fetching next token */
 	call lex
-	/* Checking if next token is (. If not -> error */
+	/* Checking what we declare */
+	cmpw $'[, token_tag
+	je _array_declaration
 	cmpw $'(, token_tag
-	jne _syntax_error
+	je _function_declaration
+	ret
+
+/* Parse and compile array declaration */
+_array_declaration:
+	/* TODO: implement array declaration */
+	ret
+
+/* Parse and compile function declaration */
+_function_declaration:
 	/* Functions are written to text segment */
 	call enter_text_segment
 	/* Fetching identifier */
