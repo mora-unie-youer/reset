@@ -877,6 +877,40 @@ _function_declaration:
 	call newline
 	ret
 
+/* Parse value */
+_simple_value:
+	cmpw $TOKEN_INTEGER, token_tag
+	je 1f
+	cmpw $TOKEN_IDENTIFIER, token_tag
+	je 2f
+	cmpw $TOKEN_STRING, token_tag
+	je 3f
+	cmpw $'-, token_tag
+	je 4f
+	jmp _syntax_error
+1:
+	pushl token_val
+	call putd
+	addl $4, %esp
+	ret
+2:
+	pushl $token_text
+	call puts
+	addl $4, %esp
+	ret
+3:
+	call _get_string_address
+	pushl $token_text
+	call _push_string
+	addl $4, %esp
+	ret
+4:
+	pushl $'-
+	call putc
+	addl $4, %esp
+	call lex
+	jmp _simple_expr
+
 /* Parse function arguments */
 _function_args:
 	subl $4, %esp /* counter */
