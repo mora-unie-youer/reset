@@ -116,6 +116,13 @@ comma:
 	call putc /* printing char */
 	addl $1, %esp
 	ret
+/* Print space char */
+space:
+	subl $1, %esp /* space_char */
+	movb $' , (%esp)
+	call putc /* printing char */
+	addl $1, %esp
+	ret
 
 /* Prints full pushl instruction (with register) */
 _pushl:
