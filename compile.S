@@ -244,6 +244,7 @@ _expr:
 	cmpw $TOKEN_LABEL, token_tag
 	je _label_expr
 	call _toplevel_expr
+	call newline /* Split expressions with newline for readability */
 	ret
 
 /* Parse and compile if expression */
