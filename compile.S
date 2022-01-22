@@ -573,6 +573,8 @@ _block:
 _toplevel_expr:
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 1f
+	cmpw $TOKEN_MACRO, token_tag
+	je 1f
 	cmpw $TOKEN_ARGUMENT, token_tag
 	je 4f
 	cmpw $TOKEN_VARIABLE, token_tag
@@ -970,6 +972,8 @@ _simple_value:
 	je 1f
 	cmpw $TOKEN_IDENTIFIER, token_tag
 	je 2f
+	cmpw $TOKEN_MACRO, token_tag
+	je 2f
 	cmpw $TOKEN_STRING, token_tag
 	je 3f
 	cmpw $'-, token_tag
@@ -996,7 +1000,7 @@ _simple_value:
 	call putc
 	addl $4, %esp
 	call lex
-	jmp _simple_expr
+	jmp _simple_value
 
 /* Parse function arguments */
 _function_args:
