@@ -672,7 +672,19 @@ _toplevel_expr:
 	/* If none from listed above - erroring */
 	call _syntax_error
 5:
-	/* TODO: implement argument assigning */
+	subl $4, %esp /* arg_num */
+	movl %eax, (%esp)
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Compiling assigning */
+	call movl
+	call eax
+	call comma
+	call argument
+	call newline
+	addl $4, %esp
+	ret
 6:
 	/* TODO: implement argument indexing */
 7:
