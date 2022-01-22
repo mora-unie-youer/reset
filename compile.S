@@ -1356,7 +1356,6 @@ _simple_expr:
 	call _constant_expr
 	jmp 2f
 1:
-	/* TODO: implement identifier parsing */
 	pushl $token_text
 	call _push_ident /* Pushing identifier to stack */
 	addl $4, %esp
@@ -1366,11 +1365,25 @@ _simple_expr:
 	je _function_call
 	cmpw $'[, token_tag
 	je _return_array_value
-	/* If none of above listed, erroring */
-	call _syntax_error
+	/* If none of above listed, reading value from label */
+	jmp _return_label_value
 2:
 	/* Exit point of _simple_expr */
 	ret
+
+_return_label_value:
+	/* Reading value from label */
+	call movl
+	pushl $0
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	addl $4, %esp
+	call _pop_ident
+	call comma
+	call eax
+	call newline
+	jmp 2b
 
 _return_array_value:
 	/* Parse identifier indexing */
@@ -1451,7 +1464,7 @@ _constant_expr:
 	cmpw $TOKEN_STRING, token_tag
 	je _constant_expr_string
 	/* If nothing was parsed, syntax erroring */
-	call _syntax_error
+	jmp _syntax_error
 
 _constant_expr_integer:
 	/* Storing integer value to %eax */
