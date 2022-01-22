@@ -239,12 +239,12 @@ _expr:
 	je _syscall_expr
 	cmpw $TOKEN_GLOBAL, token_tag
 	je _global_expr
+	call newline /* Split expressions with newline for readability */
 	cmpw $TOKEN_GOTO, token_tag
 	je _goto_expr
 	cmpw $TOKEN_LABEL, token_tag
 	je _label_expr
 	call _toplevel_expr
-	call newline /* Split expressions with newline for readability */
 	ret
 
 /* Parse and compile if expression */
