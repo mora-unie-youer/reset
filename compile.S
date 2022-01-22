@@ -537,7 +537,7 @@ _label_expr:
 
 /* Parse and compile 'writechar' expression */
 _writechar_expr:
-	subl $4, %esp
+	subl $1, %esp
 	/* Checking for correct syntax */
 	call lex
 	cmpw $'(, token_tag
@@ -582,7 +582,7 @@ _writechar_expr:
 	/* Checking for correct syntax */
 	call lex
 	cmpw $'), token_tag
-	addl $4, %esp
+	addl $1, %esp
 	ret
 
 /* Parse and compile block */
@@ -1715,6 +1715,8 @@ _simple_expr:
 	je _return_variable
 	cmpw $TOKEN_SYSCALL, token_tag
 	je _syscall_expr
+	cmpw $TOKEN_READCHAR, token_tag
+	je _readchar_expr
 	cmpw $'(, token_tag
 	je _parse_parantheses
 	call _constant_expr
@@ -1875,6 +1877,48 @@ _return_variable:
 	call eax
 	call newline
 	jmp 2b
+
+/* Parse and compile `readchar` expression */
+_readchar_expr:
+	subl $1, %esp
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'(, token_tag
+	jne _syntax_error
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Backing up base address */
+	call pushl_eax
+	/* Checking for correct syntax */
+	call lex
+	cmpw $',, token_tag
+	jne _syntax_error
+	/* Fetching next token and expression */
+	call lex
+	call _or_expr
+	/* Calculating address */
+	call popl_ebx
+	call addl
+	call eax
+	call comma
+	call ebx
+	call newline
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'), token_tag
+	/* Compiling reading from address */
+	call movsbl
+	movb $'(, (%esp)
+	call putc
+	call ebx
+	movb $'), (%esp)
+	call putc
+	call comma
+	call eax
+	call newline
+	addl $1, %esp
+	ret
 
 /* Parse parantheses */
 _parse_parantheses:
