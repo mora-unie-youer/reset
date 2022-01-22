@@ -804,6 +804,7 @@ _address_call:
 	call eax
 	call newline
 	/* Calling address */
+	call call
 	movl $'*, (%esp)
 	call putc
 	call eax
