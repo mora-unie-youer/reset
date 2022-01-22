@@ -575,7 +575,7 @@ _toplevel_expr:
 	cmpw $TOKEN_ARGUMENT, token_tag
 	je 4f
 	cmpw $TOKEN_VARIABLE, token_tag
-	je 5f
+	je 8f
 	call _simple_expr
 	ret
 1:
@@ -652,10 +652,34 @@ _toplevel_expr:
 	call newline
 	ret
 4:
-	/* TODO: implement argument parsing */
+	/* Parse argument */
+	subl $4, %esp /* arg_num */
+	/* Backing up argument number */
+	movl token_val, %eax
+	movl %eax, (%esp)
+	/* Fetching next token */
+	call lex
+	/* Restoring argument number */
+	movl (%esp), %eax
+	addl $4, %esp
+	/* Checking what we need to do */
+	cmpw $'=, token_tag
+	je 5f
+	cmpw $'[, token_tag
+	je 6f
+	cmpw $'(, token_tag
+	je 7f
+	/* If none from listed above - erroring */
+	call _syntax_error
 5:
-	/* TODO: implement varibale parsing */
+	/* TODO: implement argument assigning */
 6:
+	/* TODO: implement argument indexing */
+7:
+	/* TODO: implement argument calling as address */
+8:
+	/* TODO: implement varibale parsing */
+9:
 	/* Exit point of _toplevel_expr */
 	ret
 
