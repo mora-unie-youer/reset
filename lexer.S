@@ -58,6 +58,8 @@ reserved_words:
 	.long global_text, goto_text, label_text
 	/* Byte operations */
 	.long readchar_text, writechar_text
+	/* Types */
+	.long char_text, int_text
 	/* End of list */
 	.long 0
 
@@ -72,6 +74,8 @@ goto_text:     .string "goto"
 label_text:    .string "label"
 readchar_text: .string "readchar"
 writechar_text:.string "writechar"
+char_text:     .string "char"
+int_text:      .string "int"
 
 /* Messages */
 line_string: .string "line "

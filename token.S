@@ -21,14 +21,17 @@
 /* Byte operations */
 .equ TOKEN_READCHAR,   271
 .equ TOKEN_WRITECHAR,  272
+/* Types */
+.equ TOKEN_CHAR,       273
+.equ TOKEN_INT,        274
 /* Symbols */
-.equ TOKEN_EQUAL,      273 /* == */
-.equ TOKEN_NOTEQUAL,   274 /* != */
-.equ TOKEN_LE,         275 /* <= */
-.equ TOKEN_GE,         276 /* >= */
-.equ TOKEN_ARROW,      277 /* => */
+.equ TOKEN_EQUAL,      275 /* == */
+.equ TOKEN_NOTEQUAL,   276 /* != */
+.equ TOKEN_LE,         277 /* <= */
+.equ TOKEN_GE,         278 /* >= */
+.equ TOKEN_ARROW,      279 /* => */
 /* End of token */
-.equ TOKEN_END,        278
+.equ TOKEN_END,        280
 
 /* Maximum token size */
 .equ MAX_TOKEN_LEN, 128 /* NOTE: in future may be changed */
