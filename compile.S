@@ -1511,9 +1511,9 @@ _compare_expr:
 	call newline
 	call popl_eax /* Restoring first operand */
 	call cmpl /* Comparing operands */
-	call eax
-	call comma
 	call ebx
+	call comma
+	call eax
 	call newline
 	/* If op is '<', setting less flag. */
 	/* If op is '>', setting greater flag. */
