@@ -2,6 +2,7 @@
 SYS_exit  => 1;
 SYS_read  => 3;
 SYS_write => 4;
+SYS_open  => 5;
 
 ### System call functions
 ## Exit with code
@@ -26,6 +27,14 @@ read : (a0, a1, a2) {
 # @return write count
 write : (a0, a1, a2) {
 	return syscall(SYS_write, a0, a1, a2);
+};
+
+## Open file
+# a0 - path
+# a1 - flags
+# @return fd or error
+open : (a0, a1) {
+	return syscall(SYS_open, a0, a1);
 };
 
 ### String operations
