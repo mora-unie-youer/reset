@@ -95,7 +95,24 @@ itoa : (a0, a1, a2) {
 	return(a1);
 };
 
-### String operations
+### Memory/String operations
+## Fill memory block with value (char)
+# a0 - value
+# a1 - address
+# a2 - size
+memset : (a0, a1, a2) {
+	# x0 - pos
+	allocate(1);
+	x0 = 0;
+	# Writing value to memory block
+	while (x0 < a2) {
+		# Writing byte
+		writechar(a1, x0, a0);
+		# Moving to next byte
+		x0 = x0 + 1;
+	};
+};
+
 ## Get length of string
 # a0 - string
 # @return string length
