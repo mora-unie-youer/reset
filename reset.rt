@@ -1,40 +1,51 @@
 ### System calls
-SYS_exit  => 1;
-SYS_read  => 3;
-SYS_write => 4;
-SYS_open  => 5;
+SYS_exit   => 1;
+SYS_read   => 3;
+SYS_write  => 4;
+SYS_open   => 5;
+SYS_munmap => 91;
+SYS_mmap2  => 192;
 
 ### System call functions
 ## Exit with code
 # a0 - exit code
-exit : (a0) {
-	syscall(SYS_exit, a0);
-};
+exit : (a0) { syscall(SYS_exit, a0); };
 
 ## Read from file
 # a0 - file
 # a1 - buffer
 # a2 - count
 # @return read count
-read : (a0, a1, a2) {
-	return syscall(SYS_read, a0, a1, a2);
-};
+read : (a0, a1, a2) { return syscall(SYS_read, a0, a1, a2); };
 
 ## Write to file
 # a0 - file
 # a1 - buffer
 # a2 - count
 # @return write count
-write : (a0, a1, a2) {
-	return syscall(SYS_write, a0, a1, a2);
-};
+write : (a0, a1, a2) { return syscall(SYS_write, a0, a1, a2); };
 
 ## Open file
 # a0 - path
 # a1 - flags
 # @return fd or error
-open : (a0, a1) {
-	return syscall(SYS_open, a0, a1);
+open : (a0, a1) { return syscall(SYS_open, a0, a1); };
+
+## Unmap memory page
+# a0 - address
+# a1 - size
+# @return zero on success, negative on error
+munmap : (a0, a1) { return syscall(SYS_munmap, a0, a1); };
+
+## Map memory page
+# a0 - address
+# a1 - size
+# a2 - protection flags
+# a3 - map flags
+# a4 - fd
+# a5 - offset
+mmap2 : (a0, a1, a2, a3, a4, a5) {
+	return syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5);
 };
 
 ### String operations
