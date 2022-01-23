@@ -1147,6 +1147,7 @@ _function_args:
 	/* Fetching next token */
 	call lex
 	/* If not equal to comma symbol, trying to exit. */
+	cmpw $',, token_tag
 	jne 2f
 	/* Fetching next token and iterating again */
 	call lex
