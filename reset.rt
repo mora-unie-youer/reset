@@ -7,7 +7,17 @@ exit : (a0) {
 	syscall(SYS_exit, a0);
 };
 
+# Main function
+# a0 - argc
+# a1 - argv
+# returns exit code
+main : (a0, a1) {
+	return(a0);
+};
+
+# Entry point of the entire program
 global _start;
 _start : () {
-	exit(0);
+	# argc is located in 4(%esp), argv is located in 8(%esp)
+	exit(main(*(&a0 - 4), &a0));
 };
