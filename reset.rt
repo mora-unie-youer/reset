@@ -9,18 +9,41 @@ exit : (a0) {
 };
 
 ### String operations
-# Get length of string
+## Get length of string
 # a0 - string
 # @return string length
 strlen : (a0) {
 	# x0 - string length
 	allocate(1);
 	x0 = 0;
+	# While char is not NULL, incrementing length
 	while (readchar(a0, x0) != '\0') { x0 = x0 + 1; };
 	return x0;
 };
 
-# Main function
+## Copy string
+# a0 - src
+# a1 - dest
+strcpy : (a0, a1) {
+	# x0 - pos
+	allocate(2);
+	x0 = 0;
+	# Reading char from string
+	x1 = readchar(a0, x0);
+	# Checking if char is not NULL
+	while (x1 != '\0') {
+		# Copying char from one string to another
+		writechar(a1, x0, x1);
+		# Moving to next char
+		x0 = x0 + 1;
+		# Reading next char
+		x1 = readchar(a0, x0);
+	};
+	# Writing NULL character
+	writechar(a1, x0, '\0');
+};
+
+## Main function
 # a0 - argc
 # a1 - argv
 # @return exit code
