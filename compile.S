@@ -970,6 +970,13 @@ _array_declaration:
 	/* Appending colon symbol */
 	movb $':, (%esp)
 	call putc
+	/* First value will be address of array, for better syntax (w/o & prefix) */
+	call long
+	call _label_id
+	movl %eax, (%esp)
+	call label
+	call newline
+	call label_def
 	/* Listing all values */
 	call long
 	call lex
@@ -1031,13 +1038,22 @@ _reserved_char_array_declaration:
 	call lex
 	cmpw $'[, token_tag
 	jne _syntax_error
-	/* Starting .comm macro */
-	call comm
+	/* First value will be address of array, for better syntax (w/o & prefix) */
 	movl $0, (%esp)
 	call _get_ident
 	movl %eax, (%esp)
 	call puts
 	call _pop_ident
+	movb $':, (%esp)
+	call putc
+	call long
+	call _label_id
+	movl %eax, (%esp)
+	call label
+	call newline
+	/* Starting .comm macro */
+	call comm
+	call label
 	call comma
 	/* Fetching next token and expression */
 	call lex
@@ -1063,13 +1079,22 @@ _reserved_int_array_declaration:
 	call lex
 	cmpw $'[, token_tag
 	jne _syntax_error
-	/* Starting .comm macro */
-	call comm
+	/* First value will be address of array, for better syntax (w/o & prefix) */
 	movl $0, (%esp)
 	call _get_ident
 	movl %eax, (%esp)
 	call puts
 	call _pop_ident
+	movb $':, (%esp)
+	call putc
+	call long
+	call _label_id
+	movl %eax, (%esp)
+	call label
+	call newline
+	/* Starting .comm macro */
+	call comm
+	call label
 	call comma
 	/* Fetching next token and expression */
 	call lex
