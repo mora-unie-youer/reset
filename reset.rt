@@ -64,6 +64,32 @@ strcpy : (a0, a1) {
 	writechar(a1, x0, '\0');
 };
 
+## Compare string
+# a0 - first string
+# a1 - second string
+# @return difference between different chars (0 if strings are equal)
+strcmp : (a0, a1) {
+	# x0 - pos
+	# x1 - char from first string
+	# x2 - char from second string
+	allocate(3);
+	x0 = 0;
+	# Reading first chars from strings
+	x1 = readchar(a0, x0);
+	x2 = readchar(a1, x0);
+	# Comparing char by char
+	while (x1 != '\0') {
+		if (x1 != x2) { return(x1 - x2); };
+		# Moving to next char
+		x0 = x0 + 1;
+		# Reading next char
+		x1 = readchar(a0, x0);
+		x2 = readchar(a1, x0);
+	};
+	# As first string ended, finding the difference between ending chars
+	return(x1 - x2);
+};
+
 ## Main function
 # a0 - argc
 # a1 - argv
