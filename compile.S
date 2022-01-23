@@ -581,6 +581,7 @@ _writechar_expr:
 	/* Checking for correct syntax */
 	call lex
 	cmpw $'), token_tag
+	jne _syntax_error
 	addl $1, %esp
 	ret
 

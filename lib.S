@@ -20,12 +20,16 @@ wrbuf_idx: .long 0
 
 .text
 _read:
+	/* Resetting read buffer index */
+	movl $0, rdbuf_idx
 	/* Filling read buffer */
 	movl $0x3, %eax /* syscall=0x3 (read) */
 	movl $0x0, %ebx /* fd=0 (stdin) */
 	movl $rdbuf, %ecx /* output_addr=rdbuf */
 	movl $RDBUFSZ, %edx /* count=RDBUFSIZE */
 	int $0x80 /* calling the interrupt */
+	/* Setting end of read buffer */
+	movl %eax, rdbuf_end
 	ret
 
 .global getc
@@ -39,7 +43,6 @@ getc:
 	/* If nothing was read, return EOF */
 	cmpl $0, %eax
 	jbe 2f
-	movl %eax, rdbuf_end
 1:
 	xorl %eax, %eax /* we are storing char in %eax */
 	movb rdbuf(%ebx), %al /* ebx stores either 0 or rdbuf_idx */
@@ -61,7 +64,6 @@ nextc:
 	/* If nothing was read, return EOF */
 	cmpl $0, %eax
 	jbe 2f
-	movl %eax, rdbuf_end
 1:
 	xorl %eax, %eax /* we are storing char in %eax */
 	movb rdbuf(%ebx), %al /* ebx stores either 0 or rdbuf_idx */
