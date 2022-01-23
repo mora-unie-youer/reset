@@ -1053,8 +1053,40 @@ _reserved_char_array_declaration:
 	addl $4, %esp
 	ret
 
+/* Parse and compile int array declaration */
 _reserved_int_array_declaration:
-	/* TODO: implement int array reservation */
+	subl $4, %esp /* array_name/ident_num */
+	/* Arrays are written in data segment */
+	call enter_data_segment
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'[, token_tag
+	jne _syntax_error
+	/* Starting .comm macro */
+	call comm
+	movl $0, (%esp)
+	call _get_ident
+	movl %eax, (%esp)
+	call puts
+	call _pop_ident
+	call comma
+	/* Fetching next token and expression */
+	call lex
+	call _simple_value
+	/* Finishing .comm macro */
+	movb $'*, (%esp)
+	call putc
+	movl $4, (%esp)
+	call putd
+	call comma
+	movl $1, (%esp)
+	call putd
+	call newline
+	/* Checking for correct syntax */
+	call lex
+	cmpw $'], token_tag
+	jne _syntax_error
+	addl $4, %esp
 	ret
 
 /* Parse value */
