@@ -122,14 +122,14 @@ print_error:
 	pushl %ebp
 	movl %esp, %ebp
 	call flush /* Print all the output */
+	movl $2, output_fd /* Writing error to `stderr` */
 	call _print_line /* Printing line number */
 	movl $error_string, (%ebp) /* error string */
 	call puts /* Printing error string */
 	movl 8(%ebp), %ebx /* error message */
 	movl %ebx, (%ebp) /* passing message as argument */
 	call puts /* Printing error message */
-	movl $2, output_fd /* Writing error to `stderr` */
-	call flush /* Print to stderr */
+	/* NOTE: Not needed to be flushed, because message ends on \n */
 	/* As error occured, exitting */
 	pushl $1
 	call exit
