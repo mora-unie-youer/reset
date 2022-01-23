@@ -1,16 +1,29 @@
-# System calls
+### System calls
 SYS_exit => 1;
 
+### System call functions
 # Exit with code
 # a0 - exit code
 exit : (a0) {
 	syscall(SYS_exit, a0);
 };
 
+### String operations
+# Get length of string
+# a0 - string
+# @return string length
+strlen : (a0) {
+	# x0 - string length
+	allocate(1);
+	x0 = 0;
+	while (readchar(a0, x0) != '\0') { x0 = x0 + 1; };
+	return x0;
+};
+
 # Main function
 # a0 - argc
 # a1 - argv
-# returns exit code
+# @return exit code
 main : (a0, a1) {
 	return(a0);
 };
