@@ -1,11 +1,31 @@
 ### System calls
-SYS_exit => 1;
+SYS_exit  => 1;
+SYS_read  => 3;
+SYS_write => 4;
 
 ### System call functions
-# Exit with code
+## Exit with code
 # a0 - exit code
 exit : (a0) {
 	syscall(SYS_exit, a0);
+};
+
+## Read from file
+# a0 - file
+# a1 - buffer
+# a2 - count
+# @return read count
+read : (a0, a1, a2) {
+	return syscall(SYS_read, a0, a1, a2);
+};
+
+## Write to file
+# a0 - file
+# a1 - buffer
+# a2 - count
+# @return write count
+write : (a0, a1, a2) {
+	return syscall(SYS_write, a0, a1, a2);
 };
 
 ### String operations
