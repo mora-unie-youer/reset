@@ -1,3 +1,9 @@
+### Useful constants
+NULL  => 0;
+## Booleans
+FALSE => 0;
+TRUE  => 1;
+
 ### System calls
 SYS_exit   => 1;
 SYS_read   => 3;
