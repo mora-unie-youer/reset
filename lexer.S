@@ -78,11 +78,12 @@ char_text:     .string "char"
 int_text:      .string "int"
 
 /* Messages */
-line_string: .string "line "
+line_string:  .string "line "
 error_string: .string ": ERROR: "
+token_string: .string "Token, which caused error: #"
 /* Error messages */
-hold_error_string: .string "Trying to hold two or more tokens\n"
-too_long_token_string: .string "Too long token\n"
+hold_error_string:      .string "Trying to hold two or more tokens\n"
+too_long_token_string:  .string "Too long token\n"
 undefined_token_string: .string "Undefined token\n"
 
 .data
@@ -116,6 +117,23 @@ _print_line:
 	leave
 	ret
 
+/* Print token information */
+_print_token:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $4, %esp /* string/token_tag */
+	/* Printing token_string */
+	movl $token_string, -4(%ebp)
+	call puts
+	/* Print token_tag */
+	xorl %eax, %eax
+	movw token_tag, %ax
+	movl %eax, -4(%ebp)
+	call putd
+	call newline
+	leave
+	ret
+
 /* Print error and exit */
 .global print_error
 print_error:
@@ -130,6 +148,7 @@ print_error:
 	movl %ebx, (%ebp) /* passing message as argument */
 	call puts /* Printing error message */
 	/* NOTE: Not needed to be flushed, because message ends on \n */
+	call _print_token
 	/* As error occured, exitting */
 	pushl $1
 	call exit
