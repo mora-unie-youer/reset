@@ -46,6 +46,7 @@ strlen : (a0) {
 # a1 - dest
 strcpy : (a0, a1) {
 	# x0 - pos
+	# x1 - char
 	allocate(2);
 	x0 = 0;
 	# Reading char from string
