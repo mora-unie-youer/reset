@@ -9,6 +9,7 @@ SYS_exit   => 1;
 SYS_read   => 3;
 SYS_write  => 4;
 SYS_open   => 5;
+SYS_brk    => 45;
 SYS_munmap => 91;
 SYS_mmap2  => 192;
 
@@ -36,6 +37,11 @@ write : (a0, a1, a2) { return syscall(SYS_write, a0, a1, a2); };
 # a1 - flags
 # @return fd or error
 open : (a0, a1) { return syscall(SYS_open, a0, a1); };
+
+## Set/return heap limit
+# a0 - address (set) or NULL (return)
+# @return heap limit
+brk : (a0) { return syscall(SYS_brk, a0); };
 
 ## Unmap memory page
 # a0 - address
