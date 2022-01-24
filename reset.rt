@@ -38,9 +38,9 @@ write : (a0, a1, a2) { return syscall(SYS_write, a0, a1, a2); };
 # @return fd or error
 open : (a0, a1) { return syscall(SYS_open, a0, a1); };
 
-## Set/return heap limit
+## Set/return heap segment limit
 # a0 - address (set) or NULL (return)
-# @return heap limit
+# @return current heap limit
 brk : (a0) { return syscall(SYS_brk, a0); };
 
 ## Unmap memory page
@@ -99,6 +99,33 @@ itoa : (a0, a1, a2) {
 	};
 	# Returning result buffer
 	return(a1);
+};
+
+### Memory Management
+## Memory page size
+PAGE_SIZE => 4096; # 0x1000
+## Heap segment start and end
+brk_start : NULL;
+brk_end   : NULL;
+
+## Increment heap segment size
+# a0 - increment size (use negative to decrement)
+# @return new heap segment limit
+sbrk : (a0) {
+	# x0 - new limit
+	allocate(1);
+	x0 = brk_end;
+	# Uninitialized heap
+	if (x0 == NULL) {
+		x0 = brk(NULL);
+		brk_start = x0;
+	};
+	# Incrementing/decrementing limit
+	x0 = x0 + a0;
+	# TODO: handle error, when x0 (new brk_end) < brk_start
+	brk_end = x0;
+	# Setting and returning new heap segment limit
+	return brk(x0);
 };
 
 ### Memory/String operations
