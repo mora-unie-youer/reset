@@ -265,6 +265,24 @@ merge_block : (a0) {
 	a0[0] = x0;
 };
 
+## Deallocate block
+# a0 - block
+deallocate_block : (a0) {
+	# x0 - block status/next block
+	allocate(1);
+	# Fetching block status
+	x0 = a0[1] & PAGE_USED;
+	# If block is not used - returning
+	if (x0 == NULL) { return; };
+	# Setting free status
+	a0[1] = a0[1] & ~(PAGE_USED);
+	# Try to merge this block
+	merge_block(a0);
+	# Try to merge next block
+	if (a0 == memory_block) { return; };
+	merge_block(a0 + a0[1] + 8);
+};
+
 ### Memory/String operations
 ## Fill memory block with value (char)
 # a0 - value
