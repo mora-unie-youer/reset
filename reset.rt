@@ -214,7 +214,7 @@ label allocate_block_retry;
 				# Setting used status
 				x1[1] = x2 | PAGE_USED;
 				# Returning allocated block (skipping 8 bytes)
-				return(x1 + 8);
+				return(x1);
 			};
 			# Checking if this block can be splitted (requested size + header size)
 			if (x2 >= x0 + 8) {
@@ -226,7 +226,7 @@ label allocate_block_retry;
 				if (x1 == memory_block) { memory_block = x3; };
 				# Decreasing block size and setting used status
 				x1[1] = x0 | PAGE_USED;
-				return(x1 + 8);
+				return(x1);
 			};
 		};
 		# Iterating with next block
@@ -281,6 +281,30 @@ deallocate_block : (a0) {
 	# Try to merge next block
 	if (a0 == memory_block) { return; };
 	merge_block(a0 + a0[1] + 8);
+};
+
+## Allocate memory
+# a0 - size
+malloc : (a0) {
+	return(allocate_block(a0) + 8);
+};
+
+## Allocate cleared memory
+# a0 - size
+calloc : (a0) {
+	# x0 - address
+	allocate(1);
+	# Allocating memory
+	x0 = malloc(a0);
+	# Clearing memory with zeroes
+	memset(0, x0, a0);
+	return x0;
+};
+
+## Free memory
+# a0 - address
+free : (a0) {
+	deallocate_block(a0 - 8);
 };
 
 ### Memory/String operations
