@@ -24,31 +24,31 @@ exit : (a0) { syscall(SYS_exit, a0); };
 # a1 - buffer
 # a2 - count
 # @return read count
-read : (a0, a1, a2) { return syscall(SYS_read, a0, a1, a2); };
+read : (a0, a1, a2) { return(syscall(SYS_read, a0, a1, a2)); };
 
 ## Write to file
 # a0 - file
 # a1 - buffer
 # a2 - count
 # @return write count
-write : (a0, a1, a2) { return syscall(SYS_write, a0, a1, a2); };
+write : (a0, a1, a2) { return(syscall(SYS_write, a0, a1, a2)); };
 
 ## Open file
 # a0 - path
 # a1 - flags
 # @return fd or error
-open : (a0, a1) { return syscall(SYS_open, a0, a1); };
+open : (a0, a1) { return(syscall(SYS_open, a0, a1)); };
 
 ## Set/return heap segment limit
 # a0 - address (set) or NULL (return)
 # @return current heap limit
-brk : (a0) { return syscall(SYS_brk, a0); };
+brk : (a0) { return(syscall(SYS_brk, a0)); };
 
 ## Unmap memory page
 # a0 - address
 # a1 - size
 # @return zero on success, negative on error
-munmap : (a0, a1) { return syscall(SYS_munmap, a0, a1); };
+munmap : (a0, a1) { return(syscall(SYS_munmap, a0, a1)); };
 
 ## Map memory page
 # a0 - address
@@ -58,7 +58,7 @@ munmap : (a0, a1) { return syscall(SYS_munmap, a0, a1); };
 # a4 - fd
 # a5 - offset
 mmap2 : (a0, a1, a2, a3, a4, a5) {
-	return syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5);
+	return(syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5));
 };
 
 ### Useful functions
@@ -299,7 +299,7 @@ calloc : (a0) {
 	x0 = malloc(a0);
 	# Clearing memory with zeroes
 	memset(0, x0, a0);
-	return x0;
+	return(x0);
 };
 
 ## Free memory
@@ -351,7 +351,7 @@ strlen : (a0) {
 	x0 = 0;
 	# While char is not NULL, incrementing length
 	while (readchar(a0, x0) != '\0') { x0 = x0 + 1; };
-	return x0;
+	return(x0);
 };
 
 ## Copy string
@@ -420,7 +420,7 @@ tuple3 : (a0, a1, a2) {
 	x0[0] = a0;
 	x0[1] = a1;
 	x0[2] = a2;
-	return x0;
+	return(x0);
 };
 
 ## Make tuple with 4 values
@@ -435,7 +435,7 @@ tuple4 : (a0, a1, a2, a3) {
 	x0[1] = a1;
 	x0[2] = a2;
 	x0[3] = a3;
-	return x0;
+	return(x0);
 };
 
 ### I/O
@@ -461,7 +461,7 @@ input_chan : (a0) {
 	x0 = malloc(IBUFFER_SIZE);
 	# Creating channel
 	x0 = tuple4(a0, x0, 0, 0);
-	return x0;
+	return(x0);
 };
 
 ## Create new output channel
@@ -473,7 +473,7 @@ output_chan : (a0) {
 	x0 = malloc(OBUFFER_SIZE);
 	# Creating channel
 	x0 = tuple3(a0, x0, 0);
-	return x0;
+	return(x0);
 };
 
 ## Initialize standard I/O
@@ -507,17 +507,33 @@ fgetc : (a0) {
 	# Filling buffer, if needed
 	fill(a0);
 	# Checking if input is ended
-	if (a0[CHAN_IDX] == a0[ICHAN_END]) { return EOF; };
+	if (a0[CHAN_IDX] == a0[ICHAN_END]) { return(EOF); };
 	# Fetching char
 	x0 = readchar(a0[CHAN_BUF], a0[CHAN_IDX]);
 	# Incrementing index and returning char
 	a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
-	return x0;
+	return(x0);
 };
 
 ## Read char from stdin
 # @return char
-getc : () { return fgetc(stdin); };
+getc : () { return(fgetc(stdin)); };
+
+## Look ahead next char
+# a0 - channel
+# @return char
+fnextc : (a0) {
+	# Filling buffer, if needed
+	fill(a0);
+	# Checking if input is ended
+	if (a0[CHAN_IDX] == a0[ICHAN_END]) { return(EOF); };
+	# Fetching char
+	return(readchar(a0[CHAN_BUF], a0[CHAN_IDX]));
+};
+
+## Look ahead next char from stdin
+# @return char
+nextc : () { return(fnextc(stdin)); };
 
 ## Flush output channel
 # a0 - channel
@@ -607,6 +623,7 @@ main : (a0, a1) {
 	putx(a1);
 	putc('\n');
 	getc();
+	nextc();
 	return(a0);
 };
 
