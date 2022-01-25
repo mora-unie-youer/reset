@@ -1,5 +1,6 @@
 ### Useful constants
 NULL  => 0;
+EOF   => -1;
 ## Booleans
 FALSE => 0;
 TRUE  => 1;
@@ -497,6 +498,27 @@ fill : (a0) {
 	};
 };
 
+## Read char
+# a0 - channel
+# @return char
+fgetc : (a0) {
+	# x0 - char
+	allocate(1);
+	# Filling buffer, if needed
+	fill(a0);
+	# Checking if input is ended
+	if (a0[CHAN_IDX] == a0[ICHAN_END]) { return EOF; };
+	# Fetching char
+	x0 = readchar(a0[CHAN_BUF], a0[CHAN_IDX]);
+	# Incrementing index and returning char
+	a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
+	return x0;
+};
+
+## Read char from stdin
+# @return char
+getc : () { return fgetc(stdin); };
+
 ## Flush output channel
 # a0 - channel
 flush : (a0) {
@@ -584,6 +606,7 @@ main : (a0, a1) {
 	puts("Hello, world!\n");
 	putx(a1);
 	putc('\n');
+	getc();
 	return(a0);
 };
 
