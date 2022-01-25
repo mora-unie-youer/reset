@@ -1782,17 +1782,9 @@ _prefix_expr:
 	ret
 2:
 	/* Parsing addressof argument */
-	call movl /* Loading current stack offset value in %eax */
-	call ebp
-	call comma
-	call eax
-	call newline
-	call addl /* Adding to offset to get argument address */
-	movl token_val, %eax
-	addl $2, %eax
-	imul $4, %eax /* Offset of argument */
-	pushl %eax
-	call value
+	call leal
+	pushl token_val
+	call argument
 	addl $4, %esp
 	call comma
 	call eax
@@ -1800,17 +1792,9 @@ _prefix_expr:
 	ret
 3:
 	/* Parsing addressof variable */
-	call movl /* Loading current stack offset value in %eax */
-	call ebp
-	call comma
-	call eax
-	call newline
-	call subl /* Subtracting to offset to get argument address */
-	movl token_val, %eax
-	incl %eax
-	imul $4, %eax /* Offset of argument */
-	pushl %eax
-	call value
+	call leal
+	pushl token_val
+	call variable
 	addl $4, %esp
 	call comma
 	call eax
