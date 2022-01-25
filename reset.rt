@@ -238,6 +238,33 @@ label allocate_block_retry;
 	goto &allocate_block_retry;
 };
 
+## Try merge block with previous
+# a0 - block
+merge_block : (a0) {
+	# x0 - prev block
+	# x1 - status of prev block
+	# x2 - status of this block
+	allocate(3);
+	# Getting block from address
+	# Fetching previous block
+	x0 = a0[0];
+	# Checking if previous block is not null
+	if (x0 == NULL) { return; };
+	# Fetching statuses
+	x1 = x0[1] & PAGE_USED;
+	x2 = a0[1] & PAGE_USED;
+	# If statuses are not NULL (free) and are not equal - returning
+	if (x1) { return; };
+	if (x1 != x2) { return; };
+	# Merging previous block with this
+	x0[1] = x0[1] + a0[1] + 8;
+	# Checking if it was last block.
+	if (a0 == memory_block) { memory_block = x0; return; };
+	# Updating next block, as it wasn't last block
+	a0 = x0 + x0[1] + 8;
+	a0[0] = x0;
+};
+
 ### Memory/String operations
 ## Fill memory block with value (char)
 # a0 - value
