@@ -537,12 +537,38 @@ puts  : (a0) { fputs(stdout, a0); };
 # a0 - char
 eputs : (a0) { fputs(stderr, a0); };
 
+## Put number
+# a0 - channel
+# a1 - number
+# a2 - base
+fputn : (a0, a1, a2) {
+	# x0 - number buffer
+	allocate(1);
+	# Allocating number buffer
+	x0 = malloc(32);
+	# Convering number to string
+	itoa(a1, x0, a2);
+	# Putting string
+	fputs(a0, x0);
+	# Freeing number string
+	free(x0);
+};
+
+## Put decimal number in stdout
+# a0 - number
+putd : (a0) { fputn(stdout, a0, 10); };
+## Put hexadecimal number in stdout
+# a0 - number
+putx : (a0) { fputn(stdout, a0, 16); };
+
 ## Main function
 # a0 - argc
 # a1 - argv
 # @return exit code
 main : (a0, a1) {
 	puts("Hello, world!\n");
+	putx(a1);
+	putc('\n');
 	return(a0);
 };
 
