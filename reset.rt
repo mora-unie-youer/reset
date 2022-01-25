@@ -402,6 +402,41 @@ strcmp : (a0, a1) {
 	return(x1 - x2);
 };
 
+### Tuples
+## Allocate tuple
+# a0 - size
+# @return allocated tuple
+allocate_tuple : (a0) { return malloc(4 * a0); };
+
+## Make tuple with 3 values
+# a0, a1, a2 - values
+# @return tuple
+tuple3 : (a0, a1, a2) {
+	# x0 - tuple
+	allocate(1);
+	x0 = allocate_tuple(3);
+	# Fill tuple
+	x0[0] = a0;
+	x0[1] = a1;
+	x0[2] = a2;
+	return x0;
+};
+
+## Make tuple with 4 values
+# a0, a1, a2, a3 - values
+# @return tuple
+tuple4 : (a0, a1, a2, a3) {
+	# x0 - tuple
+	allocate(1);
+	x0 = allocate_tuple(4);
+	# Fill tuple
+	x0[0] = a0;
+	x0[1] = a1;
+	x0[2] = a2;
+	x0[3] = a3;
+	return x0;
+};
+
 ## Main function
 # a0 - argc
 # a1 - argv
