@@ -145,7 +145,8 @@ sbrk : (a0) {
 ## Allocate new memory page
 allocate_page : () {
 	# x0 - previous heap limit
-	allocate(1);
+	# x1 - memory size
+	allocate(2);
 	# Allocating next page
 	x0 = sbrk(PAGE_SIZE);
 
@@ -156,6 +157,18 @@ allocate_page : () {
 		# Initializing first memory block
 		memory_block[0] = NULL; # Pointer to previous block
 		memory_block[1] = PAGE_SIZE; # Setting size and `not allocated`
+	} else {
+		x1 = memory_block[1];
+		# If last memory block is used
+		if (x1 & PAGE_USED) {
+			# Creating new memory block
+			x0[0] = memory_block; # Points to last block
+			x0[1] = PAGE_SIZE; # Setting size and `not allocated`
+			memory_block = x0; # Setting new last block
+		} else {
+			# Memory block is not used, just adding new memory to it
+			memory_block[1] = x1 + PAGE_SIZE;
+		};
 	};
 };
 
