@@ -189,6 +189,55 @@ allocate_page : () {
 	};
 };
 
+## Allocate block
+# a0 - block size
+# @return address of block
+allocate_block : (a0) {
+	# x0 - required memory size
+	# x1 - memory block
+	# x2 - memory block size and status
+	# x3 - new memory block
+	allocate(4);
+	# required size is aligned to 4 bytes
+	x0 = align(a0, 4);
+label allocate_block_retry;
+	# Starting from latest block
+	x1 = memory_block;
+	# Iterating while we have next memory blocks
+	while (x1 != NULL) {
+		# Fetching block size and status
+		x2 = x1[1];
+		# Checking if this block is not used
+		if ((x2 & PAGE_USED) == NULL) {
+			# Checking if this block perfectly fits -> simply change status
+			if (x2 == x0) {
+				# Setting used status
+				x1[1] = x2 | PAGE_USED;
+				# Returning allocated block (skipping 8 bytes)
+				return(x1 + 8);
+			};
+			# Checking if this block can be splitted (requested size + header size)
+			if (x2 >= x0 + 8) {
+				# New free block
+				x3 = x1 + x0 + 8;
+				x3[0] = x1; # Setting previous block
+				x3[1] = x2 - x0 - 8; # Setting new size
+				# If x1 is last block -> changing last block
+				if (x1 == memory_block) { memory_block = x3; };
+				# Decreasing block size and setting used status
+				x1[1] = x0 | PAGE_USED;
+				return(x1 + 8);
+			};
+		};
+		# Iterating with next block
+		x1 = x1[0];
+	};
+	# We are here only if there's no available block. Allocating new page
+	allocate_page();
+	# Now we have more memory, retrying
+	goto &allocate_block_retry;
+};
+
 ### Memory/String operations
 ## Fill memory block with value (char)
 # a0 - value
