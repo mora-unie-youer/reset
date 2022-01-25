@@ -475,6 +475,16 @@ output_chan : (a0) {
 	return x0;
 };
 
+## Flush output channel
+# a0 - channel
+flush : (a0) {
+	# If buffer is not empty
+	if (a0[CHAN_IDX] > 0) {
+		write(a0[CHAN_FD], a0[CHAN_BUF], a0[CHAN_IDX]);
+		a0[CHAN_IDX] = 0;
+	};
+};
+
 ## Main function
 # a0 - argc
 # a1 - argv
