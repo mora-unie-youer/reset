@@ -112,9 +112,13 @@ itoa : (a0, a1, a2) {
 ### Memory Management
 ## Memory page size
 PAGE_SIZE => 4096; # 0x1000
+## Memory page status
+PAGE_USED => 2147483648; # 0x80000000
 ## Heap segment start and end
 brk_start : NULL;
 brk_end   : NULL;
+## Memory page list
+memory_block : NULL;
 
 ## Increment heap segment size
 # a0 - increment size (use negative to decrement)
@@ -134,6 +138,21 @@ sbrk : (a0) {
 	brk_end = x0;
 	# Setting and returning new heap segment limit
 	return brk(x0);
+};
+
+## Allocate new memory page
+allocate_page : () {
+	# Allocating next page
+	sbrk(PAGE_SIZE);
+
+	# If memory blocks are uninitialized
+	if (memory_block == NULL) {
+		# Initializing pointers
+		memory_block = brk_start;
+		# Initializing first memory block
+		memory_block[0] = NULL; # Pointer to previous block
+		memory_block[1] = PAGE_SIZE; # Setting size and `not allocated`
+	};
 };
 
 ### Memory/String operations
