@@ -437,6 +437,44 @@ tuple4 : (a0, a1, a2, a3) {
 	return x0;
 };
 
+### I/O
+## Parts of I/O channels
+CHAN_FD   => 0;
+CHAN_BUF  => 1;
+CHAN_IDX  => 2;
+ICHAN_END => 3;
+## Buffer sizes
+IBUFFER_SIZE => 512;
+OBUFFER_SIZE => 512;
+## Standard channels
+stdin  : NULL;
+stdout : NULL;
+stderr : NULL;
+
+## Create new input channel
+# a0 - fd
+input_chan : (a0) {
+	# x0 - buffer/channel
+	allocate(1);
+	# Allocating buffer
+	x0 = malloc(IBUFFER_SIZE);
+	# Creating channel
+	x0 = tuple4(a0, x0, 0, 0);
+	return x0;
+};
+
+## Create new output channel
+# a0 - fd
+output_chan : (a0) {
+	# x0 - buffer/channel
+	allocate(1);
+	# Allocating buffer
+	x0 = malloc(OBUFFER_SIZE);
+	# Creating channel
+	x0 = tuple3(a0, x0, 0);
+	return x0;
+};
+
 ## Main function
 # a0 - argc
 # a1 - argv
