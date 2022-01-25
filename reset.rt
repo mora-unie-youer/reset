@@ -10,6 +10,7 @@ SYS_exit   => 1;
 SYS_read   => 3;
 SYS_write  => 4;
 SYS_open   => 5;
+SYS_close  => 6;
 SYS_brk    => 45;
 SYS_munmap => 91;
 SYS_mmap2  => 192;
@@ -39,6 +40,11 @@ write : (a0, a1, a2) { return(syscall(SYS_write, a0, a1, a2)); };
 # a2 - mode
 # @return fd or error
 open : (a0, a1, a2) { return(syscall(SYS_open, a0, a1, a2)); };
+
+## Close file
+# a0 - fd
+# @return result code
+close : (a0) { return(syscall(SYS_close, a0)); };
 
 ## Set/return heap segment limit
 # a0 - address (set) or NULL (return)
@@ -487,6 +493,17 @@ input_chan_file : (a0) {
 	return input_chan(x0);
 };
 
+## Close input channel
+# a0 - channel
+input_chan_close : (a0) {
+	# Closing fd
+	close(a0[CHAN_FD]);
+	# Deallocating buffer
+	free(a0[CHAN_BUF]);
+	# Deallocating channel
+	free(a0);
+};
+
 ## Create new output channel
 # a0 - fd
 # @return channel
@@ -512,6 +529,19 @@ output_chan_file : (a0) {
 	if (x0 < 0) { eputs("Coudn't open file output channel\n"); exit(1); };
 	# Returning new channel
 	return output_chan(x0);
+};
+
+## Close output channel
+# a0 - channel
+output_chan_close : (a0) {
+	# Flushing buffer
+	flush(a0);
+	# Closing fd
+	close(a0[CHAN_FD]);
+	# Deallocating buffer
+	free(a0[CHAN_BUF]);
+	# Deallocating channel
+	free(a0);
 };
 
 ## Initialize standard I/O
