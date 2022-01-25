@@ -36,8 +36,9 @@ write : (a0, a1, a2) { return(syscall(SYS_write, a0, a1, a2)); };
 ## Open file
 # a0 - path
 # a1 - flags
+# a2 - mode
 # @return fd or error
-open : (a0, a1) { return(syscall(SYS_open, a0, a1)); };
+open : (a0, a1, a2) { return(syscall(SYS_open, a0, a1, a2)); };
 
 ## Set/return heap segment limit
 # a0 - address (set) or NULL (return)
@@ -439,6 +440,13 @@ tuple4 : (a0, a1, a2, a3) {
 };
 
 ### I/O
+## Open flags
+O_RDONLY => 0;
+O_WRONLY => 1;
+O_RDWR   => 2;
+O_CREAT  => 64;
+O_TRUNC  => 512;
+O_APPEND => 1024;
 ## Parts of I/O channels
 CHAN_FD   => 0;
 CHAN_BUF  => 1;
@@ -454,6 +462,7 @@ stderr : NULL;
 
 ## Create new input channel
 # a0 - fd
+# @return channel
 input_chan : (a0) {
 	# x0 - buffer/channel
 	allocate(1);
@@ -464,8 +473,23 @@ input_chan : (a0) {
 	return(x0);
 };
 
+## Create new input channel based on file
+# a0 - file name
+# @return channel
+input_chan_file : (a0) {
+	# x0 - fd/channel
+	allocate(1);
+	# Opening file with read permission
+	x0 = open(a0, O_RDONLY, 0);
+	# Checking for success
+	if (x0 < 0) { eputs("Coudn't open file input channel\n"); exit(1); };
+	# Returning new channel
+	return input_chan(x0);
+};
+
 ## Create new output channel
 # a0 - fd
+# @return channel
 output_chan : (a0) {
 	# x0 - buffer/channel
 	allocate(1);
@@ -474,6 +498,20 @@ output_chan : (a0) {
 	# Creating channel
 	x0 = tuple3(a0, x0, 0);
 	return(x0);
+};
+
+## Create new output channel based on file
+# a0 - file name
+# @return channel
+output_chan_file : (a0) {
+	# x0 - fd/channel
+	allocate(1);
+	# Opening file with read permission
+	x0 = open(a0, O_WRONLY|O_CREAT|O_TRUNC, 420); # 420 = 0644
+	# Checking for success
+	if (x0 < 0) { eputs("Coudn't open file output channel\n"); exit(1); };
+	# Returning new channel
+	return output_chan(x0);
 };
 
 ## Initialize standard I/O
