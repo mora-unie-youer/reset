@@ -512,11 +512,37 @@ putc  : (a0) { fputc(stdout, a0); };
 # a0 - char
 eputc : (a0) { fputc(stderr, a0); };
 
+## Put string
+# a0 - channel
+# a1 - string
+fputs : (a0, a1) {
+	# x0 - char
+	allocate(1);
+	# Fetching first char
+	x0 = readchar(a1, 0);
+	# Iterating, until we'll find '\0'
+	while (x0 != '\0') {
+		# Putting character
+		fputc(a0, x0);
+		# Reading next character
+		a1 = a1 + 1;
+		x0 = readchar(a1, 0);
+	};
+};
+
+## Put string in stdout
+# a0 - char
+puts  : (a0) { fputs(stdout, a0); };
+## Put string in stderr
+# a0 - char
+eputs : (a0) { fputs(stderr, a0); };
+
 ## Main function
 # a0 - argc
 # a1 - argv
 # @return exit code
 main : (a0, a1) {
+	puts("Hello, world!\n");
 	return(a0);
 };
 
