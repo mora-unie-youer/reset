@@ -73,6 +73,14 @@ itoa : (a0, a1, a2) {
 	allocate(3);
 	x0 = 0;
 	x1 = 0;
+
+	# Writing first digit
+	writechar(a1, x0, readchar(itoa_digits, a0 % a2));
+	# Going to next unit
+	a0 = a0 / a2;
+	# Going to next char position
+	x0 = x0 + 1;
+
 	# Iterating while value is not zero
 	while (a0 != 0) {
 		# Writing needed char to result buffer
