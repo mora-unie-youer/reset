@@ -475,6 +475,13 @@ output_chan : (a0) {
 	return x0;
 };
 
+## Initialize standard I/O
+initialize_io : () {
+	stdin  = input_chan(0);  # stdin=0
+	stdout = output_chan(1); # stdout=1
+	stderr = output_chan(2); # stderr=2
+};
+
 ## Flush output channel
 # a0 - channel
 flush : (a0) {
@@ -496,6 +503,8 @@ main : (a0, a1) {
 # Entry point of the entire program
 global _start;
 _start : () {
+	# Initializing I/O at the start
+	initialize_io();
 	# argc is located in 4(%esp), argv is located in 8(%esp)
 	exit(main(*(&a0 - 4), &a0));
 };
