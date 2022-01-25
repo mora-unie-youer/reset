@@ -482,6 +482,21 @@ initialize_io : () {
 	stderr = output_chan(2); # stderr=2
 };
 
+## Fill input channel
+# a0 - channel
+fill : (a0) {
+	# x0 - read count
+	allocate(1);
+	# Checking if buffer is exhausted
+	if (a0[CHAN_IDX] == a0[ICHAN_END]) {
+		# Input buffer is empty, refilling
+		x0 = read(a0[CHAN_FD], a0[CHAN_BUF], IBUFFER_SIZE);
+		# Resetting index and setting size
+		a0[CHAN_IDX]  = 0;
+		a0[ICHAN_END] = x0;
+	};
+};
+
 ## Flush output channel
 # a0 - channel
 flush : (a0) {
