@@ -492,6 +492,26 @@ flush : (a0) {
 	};
 };
 
+## Put character
+# a0 - channel
+# a1 - char
+fputc : (a0, a1) {
+	# Writing to buffer
+	writechar(a0[CHAN_BUF], a0[CHAN_IDX], a1);
+	# Incrementing index
+	a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
+	# Checking if need to flush
+	if (a0[CHAN_IDX] == OBUFFER_SIZE) { flush(a0); return; };
+	if (a1 == '\n') { flush(a0); return; };
+};
+
+## Put character in stdout
+# a0 - char
+putc  : (a0) { fputc(stdout, a0); };
+## Put character in stderr
+# a0 - char
+eputc : (a0) { fputc(stderr, a0); };
+
 ## Main function
 # a0 - argc
 # a1 - argv
