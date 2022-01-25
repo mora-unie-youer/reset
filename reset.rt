@@ -614,16 +614,21 @@ putd : (a0) { fputn(stdout, a0, 10); };
 # a0 - number
 putx : (a0) { fputn(stdout, a0, 16); };
 
+## Print usage
+# a0 - program name
+usage : (a0) {
+	eputs("usage: ");
+	eputs(a0);
+	eputs(" [option]... <file>\n");
+};
+
 ## Main function
 # a0 - argc
 # a1 - argv
 # @return exit code
 main : (a0, a1) {
-	puts("Hello, world!\n");
-	putx(a1);
-	putc('\n');
-	getc();
-	nextc();
+	# If no additional args - printing usage
+	if (a0 < 2) { usage(a1[0]); return 1; };
 	return(a0);
 };
 
