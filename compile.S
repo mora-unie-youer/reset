@@ -668,24 +668,40 @@ _toplevel_expr:
 	/* Parsing value to set */
 	call lex
 	call _or_expr /* Value stored in %eax */
-	/* Storing index in %ebx */
-	call popl_ebx
-	/* Loading from identifier address + offset to %eax */
+	/* Storing index in %ecx */
+	call popl_ecx
+	/* Loading array base from first byte */
 	call movl
-	call eax
-	call comma
 	movl $0, (%esp)
 	call _get_ident
 	movl %eax, (%esp)
 	call puts
 	call _pop_ident
-	movb $'(, (%esp)
-	call putc
 	call comma
 	call ebx
+	call newline
+	/* Storing address in %ebx */
+	call leal
+	movb $'(, (%esp)
+	call putc
+	call ebx
+	call comma
+	call ecx
 	call comma
 	movl $4, (%esp)
 	call putd
+	movb $'), (%esp)
+	call putc
+	call comma
+	call ebx
+	call newline
+	/* Loading from %eax to identifier address + offset */
+	call movl
+	call eax
+	call comma
+	movb $'(, (%esp)
+	call putc
+	call ebx
 	movb $'), (%esp)
 	call putc
 	call newline
@@ -1887,22 +1903,38 @@ _return_label_index_value:
 	call lex
 	cmpw $'], token_tag
 	jne _syntax_error
-	/* Storing index in %ebx */
-	call popl_ebx
-	/* Loading from identifier address + offset to %eax */
+	/* Storing index in %ecx */
+	call popl_ecx
+	/* Loading array base from first byte */
 	call movl
 	movl $0, (%esp)
 	call _get_ident
 	movl %eax, (%esp)
 	call puts
 	call _pop_ident
-	movb $'(, (%esp)
-	call putc
 	call comma
 	call ebx
+	call newline
+	/* Storing address in %ebx */
+	call leal
+	movb $'(, (%esp)
+	call putc
+	call ebx
+	call comma
+	call ecx
 	call comma
 	movl $4, (%esp)
 	call putd
+	movb $'), (%esp)
+	call putc
+	call comma
+	call ebx
+	call newline
+	/* Loading from identifier address + offset to %eax */
+	call movl
+	movb $'(, (%esp)
+	call putc
+	call ebx
 	movb $'), (%esp)
 	call putc
 	call comma
