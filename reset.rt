@@ -690,6 +690,23 @@ usage : (a0) {
 	eputs(" [option]... <file>\n");
 };
 
+### Lexer
+## Character types
+CHAR_NULL      => 0;  # \0 */
+CHAR_INVALID   => 1;  # invalid characters */
+CHAR_SPACES    => 2;  # [\t\r ]
+CHAR_NEWLINE   => 3;  # \n
+CHAR_ZERO      => 4;  # 0
+CHAR_OCTAL     => 5;  # [1-7]
+CHAR_DECIMAL   => 6;  # [89]
+CHAR_ALPHA     => 7;  # [A-Za-z_] \ [ax]
+CHAR_A_OR_X    => 8;  # [ax]
+CHAR_SQUOTE    => 9;  # \'
+CHAR_DQUOTE    => 10; # \"
+CHAR_BACKSLASH => 11; # \\
+CHAR_SYMBOL    => 12; # other characters
+
+
 ## Main function
 # a0 - argc
 # a1 - argv
@@ -697,6 +714,7 @@ usage : (a0) {
 main : (a0, a1) {
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return 1; };
+	# TODO: implement option parser
 	return(a0);
 };
 
