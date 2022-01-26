@@ -164,7 +164,7 @@ sbrk : (a0) {
 	# Setting and returning new heap segment limit
 	brk_end = x1;
 	brk(x1);
-	return x0;
+	return(x0);
 };
 
 ## Allocate new memory page
@@ -490,7 +490,7 @@ input_chan_file : (a0) {
 	# Checking for success
 	if (x0 < 0) { eputs("Coudn't open file input channel\n"); exit(1); };
 	# Returning new channel
-	return input_chan(x0);
+	return(input_chan(x0));
 };
 
 ## Close input channel
@@ -528,7 +528,7 @@ output_chan_file : (a0) {
 	# Checking for success
 	if (x0 < 0) { eputs("Coudn't open file output channel\n"); exit(1); };
 	# Returning new channel
-	return output_chan(x0);
+	return(output_chan(x0));
 };
 
 ## Close output channel
