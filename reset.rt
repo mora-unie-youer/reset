@@ -465,20 +465,24 @@ LIST_VALUE => 1;
 
 ## Create linked list with value
 # a0 - value
-list : (a0) { return list_insert(NULL, a0); };
+# @return list
+list : (a0) { return(list_insert(NULL, a0)); };
 
 ## Insert value in linked list
 # a0 - list
 # a1 - value
-list_insert : (a0, a1) { return tuple2(a0, a1); };
+# @return list with new value
+list_insert : (a0, a1) { return(tuple2(a0, a1)); };
 
 ## Get next element of linked list
 # a0 - list
-list_next : (a0) { return a0[LIST_NEXT]; };
+# @return list with next value
+list_next : (a0) { return(a0[LIST_NEXT]); };
 
 ## Get value of current element of linked list
 # a0 - list
-list_value : (a0) { return a0[LIST_VALUE]; };
+# @return current element value
+list_value : (a0) { return(a0[LIST_VALUE]); };
 
 ### I/O
 ## Open flags
