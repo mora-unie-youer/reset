@@ -472,6 +472,14 @@ list : (a0) { return list_insert(NULL, a0); };
 # a1 - value
 list_insert : (a0, a1) { return tuple2(a0, a1); };
 
+## Get next element of linked list
+# a0 - list
+list_next : (a0) { return a0[LIST_NEXT]; };
+
+## Get value of current element of linked list
+# a0 - list
+list_value : (a0) { return a0[LIST_VALUE]; };
+
 ### I/O
 ## Open flags
 O_RDONLY => 0;
