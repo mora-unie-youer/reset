@@ -596,16 +596,6 @@ O_TRUNC  => 512;
 O_APPEND => 1024;
 ## Parts of I/O channels
 CHAN_FD   => 0;
-### I/O
-## Open flags
-O_RDONLY => 0;
-O_WRONLY => 1;
-O_RDWR   => 2;
-O_CREAT  => 64;
-O_TRUNC  => 512;
-O_APPEND => 1024;
-## Parts of I/O channels
-CHAN_FD   => 0;
 CHAN_BUF  => 1;
 CHAN_IDX  => 2;
 ICHAN_END => 3;
