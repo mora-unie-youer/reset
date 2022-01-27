@@ -598,6 +598,23 @@ char_vector_get : (a0, a1) { return(readchar(a0[VEC_BUF], a1)); };
 # @return value
 vector_get : (a0, a1) { return(a0[VEC_BUF][a1]); };
 
+## Set value at index in char vector
+# a0 - char vector
+# a1 - index
+# a2 - char
+char_vector_set : (a0, a1, a2) { writechar(a0[VEC_BUF], a1, a2); };
+
+## Set value at index in vector
+# a0 - vector
+# a1 - index
+# a2 - value
+vector_set : (a0, a1, a2) {
+	# x0 - buffer
+	allocate(1);
+	x0 = a0[VEC_BUF];
+	x0[a1] = a2;
+};
+
 ### I/O
 ## Open flags
 O_RDONLY => 0;
