@@ -493,12 +493,24 @@ VEC_BUF  => 2;
 ## Create character vector
 # a0 - size
 # a1 - capacity
+# @return character vector
 char_vector : (a0, a1) { return(tuple3(a0, a1, calloc(a1))); };
 
 ## Create vector
 # a0 - size
 # a1 - capacity
+# @return vector
 vector : (a0, a1) { return(tuple3(a0, a1, calloc(4 * a1))); };
+
+## Get vector buffer
+# a0 - vector
+# @return vector buffer
+vector_buffer : (a0) { return(a0[VEC_BUF]); };
+
+## Get vector size
+# a0 - vector
+# @return vector size
+vector_size : (a0) { return(a0[VEC_SIZE]); };
 
 ### I/O
 ## Open flags
