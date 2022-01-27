@@ -586,6 +586,18 @@ vector_resize : (a0, a1) {
 	a0[VEC_SIZE] = a1;
 };
 
+## Get value at index in char vector
+# a0 - char vector
+# a1 - index
+# @return char
+char_vector_get : (a0, a1) { return(readchar(a0[VEC_BUF], a1)); };
+
+## Get value at index in vector
+# a0 - vector
+# a1 - index
+# @return value
+vector_get : (a0, a1) { return(a0[VEC_BUF][a1]); };
+
 ### I/O
 ## Open flags
 O_RDONLY => 0;
