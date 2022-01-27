@@ -615,6 +615,54 @@ vector_set : (a0, a1, a2) {
 	x0[a1] = a2;
 };
 
+## Insert value in the end of char vector
+# a0 - char vector
+# a1 - value
+char_vector_push : (a0, a1) {
+	# If vector buffer is full, reserving more
+	if (a0[VEC_SIZE] == a0[VEC_CAP]) {
+		char_vector_reserve(a0, a0[VEC_CAP] * 2);
+	};
+	# Putting new value
+	char_vector_set(a0, a0[VEC_SIZE], a1);
+	# Incrementing size
+	a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
+};
+
+## Insert value in the end of vector
+# a0 - vector
+# a1 - value
+vector_push : (a0, a1) {
+	# If vector buffer is full, reserving more
+	if (a0[VEC_SIZE] == a0[VEC_CAP]) {
+		vector_reserve(a0, a0[VEC_CAP] * 2);
+	};
+	# Putting new value
+	vector_set(a0, a0[VEC_SIZE], a1);
+	# Incrementing size
+	a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
+};
+
+## Remove and return last value from char vector
+# a0 - char vector
+# @return char
+char_vector_pop : (a0) {
+	# Decrementing size
+	a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
+	# Returning the value
+	return(char_vector_get(a0, a0[VEC_SIZE]));
+};
+
+## Remove and return last value from vector
+# a0 - vector
+# @return value
+vector_pop : (a0) {
+	# Decrementing size
+	a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
+	# Returning the value
+	return(vector_get(a0, a0[VEC_SIZE]));
+};
+
 ### I/O
 ## Open flags
 O_RDONLY => 0;
