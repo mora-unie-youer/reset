@@ -291,14 +291,21 @@ deallocate_block : (a0) {
 	merge_block(a0 + a0[1] + 8);
 };
 
+## Get block size
+# a0 - block
+# @return block size
+block_size : (a0) { return(a0[1] & ~(PAGE_USED)); };
+
 ## Allocate memory
 # a0 - size
+# @return allocated memory
 malloc : (a0) {
 	return(allocate_block(a0) + 8);
 };
 
 ## Allocate cleared memory
 # a0 - size
+# @return allocated and cleared memory
 calloc : (a0) {
 	# x0 - address
 	allocate(1);
@@ -307,6 +314,27 @@ calloc : (a0) {
 	# Clearing memory with zeroes
 	memset(0, x0, a0);
 	return(x0);
+};
+
+## Reallocate memory with new size
+# a0 - allocated memory
+# a1 - new size
+# @return new allocated memory
+realloc : (a0, a1) {
+	# x0 - old size/min size
+	# x1 - new allocated memory space
+	allocate(2);
+	# Fetching old size
+	x0 = block_size(a0 - 8);
+	# Storing minimal size
+	if (a1 < x0) { x0 = a1; };
+	# Allocating new memory
+	x1 = malloc(x0);
+	# Copying data to new memory space
+	memcpy(a0, x1, x0);
+	# Freeing old memory space
+	free(a0);
+	return x1;
 };
 
 ## Free memory
