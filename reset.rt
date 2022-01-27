@@ -540,6 +540,46 @@ vector_buffer : (a0) { return(a0[VEC_BUF]); };
 # @return vector size
 vector_size : (a0) { return(a0[VEC_SIZE]); };
 
+## Reserve more space for char vector buffer
+# a0 - char vector
+# a1 - new capacity
+char_vector_reserve : (a0, a1) {
+	# x0 - new buffer
+	allocate(1);
+	# Reserving, if new capacity is bigger
+	if (a1 > a0[VEC_CAP]) {
+		# Reallocating buffer
+		a0[VEC_BUF] = realloc(a0[VEC_BUF], a1);
+		# Setting new capacity
+		a0[VEC_CAP] = a1;
+	};
+};
+
+## Reserve more space for vector buffer
+# a0 - vector
+# a1 - new capacity
+vector_reserve : (a0, a1) {
+	# x0 - new buffer
+	allocate(1);
+	# Reserving, if new capacity is bigger
+	if (a1 > a0[VEC_CAP]) {
+		# Reallocating buffer
+		a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a1);
+		# Setting new capacity
+		a0[VEC_CAP] = a1;
+	};
+};
+
+### I/O
+## Open flags
+O_RDONLY => 0;
+O_WRONLY => 1;
+O_RDWR   => 2;
+O_CREAT  => 64;
+O_TRUNC  => 512;
+O_APPEND => 1024;
+## Parts of I/O channels
+CHAN_FD   => 0;
 ### I/O
 ## Open flags
 O_RDONLY => 0;
