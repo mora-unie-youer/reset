@@ -566,6 +566,26 @@ vector_reserve : (a0, a1) {
 	};
 };
 
+## Resize char vector
+# a0 - char vector
+# a1 - new size
+char_vector_resize : (a0, a1) {
+	# Reserving, if required
+	if (a1 > a0[VEC_SIZE]) { char_vector_reserve(a0, a1); };
+	# Setting new size
+	a0[VEC_SIZE] = a1;
+};
+
+## Resize vector
+# a0 - vector
+# a1 - new size
+vector_resize : (a0, a1) {
+	# Reserving, if required
+	if (a1 > a0[VEC_SIZE]) { vector_reserve(a0, a1); };
+	# Setting new size
+	a0[VEC_SIZE] = a1;
+};
+
 ### I/O
 ## Open flags
 O_RDONLY => 0;
