@@ -544,8 +544,6 @@ vector_size : (a0) { return(a0[VEC_SIZE]); };
 # a0 - char vector
 # a1 - new capacity
 char_vector_reserve : (a0, a1) {
-	# x0 - new buffer
-	allocate(1);
 	# Reserving, if new capacity is bigger
 	if (a1 > a0[VEC_CAP]) {
 		# Reallocating buffer
@@ -559,8 +557,6 @@ char_vector_reserve : (a0, a1) {
 # a0 - vector
 # a1 - new capacity
 vector_reserve : (a0, a1) {
-	# x0 - new buffer
-	allocate(1);
 	# Reserving, if new capacity is bigger
 	if (a1 > a0[VEC_CAP]) {
 		# Reallocating buffer
