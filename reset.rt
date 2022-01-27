@@ -417,6 +417,19 @@ strcmp : (a0, a1) {
 allocate_tuple : (a0) { return malloc(4 * a0); };
 
 ## Make tuple with 3 values
+# a0, a1 - values
+# @return tuple
+tuple2 : (a0, a1) {
+	# x0 - tuple
+	allocate(1);
+	x0 = allocate_tuple(2);
+	# Fill tuple
+	x0[0] = a0;
+	x0[1] = a1;
+	return(x0);
+};
+
+## Make tuple with 3 values
 # a0, a1, a2 - values
 # @return tuple
 tuple3 : (a0, a1, a2) {
@@ -444,6 +457,20 @@ tuple4 : (a0, a1, a2, a3) {
 	x0[3] = a3;
 	return(x0);
 };
+
+### Linked List
+## List parts
+LIST_NEXT  => 0;
+LIST_VALUE => 1;
+
+## Create linked list with value
+# a0 - value
+list : (a0) { return list_insert(NULL, a0); };
+
+## Insert value in linked list
+# a0 - list
+# a1 - value
+list_insert : (a0, a1) { return tuple2(a0, a1); };
 
 ### I/O
 ## Open flags
