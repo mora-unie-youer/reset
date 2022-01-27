@@ -329,7 +329,7 @@ realloc : (a0, a1) {
 	# Storing minimal size
 	if (a1 < x0) { x0 = a1; };
 	# Allocating new memory
-	x1 = malloc(x0);
+	x1 = calloc(x0);
 	# Copying data to new memory space
 	memcpy(a0, x1, x0);
 	# Freeing old memory space
