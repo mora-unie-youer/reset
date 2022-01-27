@@ -682,12 +682,19 @@ putd : (a0) { fputn(stdout, a0, 10); };
 # a0 - number
 putx : (a0) { fputn(stdout, a0, 16); };
 
-## Print usage
-# a0 - program name
-usage : (a0) {
-	eputs("usage: ");
-	eputs(a0);
-	eputs(" [option]... <file>\n");
+## Assertion
+# a0 - condition
+# a1 - error string
+assert : (a0, a1) {
+	# If condition success, returning
+	if (a0) { return; };
+	# Printing assertion error
+	eputs("ASSERT: ");
+	# If error string is null, printing default message. If not, print a1
+	if (a1) { eputs(a1); } else { eputs("assertion failed"); };
+	eputc('\n');
+	# Exitting
+	exit(1);
 };
 
 ### Lexer
@@ -740,6 +747,14 @@ char_to_escape : [
 	   0,  7,  8,  0,  0, 27, 12,  0,  0,  0,  0,  0,  0,  0, 10,  0,
 	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
+
+## Print usage
+# a0 - program name
+usage : (a0) {
+	eputs("usage: ");
+	eputs(a0);
+	eputs(" [option]... <file>\n");
+};
 
 ## Main function
 # a0 - argc
