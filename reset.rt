@@ -484,6 +484,22 @@ list_next : (a0) { return(a0[LIST_NEXT]); };
 # @return current element value
 list_value : (a0) { return(a0[LIST_VALUE]); };
 
+### Vector
+## Vector parts
+VEC_SIZE => 0;
+VEC_CAP  => 1;
+VEC_BUF  => 2;
+
+## Create character vector
+# a0 - size
+# a1 - capacity
+char_vector : (a0, a1) { return(tuple3(a0, a1, calloc(a1))); };
+
+## Create vector
+# a0 - size
+# a1 - capacity
+vector : (a0, a1) { return(tuple3(a0, a1, calloc(4 * a1))); };
+
 ### I/O
 ## Open flags
 O_RDONLY => 0;
