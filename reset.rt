@@ -959,6 +959,9 @@ LEX_IN   => 0;
 LEX_FILE => 1;
 LEX_LINE => 2;
 LEX_COL  => 3;
+LEX_HOLD => 4;
+## Token IDs
+TOKEN_END => 256;
 ## Char table
 char_table : [
 	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -1001,8 +1004,14 @@ lexer : (a0, a1) {
 	# x0 - lexer
 	allocate(1);
 	# Creating required memory space
-	x0 = tuple4(a0, a1, 0, 0);
-	return x0;
+	x0 = tuple4(a0, a1, 0, 0, FALSE);
+	return(x0);
+};
+
+## Fetch token
+# @return token
+lexer_lex : () {
+	return(TOKEN_END);
 };
 
 ## Print usage
@@ -1022,7 +1031,7 @@ main : (a0, a1) {
 	# x1 - lexer
 	allocate(2);
 	# If no additional args - printing usage
-	if (a0 < 2) { usage(a1[0]); return 1; };
+	if (a0 < 2) { usage(a1[0]); return(1); };
 	# TODO: implement option parser
 	# Creating input channel
 	x0 = input_chan_file(a1[1]);
