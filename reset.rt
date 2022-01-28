@@ -502,6 +502,24 @@ tuple5 : (a0, a1, a2, a3, a4) {
 	return(x0);
 };
 
+## Make tuple with 7 values
+# a0, a1, a2, a3, a4, a5, a6 - values
+# @return tuple
+tuple7 : (a0, a1, a2, a3, a4, a5, a6) {
+	# x0 - tuple
+	allocate(1);
+	x0 = allocate_tuple(7);
+	# Fill tuple
+	x0[0] = a0;
+	x0[1] = a1;
+	x0[2] = a2;
+	x0[3] = a3;
+	x0[4] = a4;
+	x0[5] = a5;
+	x0[6] = a6;
+	return(x0);
+};
+
 ### Linked List
 ## List parts
 LIST_NEXT  => 0;
@@ -971,11 +989,13 @@ CHAR_DQUOTE    => 12; # \"
 CHAR_BACKSLASH => 13; # \\
 CHAR_SYMBOL    => 14; # other characters
 ## Lexer parts
-LEX_IN   => 0;
-LEX_FILE => 1;
-LEX_LINE => 2;
-LEX_COL  => 3;
-LEX_HOLD => 4;
+LEX_ICHAN  => 0;
+LEX_FILE   => 1;
+LEX_LINE   => 2;
+LEX_COLUMN => 3;
+LEX_HOLD   => 4;
+LEX_TVALUE => 5;
+LEX_TTEXT  => 6;
 ## Token IDs
 TOKEN_END => 256;
 ## Char table
@@ -1017,16 +1037,22 @@ char_to_escape : [
 # a1 - filename
 # @return lexer
 lexer : (a0, a1) {
-	# x0 - lexer
-	allocate(1);
-	# Creating required memory space
-	x0 = tuple5(a0, a1, 0, 0, FALSE);
+	# x0 - token buffer
+	# x1 - lexer
+	allocate(2);
+	# Creating empty token buffer
+	x0 = char_vector(0, 1);
+	# Pushing '\0' to token buffer
+	char_vector_push(x0, '\0');
+	# Allocating lexer
+	x1 = tuple7(a0, a1, 0, 0, FALSE, 0, x0);
 	return(x0);
 };
 
 ## Fetch token
+# a0 - lexer
 # @return token
-lexer_lex : () {
+lexer_lex : (a0) {
 	return(TOKEN_END);
 };
 
