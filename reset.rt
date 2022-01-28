@@ -512,6 +512,19 @@ list_next : (a0) { return(a0[LIST_NEXT]); };
 # @return current element value
 list_value : (a0) { return(a0[LIST_VALUE]); };
 
+## Remove this element from list
+# a0 - list
+# @return reduced list
+list_pop : (a0) {
+	# x0 - list continuation
+	allocate(1);
+	# Fetching next element
+	x0 = list_next(a0);
+	# Deallocating current element
+	free(a0);
+	return(x0);
+};
+
 ### Vector
 ## Vector parts
 VEC_SIZE => 0;
@@ -661,6 +674,15 @@ vector_pop : (a0) {
 	a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
 	# Returning the value
 	return(vector_get(a0, a0[VEC_SIZE]));
+};
+
+## Destroy vector
+# a0 - vector
+vector_destroy : (a0) {
+	# Deallocating buffer
+	free(a0[VEC_BUF]);
+	# Deallocating vector
+	free(a0);
 };
 
 ### I/O
