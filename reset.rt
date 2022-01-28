@@ -1068,7 +1068,7 @@ lexer : (a0, a1) {
 	# Pushing '\0' to token buffer
 	char_vector_push(x0, '\0');
 	# Allocating lexer
-	x1 = tuple8(a0, a1, 0, 0, FALSE, 0, 0, x0);
+	x1 = tuple8(a0, a1, 1, 1, FALSE, 0, 0, x0);
 	return(x1);
 };
 
@@ -1114,6 +1114,18 @@ lexer_consume : (a0) {
 lexer_hold : (a0) {
 	assert(a0[LEX_HOLD] == FALSE, "tried to hold two or more tokens");
 	a0[LEX_HOLD] = TRUE;
+};
+
+## Print location to channel
+# a0 - lexer
+# a1 - channel
+lexer_fputloc : (a0, a1) {
+	fputs(a1, a0[LEX_FILE]);
+	fputc(a1, ':');
+	fputn(a1, a0[LEX_LINE], 10);
+	fputc(a1, ':');
+	fputn(a1, a0[LEX_COLUMN], 10);
+	fputc(a1, ':');
 };
 
 ## Fetch token
