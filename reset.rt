@@ -520,6 +520,25 @@ tuple7 : (a0, a1, a2, a3, a4, a5, a6) {
 	return(x0);
 };
 
+## Make tuple with 8 values
+# a0, a1, a2, a3, a4, a5, a6, a7 - values
+# @return tuple
+tuple8 : (a0, a1, a2, a3, a4, a5, a6, a7) {
+	# x0 - tuple
+	allocate(1);
+	x0 = allocate_tuple(7);
+	# Fill tuple
+	x0[0] = a0;
+	x0[1] = a1;
+	x0[2] = a2;
+	x0[3] = a3;
+	x0[4] = a4;
+	x0[5] = a5;
+	x0[6] = a6;
+	x0[7] = a7;
+	return(x0);
+};
+
 ### Linked List
 ## List parts
 LIST_NEXT  => 0;
@@ -994,8 +1013,9 @@ LEX_FILE   => 1;
 LEX_LINE   => 2;
 LEX_COLUMN => 3;
 LEX_HOLD   => 4;
-LEX_TVALUE => 5;
-LEX_TTEXT  => 6;
+LEX_TID    => 5;
+LEX_TVALUE => 6;
+LEX_TTEXT  => 7;
 ## Token IDs
 TOKEN_END => 256;
 ## Char table
@@ -1031,6 +1051,8 @@ char_to_escape : [
 	   0,  7,  8,  0,  0, 27, 12,  0,  0,  0,  0,  0,  0,  0, 10,  0,
 	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
+## Lexer triggers
+l00_next : [ l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00 ];
 
 ## Create new lexer
 # a0 - input channel
@@ -1045,14 +1067,26 @@ lexer : (a0, a1) {
 	# Pushing '\0' to token buffer
 	char_vector_push(x0, '\0');
 	# Allocating lexer
-	x1 = tuple7(a0, a1, 0, 0, FALSE, 0, x0);
+	x1 = tuple8(a0, a1, 0, 0, FALSE, 0, 0, x0);
 	return(x0);
 };
 
+## Hold token
+# a0 - lexer
+lexer_hold : (a0) { a0[LEX_HOLD] = TRUE; };
+
 ## Fetch token
 # a0 - lexer
-# @return token
+# @return token type
 lexer_lex : (a0) {
+	# Checking if we are holding token
+	if (a0[LEX_HOLD]) {
+		a0[LEX_HOLD] = FALSE;
+		return(a0[LEX_TID]);
+	};
+
+	# Entry point of lexer
+label l00;
 	return(TOKEN_END);
 };
 
