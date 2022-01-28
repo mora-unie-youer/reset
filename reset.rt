@@ -762,7 +762,7 @@ input_chan_file : (a0) {
 	# Opening file with read permission
 	x0 = open(a0, O_RDONLY, 0);
 	# Checking for success
-	assert(x0 > 0, "Coudn't open file input channel\n");
+	assert(x0 > 0, "Couldn't open file input channel");
 	# Returning new channel
 	return(input_chan(x0));
 };
@@ -800,7 +800,7 @@ output_chan_file : (a0) {
 	# Opening file with read permission
 	x0 = open(a0, O_WRONLY|O_CREAT|O_TRUNC, 420); # 420 = 0644
 	# Checking for success
-	assert(x0 > 0, "Coudn't open file output channel\n");
+	assert(x0 > 0, "Couldn't open file output channel");
 	# Returning new channel
 	return(output_chan(x0));
 };
