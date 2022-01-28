@@ -1053,7 +1053,7 @@ char_to_escape : [
 	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
 ## Lexer triggers
-lx00n:[le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00];
+lx00n:[lx01,le00,lx00,lx00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00];
 
 ## Create new lexer
 # a0 - input channel
@@ -1176,6 +1176,9 @@ label lx00;
 	lexer_reset_token(a0);
 	# Moving to next trigger
 	goto lx00n[lexer_look(a0)];
+label lx01;
+	## We got NULL char
+	return(TOKEN_END);
 label le00;
 	lexer_error(a0, "Invalid character");
 };
