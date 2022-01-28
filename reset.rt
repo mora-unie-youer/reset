@@ -1085,6 +1085,29 @@ lexer_look : (a0) {
 	return(char_table[x0]);
 };
 
+## Consume char to token buffer
+# a0 - lexer
+# @return char
+lexer_consume : (a0) {
+	# x0 - char
+	allocate(1);
+	# Reading char
+	x0 = fgetc(a0[LEX_ICHAN]);
+	# If newline, moving to new line
+	if (x0 == '\n') {
+		a0[LEX_LINE] = a0[LEX_LINE] + 1;
+		a0[LEX_COLUMN] = 0;
+	};
+	# Incrementing column
+	a0[LEX_COLUMN] = a0[LEX_COLUMN] + 1;
+	# Replacing last char (NULL) in buffer
+	char_vector_set(a0[LEX_TTEXT], vector_size(a0[LEX_TTEXT]) - 1, x0);
+	# Pushing NULL to the end
+	char_vector_push(a0[LEX_TTEXT], '\0');
+	# Returning char
+	return(x0);
+};
+
 ## Hold token
 # a0 - lexer
 lexer_hold : (a0) {
