@@ -1053,7 +1053,7 @@ char_to_escape : [
 	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
 ## Lexer triggers
-l00_next : [ l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00,l00 ];
+lx00n:[le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00];
 
 ## Create new lexer
 # a0 - input channel
@@ -1116,6 +1116,16 @@ lexer_hold : (a0) {
 	a0[LEX_HOLD] = TRUE;
 };
 
+## Reset token data
+# a0 - lexer
+lexer_reset_token : () {
+	a0[LEX_TID] = 0;    # Resetting token id
+	a0[LEX_TVALUE] = 0; # Resetting token value
+	# Resetting token text buffer
+	char_vector_resize(a0[LEX_TTEXT], 0);
+	char_vector_push(a0[LEX_TTEXT], '\0');
+};
+
 ## Print location to channel
 # a0 - lexer
 # a1 - channel
@@ -1152,9 +1162,22 @@ lexer_lex : (a0) {
 		return(a0[LEX_TID]);
 	};
 
-	# Entry point of lexer
-label l00;
-	return(TOKEN_END);
+label lx00;
+	## Entry point of lexer
+	# If token is space/tab/newline, skip it
+	# NOTE: We're using here + instead of || as we don't have it now
+	if ((lexer_look(a0) == CHAR_SPACES) + (lexer_look(a0) == CHAR_NEWLINE)) {
+		# Consuming char
+		lexer_consume(a0);
+		# Retrying
+		goto &lx00;
+	};
+	# Resetting token buffer
+	lexer_reset_token(a0);
+	# Moving to next trigger
+	goto lx00n[lexer_look(a0)];
+label le00;
+	lexer_error(a0, "Invalid character");
 };
 
 ## Print usage
@@ -1172,7 +1195,8 @@ usage : (a0) {
 main : (a0, a1) {
 	# x0 - input channel
 	# x1 - lexer
-	allocate(2);
+	# x2 - token id
+	allocate(3);
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return(1); };
 	# TODO: implement option parser
@@ -1180,6 +1204,8 @@ main : (a0, a1) {
 	x0 = input_chan_file(a1[1]);
 	# Creating lexer
 	x1 = lexer(x0, a1[1]);
+	# Fetch first token for tests
+	x2 = lexer_lex(x1);
 	return(a0);
 };
 
