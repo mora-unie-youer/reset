@@ -1068,12 +1068,29 @@ lexer : (a0, a1) {
 	char_vector_push(x0, '\0');
 	# Allocating lexer
 	x1 = tuple8(a0, a1, 0, 0, FALSE, 0, 0, x0);
-	return(x0);
+	return(x1);
+};
+
+## Look ahead for next character
+# a0 - lexer
+# @return char type
+lexer_look : (a0) {
+	# x0 - char
+	allocate(1);
+	# Reading char
+	x0 = fnextc(a0[LEX_ICHAN]);
+	# If got EOF, returning CHAR_NULL
+	if (x0 == EOF) { return(CHAR_NULL); };
+	# Returning char type
+	return(char_table[x0]);
 };
 
 ## Hold token
 # a0 - lexer
-lexer_hold : (a0) { a0[LEX_HOLD] = TRUE; };
+lexer_hold : (a0) {
+	assert(a0[LEX_HOLD] == FALSE, "tried to hold two or more tokens");
+	a0[LEX_HOLD] = TRUE;
+};
 
 ## Fetch token
 # a0 - lexer
