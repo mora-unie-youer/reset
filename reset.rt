@@ -284,11 +284,12 @@ deallocate_block : (a0) {
 	if (x0 == NULL) { return; };
 	# Setting free status
 	a0[1] = a0[1] & ~(PAGE_USED);
+	# FIXME: segfaults for some reason
 	# Try to merge this block
-	merge_block(a0);
+	#merge_block(a0);
 	# Try to merge next block
-	if (a0 == memory_block) { return; };
-	merge_block(a0 + a0[1] + 8);
+	#if (a0 == memory_block) { return; };
+	#merge_block(a0 + a0[1] + 8);
 };
 
 ## Get block size
@@ -334,7 +335,7 @@ realloc : (a0, a1) {
 	memcpy(a0, x1, x0);
 	# Freeing old memory space
 	free(a0);
-	return x1;
+	return(x1);
 };
 
 ## Free memory
