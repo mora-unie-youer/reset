@@ -1125,7 +1125,21 @@ lexer_fputloc : (a0, a1) {
 	fputn(a1, a0[LEX_LINE], 10);
 	fputc(a1, ':');
 	fputn(a1, a0[LEX_COLUMN], 10);
-	fputc(a1, ':');
+};
+
+## Print lexer error
+# a0 - lexer
+# a1 - error message
+lexer_error : (a0, a1) {
+	# Printing location
+	lexer_fputloc(a0, stderr);
+	eputs(": ");
+	# Printing message
+	eputs(a1);
+	# Flushing
+	eputc('\n');
+	# Exitting
+	exit(1);
 };
 
 ## Fetch token
