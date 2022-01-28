@@ -954,6 +954,11 @@ CHAR_SQUOTE    => 11; # \'
 CHAR_DQUOTE    => 12; # \"
 CHAR_BACKSLASH => 13; # \\
 CHAR_SYMBOL    => 14; # other characters
+## Lexer parts
+LEX_IN   => 0;
+LEX_FILE => 1;
+LEX_LINE => 2;
+LEX_COL  => 3;
 ## Char table
 char_table : [
 	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -988,6 +993,18 @@ char_to_escape : [
 	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
 
+## Create new lexer
+# a0 - input channel
+# a1 - filename
+# @return lexer
+lexer : (a0, a1) {
+	# x0 - lexer
+	allocate(1);
+	# Creating required memory space
+	x0 = tuple4(a0, a1, 0, 0);
+	return x0;
+};
+
 ## Print usage
 # a0 - program name
 usage : (a0) {
@@ -1001,9 +1018,16 @@ usage : (a0) {
 # a1 - argv
 # @return exit code
 main : (a0, a1) {
+	# x0 - input channel
+	# x1 - lexer
+	allocate(2);
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return 1; };
 	# TODO: implement option parser
+	# Creating input channel
+	x0 = input_chan_file(a1[1]);
+	# Creating lexer
+	x1 = lexer(x0, a1[1]);
 	return(a0);
 };
 
