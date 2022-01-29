@@ -1401,11 +1401,26 @@ label lx17;
 	## Parsing symbol
 	# Fetching char
 	x0 = lexer_consume(a0);
+	# Fetching next char
+	x1 = fnextc(a0[LEX_ICHAN]);
 	# Checking for double-char symbols
-	if (x0 == '=') {};
-	if (x0 == '!') {};
-	if (x0 == '<') {};
-	if (x0 == '>') {};
+	if (x0 == '=') {
+		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); };
+		if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AR); };
+	};
+
+	if (x0 == '!') {
+		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_NE); };
+	};
+
+	if (x0 == '<') {
+		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); };
+	};
+
+	if (x0 == '>') {
+		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); };
+	};
+
 	# Checking for comment
 	if (x0 == '#') {
 		## Skipping line
