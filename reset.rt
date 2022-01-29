@@ -1055,7 +1055,8 @@ char_to_escape : [
 ];
 ## Lexer triggers
 lx00n:[lx01,le00,lx00,lx00,lx02,le00,le00,le00,le00,le00,le00,le00,le00,le00,le00];
-lx02n:[lx99,le00,lx99,lx99,le01,lx03,le02,le03,le00,le00,lx04,le00,le00,le00,le00];
+lx02n:[lx99,le00,lx99,lx99,le01,lx03,le02,le03,le00,le03,lx04,le00,le00,le00,le00];
+lx03n:[lx99,le00,lx99,lx99,le01,lx03,le02,le03,le00,le03,le00,le00,le00,le00,le00];
 
 ## Create new lexer
 # a0 - input channel
@@ -1178,6 +1179,8 @@ lexer_error : (a0, a1) {
 # a0 - lexer
 # @return token type
 lexer_lex : (a0) {
+	# x0 - current char
+	allocate(1);
 	# Checking if we are holding token
 	if (a0[LEX_HOLD]) {
 		a0[LEX_HOLD] = FALSE;
@@ -1212,7 +1215,12 @@ label lx02;
 	goto lx02n[lexer_look(a0)];
 label lx03;
 	## We have to parse octal number
-	lexer_error(a0, "Unfinished: octal number parsing");
+	# Fetching digit
+	x0 = lexer_consume(a0);
+	# Adding digit to number
+	a0[LEX_TVALUE] = a0[LEX_TVALUE] * 8 + (x0 - '0');
+	# Moving to next trigger
+	goto lx03n[lexer_look(a0)];
 label lx04;
 	## We have to parse hexadecimal number
 	lexer_error(a0, "Unfinished: hexadecimal number parsing");
