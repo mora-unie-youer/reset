@@ -1018,8 +1018,9 @@ LEX_TID    => 5;
 LEX_TVALUE => 6;
 LEX_TTEXT  => 7;
 ## Token IDs
-TOKEN_END     => 256;
-TOKEN_INTEGER => 257;
+TOKEN_END        => 256;
+TOKEN_INTEGER    => 257;
+TOKEN_IDENTIFIER => 258;
 ## Char table
 char_table : [
 	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -1054,12 +1055,13 @@ char_to_escape : [
 	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
 ## Lexer triggers
-lx00n:[lx01,le00,lx00,lx00,lx02,lx06,lx06,le00,le00,le00,le00,le00,le00,le00,le00];
+lx00n:[lx01,le00,lx00,lx00,lx02,lx06,lx06,lx07,lx07,le00,le00,le00,le00,le00,le00];
 lx02n:[lx99,le00,lx99,lx99,le01,lx03,le02,le03,le00,le03,lx04,le00,le00,le00,le00];
 lx03n:[lx99,le00,lx99,lx99,lx03,lx03,le02,le03,le00,le03,le00,le00,le00,le00,le00];
 lx04n:[le04,le00,le04,le04,lx05,lx05,lx05,lx05,le00,lx05,le00,le00,le00,le00,le00];
 lx05n:[lx99,le00,lx99,lx99,lx05,lx05,lx05,lx05,le00,lx05,le00,le00,le00,le00,le00];
 lx06n:[lx99,le00,lx99,lx99,lx06,lx06,lx06,le05,le00,le05,le00,le00,le00,le00,le00];
+lx07n:[lx99,le00,lx99,lx99,lx07,lx07,lx07,lx07,lx07,lx07,lx07,le00,le00,le00,lx99];
 
 ## Create new lexer
 # a0 - input channel
@@ -1258,6 +1260,14 @@ label lx06;
 	a0[LEX_TVALUE] = a0[LEX_TVALUE] * 10 + (x0 - '0');
 	# Moving to next trigger
 	goto lx06n[lexer_look(a0)];
+label lx07;
+	## We have to parse identifier
+	# We have to set identifier token ID
+	lexer_token_set(a0, TOKEN_IDENTIFIER);
+	# Adding char to token text
+	lexer_consume(a0);
+	# Moving to next trigger
+	goto lx07n[lexer_look(a0)];
 label lx99;
 	## Finishing lexing. Returning current token ID
 	return(a0[LEX_TID]);
