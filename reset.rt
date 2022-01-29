@@ -1119,7 +1119,7 @@ lexer : (a0, a1) {
 	# x1 - lexer
 	allocate(2);
 	# Creating empty token buffer
-	x0 = char_vector(0, 128);
+	x0 = char_vector(0, 64);
 	# Pushing '\0' to token buffer
 	char_vector_push(x0, '\0');
 	# Allocating lexer
@@ -1401,6 +1401,8 @@ label lx17;
 	## Parsing symbol
 	# Fetching char
 	x0 = lexer_consume(a0);
+	# Setting token ID to char value
+	lexer_token_set(a0, x0);
 	# Fetching next char
 	x1 = fnextc(a0[LEX_ICHAN]);
 	# Checking for double-char symbols
@@ -1425,7 +1427,10 @@ label lx17;
 	if (x0 == '#') {
 		## Skipping line
 		# NOTE: using * insead of &&, because we don't have it
-		while ((x0 != '\n') * (x0 != '\0')) { x0 = lexer_consume(a0); };
+		while ((x0 != '\n') * (x0 != '\0')) { x0 = fgetc(a0[LEX_ICHAN]); };
+		# Resetting line and column
+		a0[LEX_LINE] = a0[LEX_LINE] + 1;
+		a0[LEX_COLUMN] = 1;
 		# Starting lexing from the start
 		goto &lx00;
 	};
