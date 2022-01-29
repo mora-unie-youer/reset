@@ -616,7 +616,7 @@ char_vector_reserve : (a0, a1) {
 		# Reallocating buffer
 		a0[VEC_BUF] = realloc(a0[VEC_BUF], a1);
 		# Setting new capacity
-		a0[VEC_CAP] = a1;
+		a0[VEC_CAP] = align(a1, 4);
 	};
 };
 
@@ -1119,7 +1119,7 @@ lexer : (a0, a1) {
 	# x1 - lexer
 	allocate(2);
 	# Creating empty token buffer
-	x0 = char_vector(0, 1);
+	x0 = char_vector(0, 128);
 	# Pushing '\0' to token buffer
 	char_vector_push(x0, '\0');
 	# Allocating lexer
