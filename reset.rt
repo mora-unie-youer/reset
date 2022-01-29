@@ -1254,6 +1254,8 @@ label lx05;
 	goto lx05n[lexer_look(a0)];
 label lx06;
 	## We have to parse decimal number
+	# We have to set integer token ID
+	lexer_token_set(a0, TOKEN_INTEGER);
 	# Fetching digit
 	x0 = lexer_consume(a0);
 	# Adding digit to number
