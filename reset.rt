@@ -137,172 +137,41 @@ itoa : (a0, a1, a2) {
 ### Memory Management
 ## Memory page size
 PAGE_SIZE => 4096; # 0x1000
-## Memory page status
-PAGE_USED => 2147483648; # 0x80000000
 ## Heap segment start and end
-brk_start : NULL;
-brk_end   : NULL;
-## Memory page list
-memory_block : NULL;
-
-## Increment heap segment size
-# a0 - increment size (use negative to decrement)
-# @return new heap segment limit
-sbrk : (a0) {
-	# x0 - old limit
-	# x1 - new limit
-	allocate(2);
-	x0 = brk_end;
-	# Uninitialized heap
-	if (x0 == NULL) {
-		x0 = brk(NULL);
-		brk_start = x0;
-	};
-	# Incrementing/decrementing limit
-	x1 = x0 + a0;
-	# TODO: handle error, when x0 (new brk_end) < brk_start
-	# Setting and returning new heap segment limit
-	brk_end = x1;
-	brk(x1);
-	return(x0);
-};
+free_start : NULL;
+free_end   : NULL;
 
 ## Allocate new memory page
-allocate_page : () {
-	# x0 - previous heap limit
-	# x1 - memory size
-	allocate(2);
-	# Allocating next page
-	x0 = sbrk(PAGE_SIZE);
-
-	# If memory blocks are uninitialized
-	if (memory_block == NULL) {
-		# Initializing pointers
-		memory_block = x0;
-		# Initializing first memory block
-		memory_block[0] = NULL; # Pointer to previous block
-		memory_block[1] = PAGE_SIZE - 8; # Setting size and `not allocated`
-	} else {
-		x1 = memory_block[1];
-		# If last memory block is used
-		if (x1 & PAGE_USED) {
-			# Creating new memory block
-			x0[0] = memory_block; # Points to last block
-			x0[1] = PAGE_SIZE - 8; # Setting size and `not allocated`
-			memory_block = x0; # Setting new last block
-		} else {
-			# Memory block is not used, just adding new memory to it
-			memory_block[1] = x1 + PAGE_SIZE;
-		};
-	};
+allocate_new_page : () {
+	# If free_end is NULL, finding brk(NULL)
+	if (free_end == NULL) { free_end = brk(NULL); };
+	# Moving free memory segment pointers
+	free_start = free_end;
+	free_end = brk(free_end + PAGE_SIZE);
 };
-
-## Allocate block
-# a0 - block size
-# @return address of block
-allocate_block : (a0) {
-	# x0 - required memory size
-	# x1 - memory block
-	# x2 - memory block size and status
-	# x3 - new memory block
-	allocate(4);
-	# required size is aligned to 4 bytes
-	x0 = align(a0, 4);
-label allocate_block_retry;
-	# Starting from latest block
-	x1 = memory_block;
-	# Iterating while we have next memory blocks
-	while (x1 != NULL) {
-		# Fetching block size and status
-		x2 = x1[1];
-		# Checking if this block is not used
-		if ((x2 & PAGE_USED) == NULL) {
-			# Checking if this block perfectly fits -> simply change status
-			if (x2 == x0) {
-				# Setting used status
-				x1[1] = x2 | PAGE_USED;
-				# Returning allocated block (skipping 8 bytes)
-				return(x1);
-			};
-			# Checking if this block can be splitted (requested size + header size)
-			if (x2 >= x0 + 8) {
-				# New free block
-				x3 = x1 + x0 + 8;
-				x3[0] = x1; # Setting previous block
-				x3[1] = x2 - x0 - 8; # Setting new size
-				# If x1 is last block -> changing last block
-				if (x1 == memory_block) { memory_block = x3; };
-				# Decreasing block size and setting used status
-				x1[1] = x0 | PAGE_USED;
-				return(x1);
-			};
-		};
-		# Iterating with next block
-		x1 = x1[0];
-	};
-	# We are here only if there's no available block. Allocating new page
-	allocate_page();
-	# Now we have more memory, retrying
-	goto &allocate_block_retry;
-};
-
-## Try merge block with previous
-# a0 - block
-merge_block : (a0) {
-	# x0 - prev block
-	# x1 - status of prev block
-	# x2 - status of this block
-	allocate(3);
-	# Getting block from address
-	# Fetching previous block
-	x0 = a0[0];
-	# Checking if previous block is not null
-	if (x0 == NULL) { return; };
-	# Fetching statuses
-	x1 = x0[1] & PAGE_USED;
-	x2 = a0[1] & PAGE_USED;
-	# If statuses are not NULL (free) and are not equal - returning
-	if (x1) { return; };
-	if (x1 != x2) { return; };
-	# Merging previous block with this
-	x0[1] = x0[1] + a0[1] + 8;
-	# Checking if it was last block.
-	if (a0 == memory_block) { memory_block = x0; return; };
-	# Updating next block, as it wasn't last block
-	a0 = x0 + x0[1] + 8;
-	a0[0] = x0;
-};
-
-## Deallocate block
-# a0 - block
-deallocate_block : (a0) {
-	# x0 - block status/next block
-	allocate(1);
-	# Fetching block status
-	x0 = a0[1] & PAGE_USED;
-	# If block is not used - returning
-	if (x0 == NULL) { return; };
-	# Setting free status
-	a0[1] = a0[1] & ~(PAGE_USED);
-	# FIXME: segfaults for some reason
-	# Try to merge this block
-	#merge_block(a0);
-	# Try to merge next block
-	#if (a0 == memory_block) { return; };
-	#merge_block(a0 + a0[1] + 8);
-};
-
-## Get block size
-# a0 - block
-# @return block size
-block_size : (a0) { return(a0[1] & ~(PAGE_USED)); };
 
 ## Allocate memory
 # a0 - size
 # @return allocated memory
 malloc : (a0) {
-	return(allocate_block(a0) + 8);
+	# x0 - address
+	allocate(1);
+	# Checking if requested size is too big
+	assert(a0 <= PAGE_SIZE, "Requested memory is bigger than PAGE_SIZE");
+	# Checking if we need to allocate more memory
+	if (free_start + a0 > free_end) { allocate_new_page(); };
+	# Setting address
+	x0 = free_start;
+	# Moving free segment pointer
+	free_start = align(x0 + a0, 16);
+	# Returning memory address
+	return(x0);
 };
+
+## Free memory
+# a0 - address
+# NOTE: in this implementation of memory allocator it is impossible
+free : (a0) {};
 
 ## Allocate cleared memory
 # a0 - size
@@ -319,29 +188,23 @@ calloc : (a0) {
 
 ## Reallocate memory with new size
 # a0 - allocated memory
-# a1 - new size
+# a1 - old size
+# a2 - new size
 # @return new allocated memory
-realloc : (a0, a1) {
+realloc : (a0, a1, a2) {
 	# x0 - old size/min size
 	# x1 - new allocated memory space
 	allocate(2);
-	# Fetching old size
-	x0 = block_size(a0 - 8);
-	# Storing minimal size
-	if (a1 < x0) { x0 = a1; };
+	# Finding out the amount of memory to be copied
+	x0 = a1;
+	if (a2 < a1) { x0 = a2; };
 	# Allocating new memory
-	x1 = calloc(a1);
+	x1 = calloc(a2);
 	# Copying data to new memory space
 	memcpy(a0, x1, x0);
 	# Freeing old memory space
 	free(a0);
 	return(x1);
-};
-
-## Free memory
-# a0 - address
-free : (a0) {
-	deallocate_block(a0 - 8);
 };
 
 ### Memory/String operations
@@ -589,7 +452,7 @@ VEC_BUF  => 2;
 # a0 - size
 # a1 - capacity
 # @return character vector
-char_vector : (a0, a1) { return(tuple3(a0, align(a1, 4), calloc(a1))); };
+char_vector : (a0, a1) { return(tuple3(a0, a1, calloc(a1))); };
 
 ## Create vector
 # a0 - size
@@ -614,9 +477,9 @@ char_vector_reserve : (a0, a1) {
 	# Reserving, if new capacity is bigger
 	if (a1 > a0[VEC_CAP]) {
 		# Reallocating buffer
-		a0[VEC_BUF] = realloc(a0[VEC_BUF], a1);
+		a0[VEC_BUF] = realloc(a0[VEC_BUF], a0[VEC_CAP], a1);
 		# Setting new capacity
-		a0[VEC_CAP] = align(a1, 4);
+		a0[VEC_CAP] = a1;
 	};
 };
 
@@ -627,7 +490,7 @@ vector_reserve : (a0, a1) {
 	# Reserving, if new capacity is bigger
 	if (a1 > a0[VEC_CAP]) {
 		# Reallocating buffer
-		a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a1);
+		a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a0[VEC_CAP], 4 * a1);
 		# Setting new capacity
 		a0[VEC_CAP] = a1;
 	};
@@ -956,17 +819,16 @@ eputs : (a0) { fputs(stderr, a0); };
 # a0 - channel
 # a1 - number
 # a2 - base
+fputn_buffer : NULL;
 fputn : (a0, a1, a2) {
-	# x0 - number buffer
-	allocate(1);
-	# Allocating number buffer
-	x0 = malloc(32);
+	# Allocating number buffer, if needed
+	if (fputn_buffer == NULL) { fputn_buffer = malloc(33); };
+	# Clearing buffer
+	memset(0, fputn_buffer, 33);
 	# Convering number to string
-	itoa(a1, x0, a2);
+	itoa(a1, fputn_buffer, a2);
 	# Putting string
-	fputs(a0, x0);
-	# Freeing number string
-	free(x0);
+	fputs(a0, fputn_buffer);
 };
 
 ## Put decimal number in stdout
@@ -1119,7 +981,7 @@ lexer : (a0, a1) {
 	# x1 - lexer
 	allocate(2);
 	# Creating empty token buffer
-	x0 = char_vector(0, 64);
+	x0 = char_vector(0, 1);
 	# Pushing '\0' to token buffer
 	char_vector_push(x0, '\0');
 	# Allocating lexer
@@ -1193,7 +1055,7 @@ lexer_hold : (a0) {
 
 ## Reset token data
 # a0 - lexer
-lexer_reset_token : () {
+lexer_reset_token : (a0) {
 	a0[LEX_TID] = 0;    # Resetting token id
 	a0[LEX_TVALUE] = 0; # Resetting token value
 	# Resetting token text buffer
