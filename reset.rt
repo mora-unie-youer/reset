@@ -330,7 +330,7 @@ realloc : (a0, a1) {
 	# Storing minimal size
 	if (a1 < x0) { x0 = a1; };
 	# Allocating new memory
-	x1 = calloc(x0);
+	x1 = calloc(a1);
 	# Copying data to new memory space
 	memcpy(a0, x1, x0);
 	# Freeing old memory space
@@ -589,7 +589,7 @@ VEC_BUF  => 2;
 # a0 - size
 # a1 - capacity
 # @return character vector
-char_vector : (a0, a1) { return(tuple3(a0, a1, calloc(a1))); };
+char_vector : (a0, a1) { return(tuple3(a0, align(a1, 4), calloc(a1))); };
 
 ## Create vector
 # a0 - size
