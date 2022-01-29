@@ -1311,6 +1311,19 @@ main : (a0, a1) {
 	x1 = lexer(x0, a1[1]);
 	# Fetch first token for tests
 	x2 = lexer_lex(x1);
+	# Testing until got end of file
+	while (x2 != TOKEN_END) {
+		# Printing token
+		puts("Token #");
+		putd(x2);
+		puts(": text=");
+		puts(vector_buffer(lexer_token_text(x1)));
+		puts(" value=");
+		putd(lexer_token_value(x1));
+		putc('\n');
+		# Fetching next token
+		x2 = lexer_lex(x1);
+	};
 	return(a0);
 };
 
