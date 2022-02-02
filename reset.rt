@@ -1071,7 +1071,7 @@ lexer_fputloc : (a0, a1) {
 	fputc(a1, ':');
 	fputn(a1, a0[LEX_LINE], 10);
 	fputc(a1, ':');
-	fputn(a1, a0[LEX_COLUMN], 10);
+	fputn(a1, a0[LEX_COLUMN] - vector_size(lexer_token_text(a0)) + 1, 10);
 };
 
 ## Print lexer error
@@ -1347,10 +1347,10 @@ parser_parse : (a0) {
 	x0 = vector(0, 1);
 	# Parsing file
 	# Fetching token for tests
-	lexer_fputloc(a0[PARSER_LEX], stdout);
 	x1 = lexer_lex(a0[PARSER_LEX]);
 	# Testing until got end of file
 	while (x1 != TOKEN_END) {
+		lexer_fputloc(a0[PARSER_LEX], stdout);
 		puts(":\t");
 		# Printing token
 		puts("Token #");
@@ -1361,9 +1361,9 @@ parser_parse : (a0) {
 		putd(lexer_token_value(a0[PARSER_LEX]));
 		putc('\n');
 		# Fetching next token
-		lexer_fputloc(a0[PARSER_LEX], stdout);
 		x1 = lexer_lex(a0[PARSER_LEX]);
 	};
+	lexer_fputloc(a0[PARSER_LEX], stdout);
 	puts(":\t");
 	# Printing token
 	puts("Token #");
