@@ -1317,6 +1317,25 @@ label le07;
 	lexer_error(a0, "Unterminated string literal");
 };
 
+### Parser
+## Parser parts
+PARSER_LEXER  => 0;
+PARSER_SUBLEX => 1;
+
+## Create new parser
+# a0 - lexer of main file
+# @return parser
+parser : (a0) {
+	# x0 - lexer vector
+	# x1 - parser
+	allocate(2);
+	x0 = vector(0, 1);
+	# Allocating parser in memory
+	x1 = tuple2(a0, x0);
+	# Returning parser
+	return(x1);
+};
+
 ## Print usage
 # a0 - program name
 usage : (a0) {
