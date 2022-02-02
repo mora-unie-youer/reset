@@ -1319,7 +1319,7 @@ label le07;
 
 ### Parser
 ## Parser parts
-PARSER_LEXER  => 0;
+PARSER_LEX    => 0;
 PARSER_SUBLEX => 1;
 
 ## Create new parser
@@ -1334,6 +1334,47 @@ parser : (a0) {
 	x1 = tuple2(a0, x0);
 	# Returning parser
 	return(x1);
+};
+
+## Parse file
+# a0 - parser
+# @return AST
+parser_parse : (a0) {
+	# x0 - statements vector
+	# x1 - token
+	allocate(2);
+	# Allocating statements vector
+	x0 = vector(0, 1);
+	# Parsing file
+	# Fetching token for tests
+	lexer_fputloc(a0[PARSER_LEX], stdout);
+	x1 = lexer_lex(a0[PARSER_LEX]);
+	# Testing until got end of file
+	while (x1 != TOKEN_END) {
+		puts(":\t");
+		# Printing token
+		puts("Token #");
+		putd(x1);
+		puts(": text=");
+		puts(vector_buffer(lexer_token_text(a0[PARSER_LEX])));
+		puts("\tvalue=");
+		putd(lexer_token_value(a0[PARSER_LEX]));
+		putc('\n');
+		# Fetching next token
+		lexer_fputloc(a0[PARSER_LEX], stdout);
+		x1 = lexer_lex(a0[PARSER_LEX]);
+	};
+	puts(":\t");
+	# Printing token
+	puts("Token #");
+	putd(x1);
+	puts(": text=");
+	puts(vector_buffer(lexer_token_text(a0[PARSER_LEX])));
+	puts("\tvalue=");
+	putd(lexer_token_value(a0[PARSER_LEX]));
+	putc('\n');
+	# Returning statemtents vector
+	return(x0);
 };
 
 ## Print usage
@@ -1360,24 +1401,11 @@ main : (a0, a1) {
 	x0 = input_chan_file(a1[1]);
 	# Creating lexer
 	x1 = lexer(x0, a1[1]);
-	# Fetch first token for tests
-	lexer_fputloc(x1, stdout);
-	x2 = lexer_lex(x1);
-	# Testing until got end of file
-	while (x2 != TOKEN_END) {
-		puts(":\t");
-		# Printing token
-		puts("Token #");
-		putd(x2);
-		puts(": text=");
-		puts(vector_buffer(lexer_token_text(x1)));
-		puts("\tvalue=");
-		putd(lexer_token_value(x1));
-		putc('\n');
-		# Fetching next token
-		lexer_fputloc(x1, stdout);
-		x2 = lexer_lex(x1);
-	};
+	# Creating parser
+	x2 = parser(x1);
+	# Print address in memory of AST
+	putx(parser_parse(x2));
+	putc('\n');
 	return(a0);
 };
 
