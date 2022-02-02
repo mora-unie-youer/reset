@@ -302,6 +302,22 @@ strcmp : (a0, a1) {
 	return(x1 - x2);
 };
 
+## Duplicate string
+# a0 - string
+# @return new string
+strdup : (a0) {
+	# x0 - string length
+	# x1 - new string
+	allocate(1);
+	# Allocating new string
+	x0 = strlen(a0);
+	x1 = calloc(x0 + 1);
+	# Copying data to new string
+	memset(a0, x1, x0);
+	# Return new string
+	return(x1);
+};
+
 ### Tuples
 ## Allocate tuple
 # a0 - size
@@ -1393,7 +1409,7 @@ top_level_statement : (a0, a1) {
 		x0 = lexer_lex(a0[PARSER_LEX]);
 		# TODO: implement globaling multiple identifiers
 		# Returning expression
-		return(tuple2(STATEMENT_GLOBAL, x0));
+		return(tuple2(STATEMENT_GLOBAL, strdup(lexer_token_text(a0[PARSER_LEX]))));
 	};
 	return(tuple2(a1, a1));
 };
