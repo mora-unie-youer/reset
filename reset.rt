@@ -1350,6 +1350,7 @@ parser_parse : (a0) {
 	x1 = lexer_lex(a0[PARSER_LEX]);
 	# Testing until got end of file
 	while (x1 != TOKEN_END) {
+		vector_push(x0, top_level_statement(a0, x1));
 		lexer_fputloc(a0[PARSER_LEX], stdout);
 		puts(":\t");
 		# Printing token
@@ -1377,6 +1378,14 @@ parser_parse : (a0) {
 	return(x0);
 };
 
+## Parse top level statement
+# a0 - parser
+# a1 - current token
+# @return statement
+top_level_statement : (a0, a1) {
+	return(tuple2(a1, a1));
+};
+
 ## Print usage
 # a0 - program name
 usage : (a0) {
@@ -1392,7 +1401,7 @@ usage : (a0) {
 main : (a0, a1) {
 	# x0 - input channel
 	# x1 - lexer
-	# x2 - token id
+	# x2 - parser
 	allocate(3);
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return(1); };
