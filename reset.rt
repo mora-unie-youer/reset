@@ -1321,6 +1321,8 @@ label le07;
 ## Parser parts
 PARSER_LEX    => 0;
 PARSER_SUBLEX => 1;
+## Statement IDs
+STATEMENT_GLOBAL => 0;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1351,11 +1353,11 @@ parser_parse : (a0) {
 	# Testing until got end of file
 	while (x1 != TOKEN_END) {
 		vector_push(x0, top_level_statement(a0, x1));
+		# Printing token
 		lexer_fputloc(a0[PARSER_LEX], stdout);
 		puts(":\t");
-		# Printing token
 		puts("Token #");
-		putd(x1);
+		putd(lexer_token_get(a0[PARSER_LEX]));
 		puts(": text=");
 		puts(vector_buffer(lexer_token_text(a0[PARSER_LEX])));
 		puts("\tvalue=");
@@ -1364,9 +1366,9 @@ parser_parse : (a0) {
 		# Fetching next token
 		x1 = lexer_lex(a0[PARSER_LEX]);
 	};
+	# Printing token
 	lexer_fputloc(a0[PARSER_LEX], stdout);
 	puts(":\t");
-	# Printing token
 	puts("Token #");
 	putd(x1);
 	puts(": text=");
@@ -1383,6 +1385,16 @@ parser_parse : (a0) {
 # a1 - current token
 # @return statement
 top_level_statement : (a0, a1) {
+	# x0 - next token
+	allocate(1);
+	# Parsing global statement
+	if (a1 == TOKEN_GLOBAL) {
+		# Fetching next token
+		x0 = lexer_lex(a0[PARSER_LEX]);
+		# TODO: implement globaling multiple identifiers
+		# Returning expression
+		return(tuple2(STATEMENT_GLOBAL, x0));
+	};
 	return(tuple2(a1, a1));
 };
 
