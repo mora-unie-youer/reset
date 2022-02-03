@@ -883,10 +883,16 @@ fputn : (a0, a1, a2) {
 
 ## Put decimal number in stdout
 # a0 - number
-putd : (a0) { fputn(stdout, a0, 10); };
+putd  : (a0) { fputn(stdout, a0, 10); };
 ## Put hexadecimal number in stdout
 # a0 - number
-putx : (a0) { fputn(stdout, a0, 16); };
+putx  : (a0) { fputn(stdout, a0, 16); };
+## Put decimal number in stderr
+# a0 - number
+eputd : (a0) { fputn(stderr, a0, 10); };
+## Put hexadecimal number in stderr
+# a0 - number
+eputx : (a0) { fputn(stderr, a0, 16); };
 
 ## Assertion
 # a0 - condition
