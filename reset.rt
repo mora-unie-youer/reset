@@ -1044,6 +1044,8 @@ lexer_destroy : (a0) {
 	vector_destroy(a0[LEX_TTEXT]);
 	# Destroying input channel
 	input_chan_close(a0[LEX_ICHAN]);
+	# Freeing filename string
+	free(a0[LEX_FILE]);
 	# Destroying lexer
 	free(a0);
 };
