@@ -1738,7 +1738,47 @@ additive_expression : (a0, a1) { return(multiplicative_expression(a0, a1)); };
 # a0 - parser
 # a1 - current token
 # @return statement
-multiplicative_expression : (a0, a1) { return(prefix_expression(a0, a1)); };
+multiplicative_expression : (a0, a1) {
+	# x0 - op1
+	# x1 - next token
+	allocate(2);
+	# Fetching first operand
+	x0 = prefix_expression(a0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Parsing multiplication
+	if (x1 == '*') { return(multiplicative_mul_expression(a0, x0)); };
+	# Parsing integer division
+	if (x1 == '/') { return(multiplicative_div_expression(a0, x0)); };
+	# Parsing modulus division
+	if (x1 == '%') { return(multiplicative_mod_expression(a0, x0)); };
+	# Returning operand
+	return(x0);
+};
+
+## Parse multiplication expression
+# a0 - parser
+# a1 - op1
+# @return statement
+multiplicative_mul_expression : (a0, a1) {
+	parser_error(a0, "Multiplication is not implemented yet");
+};
+
+## Parse integer division expression
+# a0 - parser
+# a1 - op1
+# @return statement
+multiplicative_div_expression : (a0, a1) {
+	parser_error(a0, "Integer division is not implemented yet");
+};
+
+## Parse modulus division expression
+# a0 - parser
+# a1 - op1
+# @return statement
+multiplicative_mod_expression : (a0, a1) {
+	parser_error(a0, "Modulus division is not implemented yet");
+};
 
 ## Parse prefix expression
 # a0 - parser
