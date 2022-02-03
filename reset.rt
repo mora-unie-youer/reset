@@ -1539,8 +1539,23 @@ include_statement : (a0) {
 		vector_push(x0, x2);
 	} else {
 		# If not an string, check if it is (. If not, erroring.
-		# TODO: multiple files including
-		goto &include_statement_invalid;
+		if (x1 == '(') {
+label include_statement_next;
+			# Fetching next token
+			x1 = parser_lex(a0);
+			# Checking if it is string
+			if (x1 != TOKEN_STRING) { goto &include_statement_invalid; };
+			# Making a copy of data in string
+			x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
+			# Pushing file to vector
+			vector_push(x0, x2);
+			## If next token is , - redoing loop
+			# Fetching next token
+			x1 = parser_lex(a0);
+			if (x1 == ',') { goto &include_statement_next; };
+			# Checking for correct syntax
+			if (x1 != ')') { goto &include_statement_invalid; };
+		} else { goto &include_statement_invalid; };
 	};
 
 	# Creating lexers for specified files
