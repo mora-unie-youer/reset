@@ -660,6 +660,7 @@ CHAN_FD   => 0;
 CHAN_BUF  => 1;
 CHAN_IDX  => 2;
 ICHAN_END => 3;
+ICHAN_EOF => 4;
 ## Buffer sizes
 IBUFFER_SIZE => 512;
 OBUFFER_SIZE => 512;
@@ -677,7 +678,7 @@ input_chan : (a0) {
 	# Allocating buffer
 	x0 = malloc(IBUFFER_SIZE);
 	# Creating channel
-	x0 = tuple4(a0, x0, 0, 0);
+	x0 = tuple5(a0, x0, 0, 0, FALSE);
 	return(x0);
 };
 
@@ -758,6 +759,8 @@ initialize_io : () {
 fill : (a0) {
 	# x0 - read count
 	allocate(1);
+	# Checking if file is ended
+	if (a0[ICHAN_EOF]) { return; };
 	# Checking if buffer is exhausted
 	if (a0[CHAN_IDX] == a0[ICHAN_END]) {
 		# Input buffer is empty, refilling
@@ -765,6 +768,8 @@ fill : (a0) {
 		# Resetting index and setting size
 		a0[CHAN_IDX]  = 0;
 		a0[ICHAN_END] = x0;
+		# Setting EOF flag, if file is ended
+		if (a0[ICHAN_END] == 0) { a0[ICHAN_EOF] = TRUE; };
 	};
 };
 
