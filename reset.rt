@@ -1952,6 +1952,13 @@ main : (a0, a1) {
 			putx(x3[VEC_BUF][x4][NODE_OP1][VEC_BUF][x5]);
 			x5 = x5 + 1;
 		};
+		puts("] op2=[");
+		x5 = 0;
+		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OP2])) {
+			if (x5 != 0) { puts(", "); };
+			putx(x3[VEC_BUF][x4][NODE_OP2][VEC_BUF][x5]);
+			x5 = x5 + 1;
+		};
 		puts("]\n");
 		x4 = x4 + 1;
 	};
