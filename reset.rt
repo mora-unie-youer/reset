@@ -1422,6 +1422,7 @@ PARSER_SWITCH => 1;
 NODE_TYPE => 0;
 NODE_OP1  => 1;
 NODE_OP2  => 2;
+NODE_OP3  => 3;
 ## Statement IDs
 # Constant
 STMT_EXPR_INTEGER => 0;
@@ -1453,8 +1454,10 @@ STMT_EXPR_OR      => 16;
 STMT_EXPR_LAND    => 17;
 # Logical or
 STMT_EXPR_LOR     => 18;
+# Ternary
+STMT_EXPR_TERNARY => 19;
 # Top level statements
-STMT_GLOBAL       => 19;
+STMT_GLOBAL       => 20;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1727,7 +1730,59 @@ expression : (a0, a1) { return(ternary_expression(a0, a1)); };
 # a0 - parser
 # a1 - current token
 # @return statement
-ternary_expression : (a0, a1) { return(logical_or_expression(a0, a1)); };
+ternary_expression : (a0, a1) {
+	# x0 - op1
+	# x1 - next token
+	allocate(2);
+	# Fetching first operand
+	x0 = logical_or_expression(a0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Parsing ternary
+	if (x1 == '?') { return(ternary_expr(a0, x0)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(x0);
+};
+
+## Parse ternary expression
+# a0 - parser
+# a1 - op1
+# @return statement
+ternary_expr : (a0, a1) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - op3
+	# x3 - op1 vector
+	# x4 - op2 vector
+	# x5 - op3 vector
+	allocate(6);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = ternary_expression(a0, x0);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x0 != ':') { goto &ternary_expr_error; };
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching third operand
+	x2 = ternary_expression(a0, x0);
+	# Allocating operand vectors
+	x3 = vector(0, 1);
+	x4 = vector(0, 1);
+	x5 = vector(0, 1);
+	# Pushing operands to vectors
+	vector_push(x3, a1);
+	vector_push(x4, x1);
+	vector_push(x5, x2);
+	# Returning expression
+	return(tuple4(STMT_EXPR_TERNARY, x3, x4, x5));
+label ternary_expr_error;
+	parser_error(a0, "Incorrect ternary expression syntax");
+};
 
 ## Parse logical or expression
 # a0 - parser
