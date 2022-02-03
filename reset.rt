@@ -1379,10 +1379,17 @@ parser_parse : (a0) {
 	while (x1 != TOKEN_END) {
 		vector_push(x0, top_level_statement(a0, x1));
 		# Fetching next token
-		x1 = lexer_lex(parser_lexer(a0));
+		x1 = parser_lex(a0);
+		# Checking statement to be ended with ;
+		if (x1 != ';') { goto &parser_parse_error; };
+		# Fetching next token
+		x1 = parser_lex(a0);
 	};
 	# Returning statemtents vector
 	return(x0);
+label parser_parse_error;
+	eputs("Statement is not ended with semicolon\n");
+	exit(1);
 };
 
 ## Parse top level statement
