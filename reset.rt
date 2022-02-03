@@ -1408,7 +1408,8 @@ NODE_TYPE => 0;
 NODE_OP1  => 1;
 NODE_OP2  => 2;
 ## Statement IDs
-STATEMENT_GLOBAL => 0;
+STMT_EXPR_INTEGER => 0;
+STMT_GLOBAL       => 1;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1557,7 +1558,7 @@ label global_statement_next;
 		} else { goto &global_statement_invalid; };
 	};
 	# Returning statement
-	return(tuple2(STATEMENT_GLOBAL, x0));
+	return(tuple2(STMT_GLOBAL, x0));
 label global_statement_invalid;
 	parser_error(a0, "Invalid global statement");
 };
@@ -1831,7 +1832,14 @@ constant_expression : (a0, a1) {
 # a1 - current token
 # @return statement
 constant_integer_expression : (a0, a1) {
-	parser_error(a0, "Constant integer expressions are not implemented yet");
+	# x0 - op1 vector
+	allocate(1);
+	# Allocating op1 vector
+	x0 = vector(0, 1);
+	# Pushing value to vector
+	vector_push(x0, lexer_token_value(parser_lexer(a0)));
+	# Returning basic integer expression
+	return(tuple2(STMT_EXPR_INTEGER, x0));
 };
 
 ## Parse constant string expression
@@ -1881,7 +1889,7 @@ main : (a0, a1) {
 		x5 = 0;
 		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OP1])) {
 			if (x5 != 0) { puts(", "); };
-			puts(x3[VEC_BUF][x4][NODE_OP1][VEC_BUF][x5]);
+			putx(x3[VEC_BUF][x4][NODE_OP1][VEC_BUF][x5]);
 			x5 = x5 + 1;
 		};
 		puts("]\n");
