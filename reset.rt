@@ -1513,6 +1513,8 @@ top_level_statement : (a0, a1) {
 			return(variable_declaration(a0, x0));
 		};
 	};
+	# For test purposes, returning expression statement
+	return(expression(a0, a1));
 	parser_error(a0, "Couldn't parse statement");
 };
 
@@ -1663,6 +1665,86 @@ int_array_declaration : (a0) {
 variable_declaration : (a0, a1) {
 	# TODO: implement variable declaration
 	parser_error(a0, "declarations of variables are not implemented yet");
+};
+
+## Parse expression
+# a0 - parser
+# a1 - current token
+# @return statement
+expression : (a0, a1) { return(ternary_expression(a0, a1)); };
+
+## Parse ternary expression
+# a0 - parser
+# a1 - current token
+# @return statement
+ternary_expression : (a0, a1) { return(logical_or_expression(a0, a1)); };
+
+## Parse logical or expression
+# a0 - parser
+# a1 - current token
+# @return statement
+logical_or_expression : (a0, a1) { return(logical_and_expression(a0, a1)); };
+
+## Parse logical and expression
+# a0 - parser
+# a1 - current token
+# @return statement
+logical_and_expression : (a0, a1) { return(bitwise_or_expression(a0, a1)); };
+
+## Parse bitwise or expression
+# a0 - parser
+# a1 - current token
+# @return statement
+bitwise_or_expression : (a0, a1) { return(bitwise_xor_expression(a0, a1)); };
+
+## Parse bitwise xor expression
+# a0 - parser
+# a1 - current token
+# @return statement
+bitwise_xor_expression : (a0, a1) { return(bitwise_and_expression(a0, a1)); };
+
+## Parse bitwise and expression
+# a0 - parser
+# a1 - current token
+# @return statement
+bitwise_and_expression : (a0, a1) { return(equality_expression(a0, a1)); };
+
+## Parse equality expression
+# a0 - parser
+# a1 - current token
+# @return statement
+equality_expression : (a0, a1) { return(relational_expression(a0, a1)); };
+
+## Parse relational expression
+# a0 - parser
+# a1 - current token
+# @return statement
+relational_expression : (a0, a1) { return(bitwise_shift_expression(a0, a1)); };
+
+## Parse bitwise shift expression
+# a0 - parser
+# a1 - current token
+# @return statement
+bitwise_shift_expression : (a0, a1) { return(additive_expression(a0, a1)); };
+
+## Parse additive expression
+# a0 - parser
+# a1 - current token
+# @return statement
+additive_expression : (a0, a1) { return(multiplicative_expression(a0, a1)); };
+
+## Parse multiplicative expression
+# a0 - parser
+# a1 - current token
+# @return statement
+multiplicative_expression : (a0, a1) { return(prefix_expression(a0, a1)); };
+
+## Parse prefix expression
+# a0 - parser
+# a1 - current token
+# @return statement
+prefix_expression : (a0, a1) {
+	parser_error(a0, "Expressions are not implemented yet");
 };
 
 ## Print usage
