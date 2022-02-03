@@ -967,13 +967,19 @@ TOKEN_TYPE_INT   => 283;
 TOKEN_INCLUDE    => 284;
 ## Symbols
 # Equality
-TOKEN_EQ => 300;
-TOKEN_NE => 301;
+TOKEN_EQ    => 300;
+TOKEN_NE    => 301;
 # Compare
-TOKEN_LE => 302;
-TOKEN_GE => 303;
+TOKEN_LE    => 302;
+TOKEN_GE    => 303;
 # Arrow
-TOKEN_AR => 304;
+TOKEN_ARROW => 304;
+# Shift
+TOKEN_SHL   => 305;
+TOKEN_SHR   => 306;
+# Logic
+TOKEN_LAND  => 307;
+TOKEN_LOR   => 308;
 ## Char table
 char_table : [
 	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -1352,7 +1358,7 @@ label lx17;
 	# Checking for double-char symbols
 	if (x0 == '=') {
 		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); };
-		if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AR); };
+		if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); };
 	};
 
 	if (x0 == '!') {
@@ -1361,12 +1367,21 @@ label lx17;
 
 	if (x0 == '<') {
 		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); };
+		if (x1 == '<') { lexer_consume(a0); lexer_token_set(a0, TOKEN_SHL); };
 	};
 
 	if (x0 == '>') {
 		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); };
+		if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_SHR); };
 	};
 
+	if (x0 == '&') {
+		if (x1 == '&') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LAND); };
+	};
+
+	if (x0 == '|') {
+		if (x1 == '|') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LOR); };
+	};
 	# Checking for comment
 	if (x0 == '#') {
 		## Skipping line
@@ -1510,7 +1525,7 @@ top_level_statement : (a0, a1) {
 		# Fetching next token
 		x0 = parser_lex(a0);
 		# Parsing macro definition
-		if (x0 == TOKEN_AR) { return(macro_declaration(a0)); };
+		if (x0 == TOKEN_ARROW) { return(macro_declaration(a0)); };
 		# Parsing identifier declarations
 		if (x0 == ':') {
 			# Fetching next token
