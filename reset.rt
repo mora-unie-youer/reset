@@ -1726,7 +1726,7 @@ variable_declaration : (a0, a1) {
 # @return statement
 expression : (a0, a1) { return(ternary_expression(a0, a1)); };
 
-## Parse ternary expression
+## Try to parse ternary expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -1784,7 +1784,7 @@ label ternary_expr_error;
 	parser_error(a0, "Incorrect ternary expression syntax");
 };
 
-## Parse logical or expression
+## Try to parse logical or expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -1804,7 +1804,7 @@ logical_or_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse 'lor' expression
+## Parse logical or expression
 # a0 - parser
 # a1 - op1
 # @return statement
@@ -1828,7 +1828,7 @@ logical_or_expr : (a0, a1) {
 	return(tuple3(STMT_EXPR_LOR, x2, x3));
 };
 
-## Parse logical and expression
+## Try to parse logical and expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -1848,7 +1848,7 @@ logical_and_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse 'land' expression
+## Parse logical and expression
 # a0 - parser
 # a1 - op1
 # @return statement
@@ -1872,7 +1872,7 @@ logical_and_expr : (a0, a1) {
 	return(tuple3(STMT_EXPR_LAND, x2, x3));
 };
 
-## Parse bitwise or expression
+## Try to parse bitwise or expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -1892,7 +1892,7 @@ bitwise_or_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse or expression
+## Parse bitwise or expression
 # a0 - parser
 # a1 - op1
 # @return statement
@@ -1916,7 +1916,7 @@ bitwise_or_expr : (a0, a1) {
 	return(tuple3(STMT_EXPR_OR, x2, x3));
 };
 
-## Parse bitwise xor expression
+## Try to parse bitwise xor expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -1936,7 +1936,7 @@ bitwise_xor_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse xor expression
+## Parse bitwise xor expression
 # a0 - parser
 # a1 - op1
 # @return statement
@@ -1960,7 +1960,7 @@ bitwise_xor_expr : (a0, a1) {
 	return(tuple3(STMT_EXPR_XOR, x2, x3));
 };
 
-## Parse bitwise and expression
+## Try to parse bitwise and expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -1980,7 +1980,7 @@ bitwise_and_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse and expression
+## Parse bitwise and expression
 # a0 - parser
 # a1 - op1
 # @return statement
@@ -2004,7 +2004,7 @@ bitwise_and_expr : (a0, a1) {
 	return(tuple3(STMT_EXPR_AND, x2, x3));
 };
 
-## Parse equality expression
+## Try to parse equality expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -2026,7 +2026,7 @@ equality_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse equal/not equal expression
+## Parse equality expression
 # a0 - parser
 # a1 - op1
 # a2 - operation
@@ -2051,7 +2051,7 @@ equality_expr : (a0, a1, a2) {
 	return(tuple3(a2, x2, x3));
 };
 
-## Parse relational expression
+## Try to parse relational expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -2077,7 +2077,7 @@ relational_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse less/greater [or equal] expression
+## Parse relational expression
 # a0 - parser
 # a1 - op1
 # a2 - operation
@@ -2102,7 +2102,7 @@ relational_expr : (a0, a1, a2) {
 	return(tuple3(a2, x2, x3));
 };
 
-## Parse bitwise shift expression
+## Try to parse bitwise shift expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -2124,7 +2124,7 @@ bitwise_shift_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse shl/shr expression
+## Parse bitwise shift expression
 # a0 - parser
 # a1 - op1
 # a2 - operation
@@ -2149,7 +2149,7 @@ bitwise_shift_expr : (a0, a1, a2) {
 	return(tuple3(a2, x2, x3));
 };
 
-## Parse additive expression
+## Try to parse additive expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -2171,7 +2171,7 @@ additive_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse add/sub expression
+## Parse additive expression
 # a0 - parser
 # a1 - op1
 # a2 - operation
@@ -2196,7 +2196,7 @@ additive_expr : (a0, a1, a2) {
 	return(tuple3(a2, x2, x3));
 };
 
-## Parse multiplicative expression
+## Try to parse multiplicative expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -2220,7 +2220,7 @@ multiplicative_expression : (a0, a1) {
 	return(x0);
 };
 
-## Parse mul/div/mod expression
+## Parse multiplicative expression
 # a0 - parser
 # a1 - op1
 # a2 - operation
@@ -2245,7 +2245,7 @@ multiplicative_expr : (a0, a1, a2) {
 	return(tuple3(a2, x2, x3));
 };
 
-## Parse prefix expression
+## Try to parse prefix expression
 # a0 - parser
 # a1 - current token
 # @return statement
