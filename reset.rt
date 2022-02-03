@@ -1435,8 +1435,13 @@ STMT_EXPR_SUB     => 5;
 # Bitwise shift
 STMT_EXPR_SHL     => 6;
 STMT_EXPR_SHR     => 7;
+# Relational
+STMT_EXPR_LESS    => 8;
+STMT_EXPR_GREATER => 9;
+STMT_EXPR_LE      => 10;
+STMT_EXPR_GE      => 11;
 # Top level statements
-STMT_GLOBAL       => 8;
+STMT_GLOBAL       => 12;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1751,7 +1756,52 @@ equality_expression : (a0, a1) { return(relational_expression(a0, a1)); };
 # a0 - parser
 # a1 - current token
 # @return statement
-relational_expression : (a0, a1) { return(bitwise_shift_expression(a0, a1)); };
+relational_expression : (a0, a1) {
+	# x0 - op1
+	# x1 - next token
+	allocate(2);
+	# Fetching first operand
+	x0 = bitwise_shift_expression(a0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Parsing less
+	if (x1 == '<') { return(relational_expr(a0, x0, STMT_EXPR_LESS)); };
+	# Parsing greater
+	if (x1 == '>') { return(relational_expr(a0, x0, STMT_EXPR_GREATER)); };
+	# Parsing less or equal
+	if (x1 == TOKEN_LE) { return(relational_expr(a0, x0, STMT_EXPR_LE)); };
+	# Parsing greater or equal
+	if (x1 == TOKEN_GE) { return(relational_expr(a0, x0, STMT_EXPR_GE)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(x0);
+};
+
+## Parse less/greater [or equal] expression
+# a0 - parser
+# a1 - op1
+# a2 - operation
+# @return statement
+relational_expr : (a0, a1, a2) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - op1 vector
+	# x3 - op2 vector
+	allocate(4);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = relational_expression(a0, x0);
+	# Allocating operand vectors
+	x2 = vector(0, 1);
+	x3 = vector(0, 1);
+	# Pushing operands to vectors
+	vector_push(x2, a1);
+	vector_push(x3, x1);
+	# Returning expression
+	return(tuple3(a2, x2, x3));
+};
 
 ## Parse bitwise shift expression
 # a0 - parser
@@ -1765,9 +1815,9 @@ bitwise_shift_expression : (a0, a1) {
 	x0 = additive_expression(a0, a1);
 	# Fetching next token
 	x1 = parser_lex(a0);
-	# Parsing addition
+	# Parsing left shift
 	if (x1 == TOKEN_SHL) { return(bitwise_shift_expr(a0, x0, STMT_EXPR_SHL)); };
-	# Parsing subtraction
+	# Parsing right shift
 	if (x1 == TOKEN_SHR) { return(bitwise_shift_expr(a0, x0, STMT_EXPR_SHR)); };
 	# Holding token
 	parser_lexer_hold(a0);
