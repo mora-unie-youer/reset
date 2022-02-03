@@ -1819,7 +1819,27 @@ simple_parantheses_expression : (a0, a1) {
 # a1 - current token
 # @return statement
 constant_expression : (a0, a1) {
-	parser_error(a0, "Expressions are not fully implemented yet");
+	# Parsing integer
+	if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0, a1)); };
+	# Parsing string
+	if (a1 == TOKEN_STRING) { return(constant_string_expression(a0, a1)); };
+	parser_error(a0, "Syntax error - no available statements matched");
+};
+
+## Parse constant integer expression
+# a0 - parser
+# a1 - current token
+# @return statement
+constant_integer_expression : (a0, a1) {
+	parser_error(a0, "Constant integer expressions are not implemented yet");
+};
+
+## Parse constant string expression
+# a0 - parser
+# a1 - current token
+# @return statement
+constant_string_expression : (a0, a1) {
+	parser_error(a0, "Constant string expressions are not implemented yet");
 };
 
 ## Print usage
