@@ -1743,8 +1743,14 @@ multiplicative_expression : (a0, a1) { return(prefix_expression(a0, a1)); };
 # a0 - parser
 # a1 - current token
 # @return statement
-prefix_expression : (a0, a1) {
-	parser_error(a0, "Expressions are not implemented yet");
+prefix_expression : (a0, a1) { return(simple_expression(a0, a1)); };
+
+## Parse simple expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_expression : (a0, a1) {
+	parser_error(a0, "Expressions are not fully implemented yet");
 };
 
 ## Print usage
