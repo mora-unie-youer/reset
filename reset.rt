@@ -1432,8 +1432,11 @@ STMT_EXPR_MOD     => 3;
 # Additive
 STMT_EXPR_ADD     => 4;
 STMT_EXPR_SUB     => 5;
+# Bitwise shift
+STMT_EXPR_SHL     => 6;
+STMT_EXPR_SHR     => 7;
 # Top level statements
-STMT_GLOBAL       => 6;
+STMT_GLOBAL       => 8;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1754,7 +1757,48 @@ relational_expression : (a0, a1) { return(bitwise_shift_expression(a0, a1)); };
 # a0 - parser
 # a1 - current token
 # @return statement
-bitwise_shift_expression : (a0, a1) { return(additive_expression(a0, a1)); };
+bitwise_shift_expression : (a0, a1) {
+	# x0 - op1
+	# x1 - next token
+	allocate(2);
+	# Fetching first operand
+	x0 = additive_expression(a0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Parsing addition
+	if (x1 == TOKEN_SHL) { return(bitwise_shift_expr(a0, x0, STMT_EXPR_SHL)); };
+	# Parsing subtraction
+	if (x1 == TOKEN_SHR) { return(bitwise_shift_expr(a0, x0, STMT_EXPR_SHR)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(x0);
+};
+
+## Parse shl/shr expression
+# a0 - parser
+# a1 - op1
+# a2 - operation
+# @return statement
+bitwise_shift_expr : (a0, a1, a2) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - op1 vector
+	# x3 - op2 vector
+	allocate(4);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = bitwise_shift_expression(a0, x0);
+	# Allocating operand vectors
+	x2 = vector(0, 1);
+	x3 = vector(0, 1);
+	# Pushing operands to vectors
+	vector_push(x2, a1);
+	vector_push(x3, x1);
+	# Returning expression
+	return(tuple3(a2, x2, x3));
+};
 
 ## Parse additive expression
 # a0 - parser
