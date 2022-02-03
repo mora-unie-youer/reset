@@ -1363,6 +1363,11 @@ parser_lexer : (a0) { return(list_value(a0)); };
 # @return token ID
 parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); };
 
+## Print parser error
+# a0 - parser
+# a1 - error message
+parser_error : (a0, a1) { lexer_error(parser_lexer(a0), a1); };
+
 ## Parse file
 # a0 - parser
 # @return AST
@@ -1388,8 +1393,7 @@ parser_parse : (a0) {
 	# Returning statemtents vector
 	return(x0);
 label parser_parse_error;
-	eputs("Statement is not ended with semicolon\n");
-	exit(1);
+	parser_error(a0, "Statement is not ended with semicolon");
 };
 
 ## Parse top level statement
@@ -1443,8 +1447,7 @@ label global_statement_next;
 	# Returning statement
 	return(tuple2(STATEMENT_GLOBAL, x0));
 label global_statement_invalid;
-	eputs("Invalid global statement syntax\n");
-	exit(1);
+	parser_error(a0, "Invalid global statement");
 };
 
 ## Print usage
