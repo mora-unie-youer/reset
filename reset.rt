@@ -1412,8 +1412,10 @@ NODE_OP2  => 2;
 STMT_EXPR_INTEGER => 0;
 # Multiplicative
 STMT_EXPR_MUL     => 1;
+STMT_EXPR_DIV     => 2;
+STMT_EXPR_MOD     => 3;
 # Top level statements
-STMT_GLOBAL       => 2;
+STMT_GLOBAL       => 4;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1424,6 +1426,10 @@ parser : (a0) { return(tuple2(list(a0), FALSE)); };
 # a0 - parser
 # @return lexer
 parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
+
+## Hold current lexer in parser
+# a0 - parser
+parser_lexer_hold : (a0) { lexer_hold(parser_lexer(a0)); };
 
 ## Lex using current lexer in parser
 # a0 - parser
@@ -1751,11 +1757,13 @@ multiplicative_expression : (a0, a1) {
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Parsing multiplication
-	if (x1 == '*') { return(multiplicative_mul_expression(a0, x0)); };
+	if (x1 == '*') { return(multiplicative_expr(a0, x0, STMT_EXPR_MUL)); };
 	# Parsing integer division
-	if (x1 == '/') { return(multiplicative_div_expression(a0, x0)); };
+	if (x1 == '/') { return(multiplicative_expr(a0, x0, STMT_EXPR_DIV)); };
 	# Parsing modulus division
-	if (x1 == '%') { return(multiplicative_mod_expression(a0, x0)); };
+	if (x1 == '%') { return(multiplicative_expr(a0, x0, STMT_EXPR_MOD)); };
+	# Holding token
+	parser_lexer_hold(a0);
 	# Returning operand
 	return(x0);
 };
@@ -1763,8 +1771,9 @@ multiplicative_expression : (a0, a1) {
 ## Parse multiplication expression
 # a0 - parser
 # a1 - op1
+# a2 - operation
 # @return statement
-multiplicative_mul_expression : (a0, a1) {
+multiplicative_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
 	# x2 - op1 vector
@@ -1773,31 +1782,15 @@ multiplicative_mul_expression : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = prefix_expression(a0, x0);
+	x1 = multiplicative_expression(a0, x0);
 	# Allocating operand vectors
 	x2 = vector(0, 1);
 	x3 = vector(0, 1);
 	# Pushing operands to vectors
 	vector_push(x2, a1);
 	vector_push(x3, x1);
-	# Returning multiplication expression
-	return(tuple3(STMT_EXPR_MUL, x2, x3));
-};
-
-## Parse integer division expression
-# a0 - parser
-# a1 - op1
-# @return statement
-multiplicative_div_expression : (a0, a1) {
-	parser_error(a0, "Integer division is not implemented yet");
-};
-
-## Parse modulus division expression
-# a0 - parser
-# a1 - op1
-# @return statement
-multiplicative_mod_expression : (a0, a1) {
-	parser_error(a0, "Modulus division is not implemented yet");
+	# Returning expression
+	return(tuple3(a2, x2, x3));
 };
 
 ## Parse prefix expression
