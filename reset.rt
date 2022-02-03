@@ -1037,6 +1037,17 @@ lexer : (a0, a1) {
 	return(x1);
 };
 
+## Destroy lexer
+# a0 - lexer
+lexer_destroy : (a0) {
+	# Destroying token char vector
+	vector_destroy(a0[LEX_TTEXT]);
+	# Destroying input channel
+	input_chan_close(a0[LEX_ICHAN]);
+	# Destroying lexer
+	free(a0);
+};
+
 ## Look ahead for next character
 # a0 - lexer
 # @return char type
@@ -1439,6 +1450,8 @@ label parser_parse_continue;
 		# Fetching next token
 		x1 = parser_lex(a0);
 	};
+	# Destroying lexer
+	lexer_destroy(parser_lexer(a0));
 	# Switching to previous lexer
 	a0[PARSER_LEX] = list_next(a0[PARSER_LEX]);
 	# If lexer is not NULL, continuing
