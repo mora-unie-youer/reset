@@ -318,13 +318,42 @@ strdup : (a0) {
 	return(x1);
 };
 
+## Duplicate string literal (without double quotes)
+# a0 - string
+# @return new string
+strlitdup : (a0) {
+	# x0 - string length
+	# x1 - new string
+	allocate(2);
+	# Calculating length
+	x0 = strlen(a0) - 2;
+	# Allocating string
+	x1 = calloc(x0 + 1);
+	# Copying data to new string
+	memcpy(a0 + 1, x1, x0);
+	# Return new string
+	return(x1);
+};
+
 ### Tuples
 ## Allocate tuple
 # a0 - size
 # @return allocated tuple
 allocate_tuple : (a0) { return malloc(4 * a0); };
 
-## Make tuple with 3 values
+## Make tuple with 1 value
+# a0 - value
+# @return tuple
+tuple1 : (a0) {
+	# x0 - tuple
+	allocate(1);
+	x0 = allocate_tuple(1);
+	# Fill tuple
+	x0[0] = a0;
+	return(x0);
+};
+
+## Make tuple with 2 values
 # a0, a1 - values
 # @return tuple
 tuple2 : (a0, a1) {
@@ -1342,6 +1371,9 @@ label le07;
 };
 
 ### Parser
+## Parser parts
+PARSER_LEX    => 0;
+PARSER_SWITCH => 1;
 ## Node parts
 NODE_TYPE => 0;
 NODE_OP1  => 1;
@@ -1352,12 +1384,12 @@ STATEMENT_GLOBAL => 0;
 ## Create new parser
 # a0 - lexer of main file
 # @return parser
-parser : (a0) { return(list(a0)); };
+parser : (a0) { return(tuple2(list(a0), FALSE)); };
 
 ## Get current lexer in parser
 # a0 - parser
 # @return lexer
-parser_lexer : (a0) { return(list_value(a0)); };
+parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
 
 ## Lex using current lexer in parser
 # a0 - parser
@@ -1391,7 +1423,16 @@ parser_parse : (a0) {
 		# Fetching next token
 		x1 = parser_lex(a0);
 		# Checking statement to be ended with ;
-		if (x1 != ';') { goto &parser_parse_error; };
+		if (x1 != ';') {
+			# Checking if we switched to new file before
+			if (a0[PARSER_SWITCH] == FALSE) {
+				goto &parser_parse_error;
+			};
+			# Disabling this flag
+			a0[PARSER_SWITCH] = FALSE;
+			# Holding token
+			lexer_hold(parser_lexer(a0));
+		};
 		# Fetching next token
 		x1 = parser_lex(a0);
 	};
@@ -1461,8 +1502,44 @@ label global_statement_invalid;
 # a0 - parser
 # @return NULL
 include_statement : (a0) {
-	parser_lex(a0);
+	# x0 - file vector
+	# x1 - next token/i
+	# x2 - file
+	# x3 - lexer
+	allocate(4);
+	# Allocating files vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# If next token is string - importing one file
+	if (x1 == TOKEN_STRING) {
+		# Making a copy of data in string
+		x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
+		# Pushing file to vector
+		vector_push(x0, x2);
+	} else {
+		# If not an string, check if it is (. If not, erroring.
+		# TODO: multiple files including
+		goto &include_statement_invalid;
+	};
+
+	# Creating lexers for specified files
+	x1 = 0;
+	while (x1 < vector_size(x0)) {
+		# Getting filename
+		x2 = vector_get(x0, x1);
+		# Creating lexer
+		x3 = lexer(input_chan_file(x2), x2);
+		# Adding lexer to list
+		a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], x3);
+		# Moving to next file
+		x1 = x1 + 1;
+	};
+	# Marking we switched file
+	a0[PARSER_SWITCH] = TRUE;
 	return(NULL);
+label include_statement_invalid;
+	parser_error(a0, "Invalid include statement");
 };
 
 ## Print usage
