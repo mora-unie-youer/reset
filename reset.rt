@@ -1055,7 +1055,12 @@ lexer_token_get : (a0) { return(a0[LEX_TID]); };
 ## Get token text
 # a0 - lexer
 # @return token text char vector
-lexer_token_text : (a0) { return(a0[LEX_TTEXT]); };
+lexer_token_text : (a0) { return(vector_buffer(a0[LEX_TTEXT])); };
+
+## Get token text length
+# a0 - lexer
+# @return token text length
+lexer_token_length : (a0) { return(vector_size(a0[LEX_TTEXT])); };
 
 ## Get token value
 # a0 - lexer
@@ -1087,7 +1092,7 @@ lexer_fputloc : (a0, a1) {
 	fputc(a1, ':');
 	fputn(a1, a0[LEX_LINE], 10);
 	fputc(a1, ':');
-	fputn(a1, a0[LEX_COLUMN] - vector_size(lexer_token_text(a0)) + 1, 10);
+	fputn(a1, a0[LEX_COLUMN] - lexer_token_length(a0) + 1, 10);
 };
 
 ## Print lexer error
@@ -1389,7 +1394,7 @@ top_level_statement : (a0, a1) {
 	if (a1 == TOKEN_GLOBAL) {
 		# Fetching next token
 		x0 = lexer_lex(parser_lexer(a0));
-		x1 = strdup(vector_buffer(lexer_token_text(parser_lexer(a0))));
+		x1 = strdup(lexer_token_text(parser_lexer(a0)));
 		# TODO: implement globaling multiple identifiers
 		# Returning expression
 		return(tuple2(STATEMENT_GLOBAL, x1));
