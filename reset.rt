@@ -1035,7 +1035,7 @@ lexer_consume : (a0) {
 	# Incrementing column
 	a0[LEX_COLUMN] = a0[LEX_COLUMN] + 1;
 	# Replacing last char (NULL) in buffer
-	char_vector_set(a0[LEX_TTEXT], vector_size(a0[LEX_TTEXT]) - 1, x0);
+	char_vector_set(a0[LEX_TTEXT], lexer_token_length(a0) - 1, x0);
 	# Pushing NULL to the end
 	char_vector_push(a0[LEX_TTEXT], '\0');
 	# Returning char
@@ -1208,7 +1208,7 @@ label lx08;
 	# Iterating through all reserved keywords
 	while (reserved_keywords[x1] != NULL) {
 		# If strings are equal
-		if (strcmp(reserved_keywords[x1], vector_buffer(a0[LEX_TTEXT])) == NULL) {
+		if (strcmp(reserved_keywords[x1], lexer_token_text(a0)) == NULL) {
 			# Setting keyword token ID
 			lexer_token_set(a0, TOKEN_IF + x1);
 			goto &lx99;
