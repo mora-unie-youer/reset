@@ -1762,9 +1762,9 @@ equality_expression : (a0, a1) {
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Parsing equal
-	if (x1 == TOKEN_EQ) { return(bitwise_shift_expr(a0, x0, STMT_EXPR_EQ)); };
+	if (x1 == TOKEN_EQ) { return(equality_expr(a0, x0, STMT_EXPR_EQ)); };
 	# Parsing not equal
-	if (x1 == TOKEN_NE) { return(bitwise_shift_expr(a0, x0, STMT_EXPR_NE)); };
+	if (x1 == TOKEN_NE) { return(equality_expr(a0, x0, STMT_EXPR_NE)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
