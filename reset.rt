@@ -1485,10 +1485,34 @@ label parser_parse_error;
 # a1 - current token
 # @return statement
 top_level_statement : (a0, a1) {
+	# x0 - next token
+	allocate(1);
 	# Parsing global statement
 	if (a1 == TOKEN_GLOBAL) { return(global_statement(a0)); };
 	# Parsing include statement
 	if (a1 == TOKEN_INCLUDE) { return(include_statement(a0)); };
+	# Parsing statements starting with identifier
+	if (a1 == TOKEN_IDENTIFIER) {
+		# Fetching next token
+		x0 = parser_lex(a0);
+		# Parsing macro definition
+		if (x0 == TOKEN_AR) { return(macro_declaration(a0)); };
+		# Parsing identifier declarations
+		if (x0 == ':') {
+			# Fetching next token
+			x0 = parser_lex(a0);
+			# Parsing function declaration
+			if (x0 == '(') { return(function_declaration(a0)); };
+			# Parsing array declaration
+			if (x0 == '[') { return(array_declaration(a0)); };
+			# Parsing reserved char array declaration
+			if (x0 == TOKEN_TYPE_CHAR) { return(char_array_declaration(a0)); };
+			# Parsing reserved int array declaration
+			if (x0 == TOKEN_TYPE_INT) { return(int_array_declaration(a0)); };
+			# Parsing simple variable declaration
+			return(variable_declaration(a0, x0));
+		};
+	};
 	parser_error(a0, "Couldn't parse statement");
 };
 
@@ -1590,6 +1614,55 @@ label include_statement_next;
 	return(NULL);
 label include_statement_invalid;
 	parser_error(a0, "Invalid include statement");
+};
+
+## Parse macro declaration
+# a0 - parser
+# @return statement
+macro_declaration : (a0) {
+	# TODO: implement macro declaration
+	parser_error(a0, "declarations of macros are not implemented yet");
+};
+
+## Parse function declaration
+# a0 - parser
+# @return statement
+function_declaration : (a0) {
+	# TODO: implement function declaration
+	parser_error(a0, "declarations of functions are not implemented yet");
+};
+
+## Parse array declaration
+# a0 - parser
+# @return statement
+array_declaration : (a0) {
+	# TODO: implement array declaration
+	parser_error(a0, "declarations of arrays are not implemented yet");
+};
+
+## Parse char array declaration
+# a0 - parser
+# @return statement
+char_array_declaration : (a0) {
+	# TODO: implement char array declaration
+	parser_error(a0, "declarations of char arrays are not implemented yet");
+};
+
+## Parse int array declaration
+# a0 - parser
+# @return statement
+int_array_declaration : (a0) {
+	# TODO: implement int array declaration
+	parser_error(a0, "declarations of int arrays are not implemented yet");
+};
+
+## Parse variable declaration
+# a0 - parser
+# a1 - current token
+# @return statement
+variable_declaration : (a0, a1) {
+	# TODO: implement variable declaration
+	parser_error(a0, "declarations of variables are not implemented yet");
 };
 
 ## Print usage
