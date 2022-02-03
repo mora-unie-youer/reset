@@ -1037,6 +1037,11 @@ lexer : (a0, a1) {
 	return(x1);
 };
 
+## Create new lexer using file name
+# a0 - filename
+# @return lexer
+lexer_file : (a0) { return(lexer(input_chan_file(a0), a0)); };
+
 ## Destroy lexer
 # a0 - lexer
 lexer_destroy : (a0) {
@@ -1527,8 +1532,7 @@ include_statement : (a0) {
 	# x0 - file vector
 	# x1 - next token/i
 	# x2 - file
-	# x3 - lexer
-	allocate(4);
+	allocate(3);
 	# Allocating files vector
 	x0 = vector(0, 1);
 	# Fetching next token
@@ -1565,10 +1569,8 @@ label include_statement_next;
 	while (x1 < vector_size(x0)) {
 		# Getting filename
 		x2 = vector_get(x0, x1);
-		# Creating lexer
-		x3 = lexer(input_chan_file(x2), x2);
 		# Adding lexer to list
-		a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], x3);
+		a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], lexer_file(x2));
 		# Moving to next file
 		x1 = x1 + 1;
 	};
