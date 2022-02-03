@@ -1411,11 +1411,14 @@ parser_parse : (a0) {
 	allocate(3);
 	# Allocating statements vector
 	x0 = vector(0, 1);
-	# Parsing file
+label parser_parse_continue;
+	## Parsing file
 	# Fetching token for tests
 	x1 = parser_lex(a0);
 	# Testing until got end of file
 	while (x1 != TOKEN_END) {
+		# If token is ;, skipping it as empty statement
+		if (x1 == ';') { goto &parser_parse_continue; };
 		# Parsing statement
 		x2 = top_level_statement(a0, x1);
 		# Adding statement, if needed
@@ -1436,6 +1439,10 @@ parser_parse : (a0) {
 		# Fetching next token
 		x1 = parser_lex(a0);
 	};
+	# Switching to previous lexer
+	a0[PARSER_LEX] = list_next(a0[PARSER_LEX]);
+	# If lexer is not NULL, continuing
+	if (a0[PARSER_LEX] != NULL) { goto &parser_parse_continue; };
 	# Returning statemtents vector
 	return(x0);
 label parser_parse_error;
