@@ -1339,8 +1339,6 @@ label le07;
 };
 
 ### Parser
-## Parser parts
-PARSER_LEX    => 0;
 ## Node parts
 NODE_TYPE     => 0;
 NODE_OPERAND1 => 1;
@@ -1352,13 +1350,13 @@ STATEMENT_GLOBAL => 0;
 # a0 - lexer of main file
 # @return parser
 parser : (a0) {
-	return(tuple2(list(a0), NULL));
+	return(list(a0));
 };
 
 ## Get current lexer in parser
 # a0 - parser
 # @return lexer
-parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
+parser_lexer : (a0) { return(list_value(a0)); };
 
 ## Lex using current lexer in parser
 # a0 - parser
@@ -1369,7 +1367,7 @@ parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); };
 # a0 - parser
 # @return AST
 parser_parse : (a0) {
-	# x0 - statements vector
+	# x0 - top level statements vector
 	# x1 - token
 	allocate(2);
 	# Allocating statements vector
