@@ -1750,6 +1750,75 @@ prefix_expression : (a0, a1) { return(simple_expression(a0, a1)); };
 # a1 - current token
 # @return statement
 simple_expression : (a0, a1) {
+	# Parsing identifier
+	if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0, a1)); };
+	# Parsing argument
+	if (a1 == TOKEN_ARGUMENT) { return(simple_argument_expression(a0, a1)); };
+	# Parsing variable
+	if (a1 == TOKEN_VARIABLE) { return(simple_variable_expression(a0, a1)); };
+	# Parsing syscall
+	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, a1)); };
+	# Parsing readchar
+	if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a1)); };
+	# Parsing parantheses grouping
+	if (a1 == '(') { return(simple_parantheses_expression(a0, a1)); };
+	# Parsing constant expression
+	return(constant_expression(a0, a1));
+};
+
+## Parse simple identifier expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_identifier_expression : (a0, a1) {
+	parser_error(a0, "Simple identifier expressions are not implemented yet");
+};
+
+## Parse simple argument expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_argument_expression : (a0, a1) {
+	parser_error(a0, "Simple argument expressions are not implemented yet");
+};
+
+## Parse simple variable expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_variable_expression : (a0, a1) {
+	parser_error(a0, "Simple variable expressions are not implemented yet");
+};
+
+## Parse simple syscall expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_syscall_expression : (a0, a1) {
+	parser_error(a0, "Simple syscall expressions are not implemented yet");
+};
+
+## Parse simple readchar expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_readchar_expression : (a0, a1) {
+	parser_error(a0, "Simple readchar expressions are not implemented yet");
+};
+
+## Parse simple parantheses expression
+# a0 - parser
+# a1 - current token
+# @return statement
+simple_parantheses_expression : (a0, a1) {
+	parser_error(a0, "Simple parantheses expressions are not implemented yet");
+};
+
+## Parse constant expression
+# a0 - parser
+# a1 - current token
+# @return statement
+constant_expression : (a0, a1) {
 	parser_error(a0, "Expressions are not fully implemented yet");
 };
 
