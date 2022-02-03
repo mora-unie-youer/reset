@@ -1340,9 +1340,9 @@ label le07;
 
 ### Parser
 ## Node parts
-NODE_TYPE     => 0;
-NODE_OPERAND1 => 1;
-NODE_OPERAND2 => 2;
+NODE_TYPE => 0;
+NODE_OP1  => 1;
+NODE_OP2  => 2;
 ## Statement IDs
 STATEMENT_GLOBAL => 0;
 
@@ -1390,19 +1390,24 @@ parser_parse : (a0) {
 # a1 - current token
 # @return statement
 top_level_statement : (a0, a1) {
-	# x0 - next token
-	# x1 - identifier
-	allocate(2);
+	# x0 - op1 vector
+	# x1 - next token
+	# x2 - identifier
+	allocate(3);
 	# Parsing global statement
 	if (a1 == TOKEN_GLOBAL) {
+		# Allocating op1 vector
+		x0 = vector(0, 1);
 		# Fetching next token
-		x0 = parser_lex(a0);
-		x1 = strdup(lexer_token_text(parser_lexer(a0)));
+		x1 = parser_lex(a0);
+		x2 = strdup(lexer_token_text(parser_lexer(a0)));
+		# Pushing identifier to op1
+		vector_push(x0, x2);
 		# TODO: implement globaling multiple identifiers
 		# Returning expression
-		return(tuple2(STATEMENT_GLOBAL, x1));
+		return(tuple2(STATEMENT_GLOBAL, x0));
 	};
-	return(tuple2(a1, ""));
+	return(tuple2(a1, vector(0, 1)));
 };
 
 ## Print usage
@@ -1422,8 +1427,9 @@ main : (a0, a1) {
 	# x1 - lexer
 	# x2 - parser
 	# x3 - AST
-	# x4 - index
-	allocate(5);
+	# x4 - i
+	# x5 - j
+	allocate(6);
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return(1); };
 	# TODO: implement option parser
@@ -1439,9 +1445,14 @@ main : (a0, a1) {
 	while (x4 < vector_size(x3)) {
 		puts("Node #");
 		putd(x3[VEC_BUF][x4][NODE_TYPE]);
-		puts(": op1=");
-		puts(x3[VEC_BUF][x4][NODE_OPERAND1]);
-		putc('\n');
+		puts(": op1=[");
+		x5 = 0;
+		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OP1])) {
+			if (x5 != 0) { puts(", "); };
+			puts(x3[VEC_BUF][x4][NODE_OP1][VEC_BUF][x5]);
+			x5 = x5 + 1;
+		};
+		puts("]\n");
 		x4 = x4 + 1;
 	};
 	return(a0);
