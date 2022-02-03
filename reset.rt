@@ -1360,6 +1360,11 @@ parser : (a0) {
 # @return lexer
 parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
 
+## Lex using current lexer in parser
+# a0 - parser
+# @return token ID
+parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); };
+
 ## Parse file
 # a0 - parser
 # @return AST
@@ -1371,7 +1376,7 @@ parser_parse : (a0) {
 	x0 = vector(0, 1);
 	# Parsing file
 	# Fetching token for tests
-	x1 = lexer_lex(parser_lexer(a0));
+	x1 = parser_lex(a0);
 	# Testing until got end of file
 	while (x1 != TOKEN_END) {
 		vector_push(x0, top_level_statement(a0, x1));
@@ -1393,7 +1398,7 @@ top_level_statement : (a0, a1) {
 	# Parsing global statement
 	if (a1 == TOKEN_GLOBAL) {
 		# Fetching next token
-		x0 = lexer_lex(parser_lexer(a0));
+		x0 = parser_lex(a0);
 		x1 = strdup(lexer_token_text(parser_lexer(a0)));
 		# TODO: implement globaling multiple identifiers
 		# Returning expression
