@@ -1390,24 +1390,54 @@ parser_parse : (a0) {
 # a1 - current token
 # @return statement
 top_level_statement : (a0, a1) {
+	# Parsing global statement
+	if (a1 == TOKEN_GLOBAL) { return(global_statement(a0)); };
+	return(tuple2(a1, vector(0, 1)));
+};
+
+## Parse global statement
+# a0 - parser
+# @return statement
+global_statement : (a0) {
 	# x0 - op1 vector
 	# x1 - next token
 	# x2 - identifier
 	allocate(3);
-	# Parsing global statement
-	if (a1 == TOKEN_GLOBAL) {
-		# Allocating op1 vector
-		x0 = vector(0, 1);
-		# Fetching next token
-		x1 = parser_lex(a0);
+	# Allocating op1 vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# If next token is identifier - globalling only one identifier
+	if (x1 == TOKEN_IDENTIFIER) {
+		# Making a copy of identifier
 		x2 = strdup(lexer_token_text(parser_lexer(a0)));
 		# Pushing identifier to op1
 		vector_push(x0, x2);
-		# TODO: implement globaling multiple identifiers
-		# Returning expression
-		return(tuple2(STATEMENT_GLOBAL, x0));
+	} else {
+		# If not an identifier, check if it is (. If not, errorring.
+		if (x1 == '(') {
+label global_statement_next;
+			# Fetching next token
+			x1 = parser_lex(a0);
+			# Checking if it is identifier
+			if (x1 != TOKEN_IDENTIFIER) { goto &global_statement_invalid; };
+			# Making a copy of identifier
+			x2 = strdup(lexer_token_text(parser_lexer(a0)));
+			# Pushing identifier to op1
+			vector_push(x0, x2);
+			## If next token is , - redoing loop
+			# Fetching next token
+			x1 = parser_lex(a0);
+			if (x1 == ',') { goto &global_statement_next; };
+			# Checking for correct syntax
+			if (x1 != ')') { goto &global_statement_invalid; };
+		} else { goto &global_statement_invalid; };
 	};
-	return(tuple2(a1, vector(0, 1)));
+	# Returning statement
+	return(tuple2(STATEMENT_GLOBAL, x0));
+label global_statement_invalid;
+	eputs("Invalid global statement syntax\n");
+	exit(1);
 };
 
 ## Print usage
