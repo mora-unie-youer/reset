@@ -1449,8 +1449,10 @@ STMT_EXPR_AND     => 14;
 STMT_EXPR_XOR     => 15;
 # Bitwise or
 STMT_EXPR_OR      => 16;
+# Logical and
+STMT_EXPR_LAND    => 17;
 # Top level statements
-STMT_GLOBAL       => 17;
+STMT_GLOBAL       => 18;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1735,7 +1737,45 @@ logical_or_expression : (a0, a1) { return(logical_and_expression(a0, a1)); };
 # a0 - parser
 # a1 - current token
 # @return statement
-logical_and_expression : (a0, a1) { return(bitwise_or_expression(a0, a1)); };
+logical_and_expression : (a0, a1) {
+	# x0 - op1
+	# x1 - next token
+	allocate(2);
+	# Fetching first operand
+	x0 = bitwise_or_expression(a0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Parsing logical and
+	if (x1 == TOKEN_LAND) { return(logical_and_expr(a0, x0)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(x0);
+};
+
+## Parse 'land' expression
+# a0 - parser
+# a1 - op1
+# @return statement
+logical_and_expr : (a0, a1) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - op1 vector
+	# x3 - op2 vector
+	allocate(4);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = logical_and_expression(a0, x0);
+	# Allocating operand vectors
+	x2 = vector(0, 1);
+	x3 = vector(0, 1);
+	# Pushing operands to vectors
+	vector_push(x2, a1);
+	vector_push(x3, x1);
+	# Returning expression
+	return(tuple3(STMT_EXPR_LAND, x2, x3));
+};
 
 ## Parse bitwise or expression
 # a0 - parser
@@ -1749,7 +1789,7 @@ bitwise_or_expression : (a0, a1) {
 	x0 = bitwise_xor_expression(a0, a1);
 	# Fetching next token
 	x1 = parser_lex(a0);
-	# Parsing bitwise xor
+	# Parsing bitwise or
 	if (x1 == '|') { return(bitwise_or_expr(a0, x0)); };
 	# Holding token
 	parser_lexer_hold(a0);
