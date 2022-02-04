@@ -2334,7 +2334,21 @@ simple_readchar_expression : (a0, a1) {
 # a1 - current token
 # @return statement
 simple_parantheses_expression : (a0, a1) {
-	parser_error(a0, "Simple parantheses expressions are not implemented yet");
+	# x0 - next token
+	# x1 - expression
+	allocate(2);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching expression in parantheses
+	x1 = expression(a0, x0);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Checking parantheses are closed
+	if (x0 != ')') { goto &simple_parantheses_expression_invalid; };
+	# Returning expression
+	return(x1);
+label simple_parantheses_expression_invalid;
+	parser_error(a0, "Parantheses expression is not closed");
 };
 
 ## Try to parse constant expression
