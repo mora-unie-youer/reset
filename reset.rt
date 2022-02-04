@@ -1425,38 +1425,45 @@ NODE_OPS  => 1;
 # Constant
 STMT_EXPR_INTEGER => 0;
 STMT_EXPR_STRING  => 1;
+# Prefix
+STMT_EXPR_PLUS    => 2;
+STMT_EXPR_MINUS   => 3;
+STMT_EXPR_LNOT    => 4;
+STMT_EXPR_NOT     => 5;
+STMT_EXPR_DEREF   => 6;
+STMT_EXPR_ADDROF  => 7;
 # Multiplicative
-STMT_EXPR_MUL     => 2;
-STMT_EXPR_DIV     => 3;
-STMT_EXPR_MOD     => 4;
+STMT_EXPR_MUL     => 8;
+STMT_EXPR_DIV     => 9;
+STMT_EXPR_MOD     => 10;
 # Additive
-STMT_EXPR_ADD     => 5;
-STMT_EXPR_SUB     => 6;
+STMT_EXPR_ADD     => 11;
+STMT_EXPR_SUB     => 12;
 # Bitwise shift
-STMT_EXPR_SHL     => 7;
-STMT_EXPR_SHR     => 8;
+STMT_EXPR_SHL     => 13;
+STMT_EXPR_SHR     => 14;
 # Relational
-STMT_EXPR_LESS    => 9;
-STMT_EXPR_GREATER => 10;
-STMT_EXPR_LE      => 11;
-STMT_EXPR_GE      => 12;
+STMT_EXPR_LESS    => 15;
+STMT_EXPR_GREATER => 16;
+STMT_EXPR_LE      => 17;
+STMT_EXPR_GE      => 18;
 # Equality
-STMT_EXPR_EQ      => 13;
-STMT_EXPR_NE      => 14;
+STMT_EXPR_EQ      => 19;
+STMT_EXPR_NE      => 20;
 # Bitwise and
-STMT_EXPR_AND     => 15;
+STMT_EXPR_AND     => 21;
 # Bitwise xor
-STMT_EXPR_XOR     => 16;
+STMT_EXPR_XOR     => 22;
 # Bitwise or
-STMT_EXPR_OR      => 17;
+STMT_EXPR_OR      => 23;
 # Logical and
-STMT_EXPR_LAND    => 18;
+STMT_EXPR_LAND    => 24;
 # Logical or
-STMT_EXPR_LOR     => 19;
+STMT_EXPR_LOR     => 25;
 # Ternary
-STMT_EXPR_TERNARY => 20;
+STMT_EXPR_TERNARY => 26;
 # Top level statements
-STMT_GLOBAL       => 21;
+STMT_GLOBAL       => 27;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2224,9 +2231,44 @@ multiplicative_expr : (a0, a1, a2) {
 # a0 - parser
 # a1 - current token
 # @return statement
-prefix_expression : (a0, a1) { return(simple_expression(a0, a1)); };
+prefix_expression : (a0, a1) {
+	# x0 - op1
+	allocate(1);
+	# Parsing unary plus
+	if (a1 == '+') { return(prefix_expr(a0, STMT_EXPR_PLUS)); };
+	# Parsing unary minus
+	if (a1 == '-') { return(prefix_expr(a0, STMT_EXPR_MINUS)); };
+	# Parsing logical not
+	if (a1 == '!') { return(prefix_expr(a0, STMT_EXPR_LNOT)); };
+	# Parsing bitwise not
+	if (a1 == '~') { return(prefix_expr(a0, STMT_EXPR_NOT)); };
+	# Parsing dereference
+	if (a1 == '*') { return(prefix_expr(a0, STMT_EXPR_DEREF)); };
+	# Parsing addressof
+	if (a1 == '&') { return(prefix_expr(a0, STMT_EXPR_ADDROF)); };
+	# Parsing simple expression
+	return(simple_expression(a0, a1));
+};
 
-## Parse simple expression
+## Parse prefix expression
+# a0 - parser
+# a1 - operation
+# @return statement
+prefix_expr : (a0, a1) {
+	# x0 - op1
+	# x1 - ops vector
+	allocate(2);
+	# Fetching operand
+	x0 = prefix_expression(a0, parser_lex(a0));
+	# Allocating operand vector
+	x1 = vector(0, 1);
+	# Pushing operand to vector
+	vector_push(x1, x0);
+	# Returning expression
+	return(tuple2(a1, x1));
+};
+
+## Try to parse simple expression
 # a0 - parser
 # a1 - current token
 # @return statement
@@ -2295,7 +2337,7 @@ simple_parantheses_expression : (a0, a1) {
 	parser_error(a0, "Simple parantheses expressions are not implemented yet");
 };
 
-## Parse constant expression
+## Try to parse constant expression
 # a0 - parser
 # a1 - current token
 # @return statement
