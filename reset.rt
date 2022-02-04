@@ -1424,38 +1424,39 @@ NODE_OPS  => 1;
 ## Statement IDs
 # Constant
 STMT_EXPR_INTEGER => 0;
+STMT_EXPR_STRING  => 1;
 # Multiplicative
-STMT_EXPR_MUL     => 1;
-STMT_EXPR_DIV     => 2;
-STMT_EXPR_MOD     => 3;
+STMT_EXPR_MUL     => 2;
+STMT_EXPR_DIV     => 3;
+STMT_EXPR_MOD     => 4;
 # Additive
-STMT_EXPR_ADD     => 4;
-STMT_EXPR_SUB     => 5;
+STMT_EXPR_ADD     => 5;
+STMT_EXPR_SUB     => 6;
 # Bitwise shift
-STMT_EXPR_SHL     => 6;
-STMT_EXPR_SHR     => 7;
+STMT_EXPR_SHL     => 7;
+STMT_EXPR_SHR     => 8;
 # Relational
-STMT_EXPR_LESS    => 8;
-STMT_EXPR_GREATER => 9;
-STMT_EXPR_LE      => 10;
-STMT_EXPR_GE      => 11;
+STMT_EXPR_LESS    => 9;
+STMT_EXPR_GREATER => 10;
+STMT_EXPR_LE      => 11;
+STMT_EXPR_GE      => 12;
 # Equality
-STMT_EXPR_EQ      => 12;
-STMT_EXPR_NE      => 13;
+STMT_EXPR_EQ      => 13;
+STMT_EXPR_NE      => 14;
 # Bitwise and
-STMT_EXPR_AND     => 14;
+STMT_EXPR_AND     => 15;
 # Bitwise xor
-STMT_EXPR_XOR     => 15;
+STMT_EXPR_XOR     => 16;
 # Bitwise or
-STMT_EXPR_OR      => 16;
+STMT_EXPR_OR      => 17;
 # Logical and
-STMT_EXPR_LAND    => 17;
+STMT_EXPR_LAND    => 18;
 # Logical or
-STMT_EXPR_LOR     => 18;
+STMT_EXPR_LOR     => 19;
 # Ternary
-STMT_EXPR_TERNARY => 19;
+STMT_EXPR_TERNARY => 20;
 # Top level statements
-STMT_GLOBAL       => 20;
+STMT_GLOBAL       => 21;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2316,7 +2317,8 @@ constant_integer_expression : (a0, a1) {
 	# Allocating operand vector
 	x0 = vector(0, 1);
 	# Pushing value to vector
-	vector_push(x0, lexer_token_value(parser_lexer(a0)));
+	vector_push(x0, 1);
+	#vector_push(x0, lexer_token_value(parser_lexer(a0)));
 	# Returning basic integer expression
 	return(tuple2(STMT_EXPR_INTEGER, x0));
 };
@@ -2326,7 +2328,17 @@ constant_integer_expression : (a0, a1) {
 # a1 - current token
 # @return statement
 constant_string_expression : (a0, a1) {
-	parser_error(a0, "Constant string expressions are not implemented yet");
+	# x0 - duplicated string
+	# x1 - ops vector
+	allocate(2);
+	# Duplicating the string
+	x0 = strdup(lexer_token_text(parser_lexer(a0)));
+	# Allocating operand vector
+	x1 = vector(0, 1);
+	# Pushing value to vector
+	vector_push(x1, x0);
+	# Returning expression
+	return(tuple2(STMT_EXPR_STRING, x1));
 };
 
 ## Print usage
