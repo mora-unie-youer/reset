@@ -1420,9 +1420,7 @@ PARSER_LEX    => 0;
 PARSER_SWITCH => 1;
 ## Node parts
 NODE_TYPE => 0;
-NODE_OP1  => 1;
-NODE_OP2  => 2;
-NODE_OP3  => 3;
+NODE_OPS  => 1;
 ## Statement IDs
 # Constant
 STMT_EXPR_INTEGER => 0;
@@ -1575,11 +1573,11 @@ top_level_statement : (a0, a1) {
 # a0 - parser
 # @return statement
 global_statement : (a0) {
-	# x0 - op1 vector
+	# x0 - ops vector
 	# x1 - next token
 	# x2 - identifier
 	allocate(3);
-	# Allocating op1 vector
+	# Allocating ops vector
 	x0 = vector(0, 1);
 	# Fetching next token
 	x1 = parser_lex(a0);
@@ -1599,7 +1597,7 @@ label global_statement_next;
 			if (x1 != TOKEN_IDENTIFIER) { goto &global_statement_invalid; };
 			# Making a copy of identifier
 			x2 = strdup(lexer_token_text(parser_lexer(a0)));
-			# Pushing identifier to op1
+			# Pushing identifier to ops
 			vector_push(x0, x2);
 			## If next token is , - redoing loop
 			# Fetching next token
@@ -1754,10 +1752,8 @@ ternary_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
 	# x2 - op3
-	# x3 - op1 vector
-	# x4 - op2 vector
-	# x5 - op3 vector
-	allocate(6);
+	# x3 - ops vector
+	allocate(4);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
@@ -1770,16 +1766,14 @@ ternary_expr : (a0, a1) {
 	x0 = parser_lex(a0);
 	# Fetching third operand
 	x2 = ternary_expression(a0, x0);
-	# Allocating operand vectors
-	x3 = vector(0, 1);
-	x4 = vector(0, 1);
-	x5 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x3 = vector(0, 3);
+	# Pushing operands to vector
 	vector_push(x3, a1);
-	vector_push(x4, x1);
-	vector_push(x5, x2);
+	vector_push(x3, x1);
+	vector_push(x3, x2);
 	# Returning expression
-	return(tuple4(STMT_EXPR_TERNARY, x3, x4, x5));
+	return(tuple2(STMT_EXPR_TERNARY, x3));
 label ternary_expr_error;
 	parser_error(a0, "Incorrect ternary expression syntax");
 };
@@ -1811,21 +1805,19 @@ logical_or_expression : (a0, a1) {
 logical_or_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = logical_or_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(STMT_EXPR_LOR, x2, x3));
+	return(tuple2(STMT_EXPR_LOR, x2));
 };
 
 ## Try to parse logical and expression
@@ -1855,21 +1847,19 @@ logical_and_expression : (a0, a1) {
 logical_and_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = logical_and_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(STMT_EXPR_LAND, x2, x3));
+	return(tuple2(STMT_EXPR_LAND, x2));
 };
 
 ## Try to parse bitwise or expression
@@ -1899,21 +1889,19 @@ bitwise_or_expression : (a0, a1) {
 bitwise_or_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_or_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(STMT_EXPR_OR, x2, x3));
+	return(tuple2(STMT_EXPR_OR, x2));
 };
 
 ## Try to parse bitwise xor expression
@@ -1943,21 +1931,19 @@ bitwise_xor_expression : (a0, a1) {
 bitwise_xor_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_xor_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(STMT_EXPR_XOR, x2, x3));
+	return(tuple2(STMT_EXPR_XOR, x2));
 };
 
 ## Try to parse bitwise and expression
@@ -1987,21 +1973,19 @@ bitwise_and_expression : (a0, a1) {
 bitwise_and_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_and_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(STMT_EXPR_AND, x2, x3));
+	return(tuple2(STMT_EXPR_AND, x2));
 };
 
 ## Try to parse equality expression
@@ -2034,21 +2018,19 @@ equality_expression : (a0, a1) {
 equality_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = equality_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(a2, x2, x3));
+	return(tuple2(a2, x2));
 };
 
 ## Try to parse relational expression
@@ -2085,21 +2067,19 @@ relational_expression : (a0, a1) {
 relational_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = relational_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(a2, x2, x3));
+	return(tuple2(a2, x2));
 };
 
 ## Try to parse bitwise shift expression
@@ -2132,21 +2112,19 @@ bitwise_shift_expression : (a0, a1) {
 bitwise_shift_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_shift_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(a2, x2, x3));
+	return(tuple2(a2, x2));
 };
 
 ## Try to parse additive expression
@@ -2179,21 +2157,19 @@ additive_expression : (a0, a1) {
 additive_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = additive_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(a2, x2, x3));
+	return(tuple2(a2, x2));
 };
 
 ## Try to parse multiplicative expression
@@ -2228,21 +2204,19 @@ multiplicative_expression : (a0, a1) {
 multiplicative_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - op1 vector
-	# x3 - op2 vector
-	allocate(4);
+	# x2 - ops vector
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = multiplicative_expression(a0, x0);
-	# Allocating operand vectors
-	x2 = vector(0, 1);
-	x3 = vector(0, 1);
-	# Pushing operands to vectors
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
 	vector_push(x2, a1);
-	vector_push(x3, x1);
+	vector_push(x2, x1);
 	# Returning expression
-	return(tuple3(a2, x2, x3));
+	return(tuple2(a2, x2));
 };
 
 ## Try to parse prefix expression
@@ -2337,9 +2311,9 @@ constant_expression : (a0, a1) {
 # a1 - current token
 # @return statement
 constant_integer_expression : (a0, a1) {
-	# x0 - op1 vector
+	# x0 - ops vector
 	allocate(1);
-	# Allocating op1 vector
+	# Allocating operand vector
 	x0 = vector(0, 1);
 	# Pushing value to vector
 	vector_push(x0, lexer_token_value(parser_lexer(a0)));
@@ -2390,18 +2364,11 @@ main : (a0, a1) {
 	while (x4 < vector_size(x3)) {
 		puts("Node #");
 		putd(x3[VEC_BUF][x4][NODE_TYPE]);
-		puts(": op1=[");
+		puts(": ops=[");
 		x5 = 0;
-		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OP1])) {
+		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OPS])) {
 			if (x5 != 0) { puts(", "); };
-			putx(x3[VEC_BUF][x4][NODE_OP1][VEC_BUF][x5][NODE_TYPE]);
-			x5 = x5 + 1;
-		};
-		puts("] op2=[");
-		x5 = 0;
-		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OP2])) {
-			if (x5 != 0) { puts(", "); };
-			putx(x3[VEC_BUF][x4][NODE_OP2][VEC_BUF][x5][NODE_TYPE]);
+			putx(x3[VEC_BUF][x4][NODE_OPS][VEC_BUF][x5][NODE_TYPE]);
 			x5 = x5 + 1;
 		};
 		puts("]\n");
