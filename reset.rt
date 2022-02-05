@@ -1993,7 +1993,7 @@ logical_and_expression : (a0, a1) {
 	# x1 - next token
 	allocate(2);
 	# Fetching first operand
-	x0 = bitwise_or_expression(a0, a1);
+	x0 = bitwise_or_expression(a0, a1, NULL);
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Parsing logical and
@@ -2029,21 +2029,21 @@ logical_and_expr : (a0, a1) {
 ## Try to parse bitwise or expression
 # a0 - parser
 # a1 - current token
+# a2 - expression
 # @return statement
-bitwise_or_expression : (a0, a1) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
+bitwise_or_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
 	# Fetching first operand
-	x0 = bitwise_xor_expression(a0, a1);
+	if (a2 == NULL) { a2 = bitwise_xor_expression(a0, a1, NULL); };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Parsing bitwise or
-	if (x1 == '|') { return(bitwise_or_expr(a0, x0)); };
+	if (x0 == '|') { return(bitwise_or_expr(a0, a2)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
-	return(x0);
+	return(a2);
 };
 
 ## Parse bitwise or expression
@@ -2058,34 +2058,34 @@ bitwise_or_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = bitwise_or_expression(a0, x0);
+	x1 = bitwise_xor_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_OR, x2));
+	return(bitwise_or_expression(a0, NULL, tuple2(STMT_EXPR_OR, x2)));
 };
 
 ## Try to parse bitwise xor expression
 # a0 - parser
 # a1 - current token
+# a2 - expression
 # @return statement
-bitwise_xor_expression : (a0, a1) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
+bitwise_xor_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
 	# Fetching first operand
-	x0 = bitwise_and_expression(a0, a1);
+	if (a2 == NULL) { a2 = bitwise_and_expression(a0, a1, NULL); };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Parsing bitwise xor
-	if (x1 == '^') { return(bitwise_xor_expr(a0, x0)); };
+	if (x0 == '^') { return(bitwise_xor_expr(a0, a2)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
-	return(x0);
+	return(a2);
 };
 
 ## Parse bitwise xor expression
@@ -2100,34 +2100,34 @@ bitwise_xor_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = bitwise_xor_expression(a0, x0);
+	x1 = bitwise_and_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_XOR, x2));
+	return(bitwise_xor_expression(a0, NULL, tuple2(STMT_EXPR_XOR, x2)));
 };
 
 ## Try to parse bitwise and expression
 # a0 - parser
 # a1 - current token
+# a2 - expression
 # @return statement
-bitwise_and_expression : (a0, a1) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
+bitwise_and_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
 	# Fetching first operand
-	x0 = equality_expression(a0, a1, NULL);
+	if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL); };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Parsing bitwise and
-	if (x1 == '&') { return(bitwise_and_expr(a0, x0)); };
+	if (x0 == '&') { return(bitwise_and_expr(a0, a2)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
-	return(x0);
+	return(a2);
 };
 
 ## Parse bitwise and expression
@@ -2142,14 +2142,14 @@ bitwise_and_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = bitwise_and_expression(a0, x0);
+	x1 = equality_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_AND, x2));
+	return(bitwise_and_expression(a0, NULL, tuple2(STMT_EXPR_AND, x2)));
 };
 
 ## Try to parse equality expression
