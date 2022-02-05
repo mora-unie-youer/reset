@@ -2348,10 +2348,14 @@ label simple_syscall_expression_loop;
 	if (x1 == ',') { goto &simple_syscall_expression_loop; };
 	# Checking for correct syntax
 	if (x1 != ')') { goto &simple_syscall_expression_invalid; };
+	# Checking for argument count
+	if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; };
 	# Returning expression
 	return(tuple2(STMT_EXPR_SYSCALL, x0));
 label simple_syscall_expression_invalid;
 	parser_error(a0, "Invalid syscall expression");
+label simple_syscall_expression_too_many;
+	parser_error(a0, "Too many arguments in syscall expression");
 };
 
 ## Parse simple readchar expression
