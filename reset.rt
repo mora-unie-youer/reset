@@ -1759,8 +1759,10 @@ label block_statement_loop;
 	x1 = parser_lex(a0);
 	# Checking if we need to exit the loop
 	if (x1 == '}') { goto &block_statement_end; };
-	# Fetching statement
-	x2 = statement(a0, x1);
+	# Checking if we have next block inside this
+	if (x1 == '{') { x2 = block_statement(a0, x1); }
+	# Else fetching statement
+	else { x2 = statement(a0, x1); };
 	# Pushing statement to vector
 	vector_push(x0, x2);
 	# Fetching next token
