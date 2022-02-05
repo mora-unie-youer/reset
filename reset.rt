@@ -2358,7 +2358,40 @@ label simple_syscall_expression_invalid;
 # a0 - parser
 # @return statement
 simple_readchar_expression : (a0) {
-	parser_error(a0, "Simple readchar expressions are not implemented yet");
+	# x0 - ops vector
+	# x1 - token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != '(') { goto &simple_readchar_expression_invalid };
+label simple_readchar_expression_loop;
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if there is next expression as argument
+	if (x1 == ',') { goto &simple_readchar_expression_loop; };
+	# Checking for correct syntax
+	if (x1 != ')') { goto &simple_readchar_expression_invalid; };
+	# Checking for argument count
+	if (vector_size(x0) < 2) { goto &simple_readchar_expression_not_enough; };
+	if (vector_size(x0) > 2) { goto &simple_readchar_expression_too_many; };
+	# Returning expression
+	return(tuple2(STMT_EXPR_SYSCALL, x0));
+label simple_readchar_expression_invalid;
+	parser_error(a0, "Invalid readchar expression");
+label simple_readchar_expression_not_enough;
+	parser_error(a0, "Not enough arguments in readchar expression");
+label simple_readchar_expression_too_many;
+	parser_error(a0, "Too many arguments in readchar expression");
 };
 
 ## Parse simple parantheses expression
