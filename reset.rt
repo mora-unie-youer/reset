@@ -1580,6 +1580,7 @@ top_level_statement : (a0, a1) {
 	};
 	# For test purposes, returning expression statement
 	return(expression(a0, a1));
+	parser_error(a0, "Syntax error - none of available top level statements matched");
 	parser_error(a0, "Couldn't parse statement");
 };
 
@@ -1730,6 +1731,14 @@ int_array_declaration : (a0) {
 variable_declaration : (a0, a1) {
 	# TODO: implement variable declaration
 	parser_error(a0, "declarations of variables are not implemented yet");
+};
+
+## Parse statement
+# a0 - parser
+# a1 - current token
+# @return statement
+statement : (a0, a1) {
+	parser_error(a0, "Syntax error - none of available statements matched");
 };
 
 ## Parse expression
@@ -2438,7 +2447,7 @@ constant_expression : (a0, a1) {
 	if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0)); };
 	# Parsing string
 	if (a1 == TOKEN_STRING) { return(constant_string_expression(a0)); };
-	parser_error(a0, "Syntax error - no available statements matched");
+	parser_error(a0, "Syntax error - none of available expressions matched");
 };
 
 ## Parse constant integer expression
