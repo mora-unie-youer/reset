@@ -1993,7 +1993,7 @@ logical_and_expression : (a0, a1, a2) {
 	# x0 - next token
 	allocate(1);
 	# Fetching first operand
-	if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL); };
+	if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL); };
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Parsing logical and
@@ -2016,7 +2016,7 @@ logical_and_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = bitwise_or_expression(a0, x0, NULL);
+	x1 = equality_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
@@ -2024,6 +2024,100 @@ logical_and_expr : (a0, a1) {
 	vector_push(x2, x1);
 	# Returning expression
 	return(logical_and_expression(a0, NULL, tuple2(STMT_EXPR_LOGICAL_AND, x2)));
+};
+
+## Try to parse equality expression
+# a0 - parser
+# a1 - current token
+# a2 - expression
+# @return statement
+equality_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
+	# Fetching first operand
+	if (a2 == NULL) { a2 = relational_expression(a0, a1, NULL); };
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Parsing equal
+	if (x0 == TOKEN_EQ) { return(equality_expr(a0, a2, STMT_EXPR_EQ)); };
+	# Parsing not equal
+	if (x0 == TOKEN_NE) { return(equality_expr(a0, a2, STMT_EXPR_NE)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(a2);
+};
+
+## Parse equality expression
+# a0 - parser
+# a1 - op1
+# a2 - operation
+# @return statement
+equality_expr : (a0, a1, a2) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - ops vector
+	allocate(3);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = relational_expression(a0, x0, NULL);
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
+	vector_push(x2, a1);
+	vector_push(x2, x1);
+	# Returning expression
+	return(equality_expression(a0, NULL, tuple2(a2, x2)));
+};
+
+## Try to parse relational expression
+# a0 - parser
+# a1 - current token
+# a2 - expression
+# @return statement
+relational_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
+	# Fetching first operand
+	if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL); };
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Parsing less
+	if (x0 == '<') { return(relational_expr(a0, a2, STMT_EXPR_LESS)); };
+	# Parsing greater
+	if (x0 == '>') { return(relational_expr(a0, a2, STMT_EXPR_GREATER)); };
+	# Parsing less or equal
+	if (x0 == TOKEN_LE) { return(relational_expr(a0, a2, STMT_EXPR_LE)); };
+	# Parsing greater or equal
+	if (x0 == TOKEN_GE) { return(relational_expr(a0, a2, STMT_EXPR_GE)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(a2);
+};
+
+## Parse relational expression
+# a0 - parser
+# a1 - op1
+# a2 - operation
+# @return statement
+relational_expr : (a0, a1, a2) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - ops vector
+	allocate(3);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = bitwise_or_expression(a0, x0, NULL);
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
+	vector_push(x2, a1);
+	vector_push(x2, x1);
+	# Returning expression
+	return(relational_expression(a0, NULL, tuple2(a2, x2)));
 };
 
 ## Try to parse bitwise or expression
@@ -2119,7 +2213,7 @@ bitwise_and_expression : (a0, a1, a2) {
 	# x0 - next token
 	allocate(1);
 	# Fetching first operand
-	if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL); };
+	if (a2 == NULL) { a2 = bitwise_shift_expression(a0, a1, NULL); };
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Parsing bitwise and
@@ -2142,100 +2236,6 @@ bitwise_and_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = equality_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
-	# Returning expression
-	return(bitwise_and_expression(a0, NULL, tuple2(STMT_EXPR_AND, x2)));
-};
-
-## Try to parse equality expression
-# a0 - parser
-# a1 - current token
-# a2 - expression
-# @return statement
-equality_expression : (a0, a1, a2) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = relational_expression(a0, a1, NULL); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing equal
-	if (x0 == TOKEN_EQ) { return(equality_expr(a0, a2, STMT_EXPR_EQ)); };
-	# Parsing not equal
-	if (x0 == TOKEN_NE) { return(equality_expr(a0, a2, STMT_EXPR_NE)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
-};
-
-## Parse equality expression
-# a0 - parser
-# a1 - op1
-# a2 - operation
-# @return statement
-equality_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching second operand
-	x1 = relational_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
-	# Returning expression
-	return(equality_expression(a0, NULL, tuple2(a2, x2)));
-};
-
-## Try to parse relational expression
-# a0 - parser
-# a1 - current token
-# a2 - expression
-# @return statement
-relational_expression : (a0, a1, a2) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = bitwise_shift_expression(a0, a1, NULL); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing less
-	if (x0 == '<') { return(relational_expr(a0, a2, STMT_EXPR_LESS)); };
-	# Parsing greater
-	if (x0 == '>') { return(relational_expr(a0, a2, STMT_EXPR_GREATER)); };
-	# Parsing less or equal
-	if (x0 == TOKEN_LE) { return(relational_expr(a0, a2, STMT_EXPR_LE)); };
-	# Parsing greater or equal
-	if (x0 == TOKEN_GE) { return(relational_expr(a0, a2, STMT_EXPR_GE)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
-};
-
-## Parse relational expression
-# a0 - parser
-# a1 - op1
-# a2 - operation
-# @return statement
-relational_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching second operand
 	x1 = bitwise_shift_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
@@ -2243,7 +2243,7 @@ relational_expr : (a0, a1, a2) {
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(relational_expression(a0, NULL, tuple2(a2, x2)));
+	return(bitwise_and_expression(a0, NULL, tuple2(STMT_EXPR_AND, x2)));
 };
 
 ## Try to parse bitwise shift expression
