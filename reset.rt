@@ -1468,8 +1468,11 @@ STMT_EXPR_LOGICAL_AND => 29;
 STMT_EXPR_LOGICAL_OR  => 30;
 # Ternary
 STMT_EXPR_TERNARY     => 31;
+# Statements
+# Block statement
+STMT_BLOCK            => 32;
 # Top level statements
-STMT_GLOBAL           => 32;
+STMT_GLOBAL           => 33;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1578,10 +1581,9 @@ top_level_statement : (a0, a1) {
 			return(variable_declaration(a0, x0));
 		};
 	};
-	# For test purposes, returning expression statement
-	return(expression(a0, a1));
+	# For test purposes, returning block statement
+	return(block_statement(a0, a1));
 	parser_error(a0, "Syntax error - none of available top level statements matched");
-	parser_error(a0, "Couldn't parse statement");
 };
 
 ## Parse global statement
@@ -1733,11 +1735,50 @@ variable_declaration : (a0, a1) {
 	parser_error(a0, "declarations of variables are not implemented yet");
 };
 
+## Parse block of statements
+# a0 - parser
+# a1 - current token
+# @return statement
+block_statement : (a0, a1) {
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - expression
+	allocate(3);
+	# Checking for correct syntax
+	if (a1 != '{') { goto &block_statement_invalid; };
+	# Allocating operand (statements) vector
+	x0 = vector(0, 1);
+label block_statement_loop;
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if we need to exit the loop
+	if (x1 == '}') { goto &block_statement_end; };
+	# Fetching statement
+	x2 = statement(a0, x1);
+	# Pushing statement to vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if expression is ended with semicolon
+	if (x1 != ';') { goto &block_statement_content_invalid; };
+	# So, making next iteration
+	goto &block_statement_loop;
+label block_statement_end;
+	# Returning block statement
+	return(tuple2(STMT_BLOCK, x0));
+label block_statement_invalid;
+	parser_error(a0, "Invalid block statement syntax");
+label block_statement_content_invalid;
+	parser_error(a0, "Statement inside block is not ended with semicolon");
+};
+
 ## Parse statement
 # a0 - parser
 # a1 - current token
 # @return statement
 statement : (a0, a1) {
+	# For test purposes, returning expression statement
+	return(expression(a0, a1));
 	parser_error(a0, "Syntax error - none of available statements matched");
 };
 
