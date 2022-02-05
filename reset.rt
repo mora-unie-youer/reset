@@ -2299,7 +2299,17 @@ simple_expression : (a0, a1) {
 # a0 - parser
 # @return statement
 simple_identifier_expression : (a0) {
-	parser_error(a0, "Simple identifier expressions are not implemented yet");
+	# x0 - duplicated identifier string
+	# x1 - ops vector
+	allocate(2);
+	# Duplicating the identifier
+	x0 = strdup(lexer_token_text(parser_lexer(a0)));
+	# Allocating operand vector
+	x1 = vector(0, 1);
+	# Pushing value to vector
+	vector_push(x1, x0);
+	# Returning expression
+	return(tuple2(STMT_EXPR_IDENTIFIER, x1));
 };
 
 ## Parse simple argument/variable expression
