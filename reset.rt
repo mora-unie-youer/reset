@@ -2366,8 +2366,7 @@ constant_integer_expression : (a0) {
 	# Allocating operand vector
 	x0 = vector(0, 1);
 	# Pushing value to vector
-	vector_push(x0, 1);
-	#vector_push(x0, lexer_token_value(parser_lexer(a0)));
+	vector_push(x0, lexer_token_value(parser_lexer(a0)));
 	# Returning basic integer expression
 	return(tuple2(STMT_EXPR_INTEGER, x0));
 };
