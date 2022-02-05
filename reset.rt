@@ -2351,7 +2351,7 @@ label simple_syscall_expression_loop;
 	# Returning expression
 	return(tuple2(STMT_EXPR_SYSCALL, x0));
 label simple_syscall_expression_invalid;
-	parser_error(a0, "Incorrect syscall expression");
+	parser_error(a0, "Invalid syscall expression");
 };
 
 ## Parse simple readchar expression
