@@ -1897,7 +1897,7 @@ ternary_expression : (a0, a1) {
 	# x1 - next token
 	allocate(2);
 	# Fetching first operand
-	x0 = logical_or_expression(a0, a1);
+	x0 = logical_or_expression(a0, a1, NULL);
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Parsing ternary
@@ -1945,21 +1945,21 @@ label ternary_expr_error;
 ## Try to parse logical or expression
 # a0 - parser
 # a1 - current token
+# a2 - expression
 # @return statement
-logical_or_expression : (a0, a1) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
+logical_or_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
 	# Fetching first operand
-	x0 = logical_and_expression(a0, a1);
+	if (a2 == NULL) { a2 = logical_and_expression(a0, a1, NULL); };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Parsing logical or
-	if (x1 == TOKEN_LOR) { return(logical_or_expr(a0, x0)); };
+	if (x0 == TOKEN_LOR) { return(logical_or_expr(a0, a2)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
-	return(x0);
+	return(a2);
 };
 
 ## Parse logical or expression
@@ -1974,34 +1974,34 @@ logical_or_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = logical_or_expression(a0, x0);
+	x1 = logical_and_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_LOGICAL_OR, x2));
+	return(logical_or_expression(a0, NULL, tuple2(STMT_EXPR_LOGICAL_OR, x2)));
 };
 
 ## Try to parse logical and expression
 # a0 - parser
 # a1 - current token
+# a2 - expression
 # @return statement
-logical_and_expression : (a0, a1) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
+logical_and_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
 	# Fetching first operand
-	x0 = bitwise_or_expression(a0, a1, NULL);
+	if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL); };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Parsing logical and
-	if (x1 == TOKEN_LAND) { return(logical_and_expr(a0, x0)); };
+	if (x0 == TOKEN_LAND) { return(logical_and_expr(a0, a2)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
-	return(x0);
+	return(a2);
 };
 
 ## Parse logical and expression
@@ -2016,14 +2016,14 @@ logical_and_expr : (a0, a1) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = logical_and_expression(a0, x0);
+	x1 = bitwise_or_expression(a0, x0, NULL);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_LOGICAL_AND, x2));
+	return(logical_and_expression(a0, NULL, tuple2(STMT_EXPR_LOGICAL_AND, x2)));
 };
 
 ## Try to parse bitwise or expression
