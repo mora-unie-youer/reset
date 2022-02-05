@@ -1423,47 +1423,53 @@ NODE_TYPE => 0;
 NODE_OPS  => 1;
 ## Statement IDs
 # Constant
-STMT_EXPR_INTEGER => 0;
-STMT_EXPR_STRING  => 1;
+STMT_EXPR_INTEGER     => 0;
+STMT_EXPR_STRING      => 1;
+# Simple
+STMT_EXPR_IDENTIFIER  => 2;
+STMT_EXPR_ARGUMENT    => 3;
+STMT_EXPR_VARIABLE    => 4;
+STMT_EXPR_SYSCALL     => 5;
+STMT_EXPR_READCHAR    => 6;
 # Prefix
-STMT_EXPR_PLUS    => 2;
-STMT_EXPR_MINUS   => 3;
-STMT_EXPR_LNOT    => 4;
-STMT_EXPR_NOT     => 5;
-STMT_EXPR_DEREF   => 6;
-STMT_EXPR_ADDROF  => 7;
+STMT_EXPR_PLUS        => 7;
+STMT_EXPR_MINUS       => 8;
+STMT_EXPR_LOGICAL_NOT => 9;
+STMT_EXPR_NOT         => 10;
+STMT_EXPR_DEREF       => 11;
+STMT_EXPR_ADDROF      => 12;
 # Multiplicative
-STMT_EXPR_MUL     => 8;
-STMT_EXPR_DIV     => 9;
-STMT_EXPR_MOD     => 10;
+STMT_EXPR_MUL         => 13;
+STMT_EXPR_DIV         => 14;
+STMT_EXPR_MOD         => 15;
 # Additive
-STMT_EXPR_ADD     => 11;
-STMT_EXPR_SUB     => 12;
+STMT_EXPR_ADD         => 16;
+STMT_EXPR_SUB         => 17;
 # Bitwise shift
-STMT_EXPR_SHL     => 13;
-STMT_EXPR_SHR     => 14;
+STMT_EXPR_SHL         => 18;
+STMT_EXPR_SHR         => 19;
 # Relational
-STMT_EXPR_LESS    => 15;
-STMT_EXPR_GREATER => 16;
-STMT_EXPR_LE      => 17;
-STMT_EXPR_GE      => 18;
+STMT_EXPR_LESS        => 20;
+STMT_EXPR_GREATER     => 21;
+STMT_EXPR_LE          => 22;
+STMT_EXPR_GE          => 23;
 # Equality
-STMT_EXPR_EQ      => 19;
-STMT_EXPR_NE      => 20;
+STMT_EXPR_EQ          => 24;
+STMT_EXPR_NE          => 25;
 # Bitwise and
-STMT_EXPR_AND     => 21;
+STMT_EXPR_AND         => 26;
 # Bitwise xor
-STMT_EXPR_XOR     => 22;
+STMT_EXPR_XOR         => 27;
 # Bitwise or
-STMT_EXPR_OR      => 23;
+STMT_EXPR_OR          => 28;
 # Logical and
-STMT_EXPR_LAND    => 24;
+STMT_EXPR_LOGICAL_AND => 29;
 # Logical or
-STMT_EXPR_LOR     => 25;
+STMT_EXPR_LOGICAL_OR  => 30;
 # Ternary
-STMT_EXPR_TERNARY => 26;
+STMT_EXPR_TERNARY     => 31;
 # Top level statements
-STMT_GLOBAL       => 27;
+STMT_GLOBAL           => 32;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1825,7 +1831,7 @@ logical_or_expr : (a0, a1) {
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_LOR, x2));
+	return(tuple2(STMT_EXPR_LOGICAL_OR, x2));
 };
 
 ## Try to parse logical and expression
@@ -1867,7 +1873,7 @@ logical_and_expr : (a0, a1) {
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(STMT_EXPR_LAND, x2));
+	return(tuple2(STMT_EXPR_LOGICAL_AND, x2));
 };
 
 ## Try to parse bitwise or expression
@@ -2239,7 +2245,7 @@ prefix_expression : (a0, a1) {
 	# Parsing unary minus
 	if (a1 == '-') { return(prefix_expr(a0, STMT_EXPR_MINUS)); };
 	# Parsing logical not
-	if (a1 == '!') { return(prefix_expr(a0, STMT_EXPR_LNOT)); };
+	if (a1 == '!') { return(prefix_expr(a0, STMT_EXPR_LOGICAL_NOT)); };
 	# Parsing bitwise not
 	if (a1 == '~') { return(prefix_expr(a0, STMT_EXPR_NOT)); };
 	# Parsing dereference
@@ -2300,7 +2306,14 @@ simple_identifier_expression : (a0) {
 # a0 - parser
 # @return statement
 simple_argument_expression : (a0) {
-	parser_error(a0, "Simple argument expressions are not implemented yet");
+	# x0 - ops vector
+	allocate(1);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Pushing value to vector
+	vector_push(x0, lexer_token_value(parser_lexer(a0)));
+	# Returning expression
+	return(tuple2(STMT_EXPR_ARGUMENT, x0));
 };
 
 ## Parse simple variable expression
