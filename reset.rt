@@ -2653,6 +2653,11 @@ debug_ast : (a0, a1) {
 
 	if (x1 == STMT_EXPR_ADD)     { puts("+: ");  goto &debug_ast_children; };
 	if (x1 == STMT_EXPR_SUB)     { puts("-: ");  goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_MUL)     { puts("*: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_DIV)     { puts("/: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_MOD)     { puts("%: ");  goto &debug_ast_children; };
+
 	if (x1 == STMT_EXPR_SHL)     { puts("<<: "); goto &debug_ast_children; };
 	if (x1 == STMT_EXPR_SHR)     { puts(">>: "); goto &debug_ast_children; };
 
