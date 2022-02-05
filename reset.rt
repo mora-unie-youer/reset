@@ -2622,6 +2622,94 @@ constant_string_expression : (a0) {
 	return(tuple2(STMT_EXPR_STRING, x1));
 };
 
+## Debug AST
+# a0 - AST
+# a1 - depth
+debug_ast : (a0, a1) {
+	# x0 - i
+	# x1 - statement ID
+	allocate(2);
+	# Printing whitespaces
+	x0 = 0;
+	while (x0 < a1) { putc(' '); x0 = x0 + 1; };
+	# Resetting index
+	x0 = 0;
+	# Get statement ID
+	x1 = a0[NODE_TYPE];
+	# Printing expressions
+	if (x1 == STMT_EXPR_INTEGER)  { puts("INTEGER: ");  putd(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_STRING)   { puts("STRING: ");   puts(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_ARGUMENT) { puts("ARGUMENT: "); putd(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_VARIABLE) { puts("VARIABLE: "); putd(vector_get(a0[1], 0)); };
+
+	if (x1 == STMT_EXPR_PLUS)        { puts("+: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_MINUS)       { puts("-: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_LOGICAL_NOT) { puts("!: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_NOT)         { puts("~: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_DEREF)       { puts("*: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_ADDROF)      { puts("&: ");  goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_ADD)     { puts("+: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_SUB)     { puts("-: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_SHL)     { puts("<<: "); goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_SHR)     { puts(">>: "); goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_LESS)    { puts("<: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_GREATER) { puts(">: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_LE)      { puts("<=: "); goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_GE)      { puts(">=: "); goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_EQ)      { puts("==: "); goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_NE)      { puts("!=: "); goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_AND)     { puts("&: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_XOR)     { puts("^: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_OR)      { puts("|: ");  goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_LOGICAL_AND) { puts("&&: "); goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_LOGICAL_OR)  { puts("||: "); goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_TERNARY)     { puts("?: ");  goto &debug_ast_children; };
+
+	# Printing statements
+	if (x1 == STMT_IF)        { puts("if: ");        goto &debug_ast_children; };
+	if (x1 == STMT_WHILE)     { puts("while: ");     goto &debug_ast_children; };
+	if (x1 == STMT_ALLOCATE)  { puts("allocate: ");  goto &debug_ast_children; };
+	if (x1 == STMT_RETURN)    { puts("return: ");    goto &debug_ast_children; };
+	if (x1 == STMT_SYSCALL)   { puts("syscall: ");   goto &debug_ast_children; };
+	if (x1 == STMT_WRITECHAR) { puts("writechar: "); goto &debug_ast_children; };
+	if (x1 == STMT_BLOCK)     { puts("BLOCK: ");     goto &debug_ast_children; };
+
+	if (x1 == STMT_GLOBAL)    {
+		puts("global: ");
+		# Printing global symbols
+		while (x0 < vector_size(a0[1])) {
+			# Printing comma, if not first element
+			if (x0 != 0) { puts(", "); };
+			# Printing identifier
+			puts(vector_get(a0[1], x0));
+			# Moving to next symbol
+			x0 = x0 + 1;
+		};
+		# Flushing statement
+		putc('\n');
+	};
+
+	putc('\n');
+label debug_ast_exit;
+	return;
+label debug_ast_children;
+	putc('\n');
+	# Debugging children
+	while (x0 < vector_size(a0[1])) {
+		# Debugging child
+		debug_ast(vector_get(a0[1], x0), a1 + 1);
+		x0 = x0 + 1;
+	};
+	# Exitting
+	goto &debug_ast_exit;
+};
+
 ## Print usage
 # a0 - program name
 usage : (a0) {
@@ -2640,8 +2728,7 @@ main : (a0, a1) {
 	# x2 - parser
 	# x3 - AST
 	# x4 - i
-	# x5 - j
-	allocate(6);
+	allocate(5);
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return(1); };
 	# TODO: implement option parser
@@ -2653,18 +2740,10 @@ main : (a0, a1) {
 	x2 = parser(x1);
 	# Print address in memory of AST
 	x3 = parser_parse(x2);
+	# Resetting index
 	x4 = 0;
 	while (x4 < vector_size(x3)) {
-		puts("Node #");
-		putd(x3[VEC_BUF][x4][NODE_TYPE]);
-		puts(": ops=[");
-		x5 = 0;
-		while (x5 < vector_size(x3[VEC_BUF][x4][NODE_OPS])) {
-			if (x5 != 0) { puts(", "); };
-			putx(x3[VEC_BUF][x4][NODE_OPS][VEC_BUF][x5][NODE_TYPE]);
-			x5 = x5 + 1;
-		};
-		puts("]\n");
+		debug_ast(vector_get(x3, x4), 0);
 		x4 = x4 + 1;
 	};
 	return(a0);
