@@ -1777,9 +1777,63 @@ label block_statement_content_invalid;
 # a1 - current token
 # @return statement
 statement : (a0, a1) {
+	# Parsing if statement
+	if (a1 == TOKEN_IF) { return(if_statement(a0)); };
+	# Parsing while statement
+	if (a1 == TOKEN_WHILE) { return(while_statement(a0)); };
+	# Parsing allocate statement
+	if (a1 == TOKEN_ALLOCATE) { return(allocate_statement(a0)); };
+	# Parsing return statement
+	if (a1 == TOKEN_RETURN) { return(return_statement(a0)); };
+	# Parsing syscall statement
+	if (a1 == TOKEN_SYSCALL) { return(syscall_statement(a0)); };
+	# Parsing writechar statement
+	if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0)); };
 	# For test purposes, returning expression statement
 	return(expression(a0, a1));
 	parser_error(a0, "Syntax error - none of available statements matched");
+};
+
+## Parse if statement
+# a0 - parser
+# @return statement
+if_statement : (a0) {
+	parser_error(a0, "If statements are not implemented yet");
+};
+
+## Parse while statement
+# a0 - parser
+# @return statement
+while_statement : (a0) {
+	parser_error(a0, "While statements are not implemented yet");
+};
+
+## Parse allocate statement
+# a0 - parser
+# @return statement
+allocate_statement : (a0) {
+	parser_error(a0, "Allocate statements are not implemented yet");
+};
+
+## Parse return statement
+# a0 - parser
+# @return statement
+return_statement : (a0) {
+	parser_error(a0, "Return statements are not implemented yet");
+};
+
+## Parse syscall statement
+# a0 - parser
+# @return statement
+syscall_statement : (a0) {
+	parser_error(a0, "Syscall statements are not implemented yet");
+};
+
+## Parse writechar statement
+# a0 - parser
+# @return statement
+writechar_statement : (a0) {
+	parser_error(a0, "Writechar statements are not implemented yet");
 };
 
 ## Parse expression
