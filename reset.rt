@@ -1469,10 +1469,16 @@ STMT_EXPR_LOGICAL_OR  => 30;
 # Ternary
 STMT_EXPR_TERNARY     => 31;
 # Statements
+STMT_IF               => 32;
+STMT_WHILE            => 33;
+STMT_ALLOCATE         => 34;
+STMT_RETURN           => 35;
+STMT_SYSCALL          => 36;
+STMT_WRITECHAR        => 37;
 # Block statement
-STMT_BLOCK            => 32;
+STMT_BLOCK            => 38;
 # Top level statements
-STMT_GLOBAL           => 33;
+STMT_GLOBAL           => 39;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1798,7 +1804,47 @@ statement : (a0, a1) {
 # a0 - parser
 # @return statement
 if_statement : (a0) {
-	parser_error(a0, "If statements are not implemented yet");
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 3);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != '(') { goto &if_statement_invalid; };
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching condition expression
+	x2 = expression(a0, x1);
+	# Append condition to vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != ')') { goto &if_statement_invalid; };
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching block statement
+	x2 = block_statement(a0, x1);
+	# Append if block to vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if we have else statement
+	if (x1 != TOKEN_ELSE) { parser_lexer_hold(a0); goto &if_statement_end; };
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching else block statement
+	x2 = block_statement(a0, x1);
+	# Append else block to vector
+	vector_push(x0, x2);
+label if_statement_end;
+	# Return statement
+	return(tuple2(STMT_IF, x0));
+label if_statement_invalid;
+	parser_error(a0, "Invalid if statement syntax");
 };
 
 ## Parse while statement
