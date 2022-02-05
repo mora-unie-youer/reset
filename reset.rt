@@ -2274,66 +2274,60 @@ prefix_expr : (a0, a1) {
 # @return statement
 simple_expression : (a0, a1) {
 	# Parsing identifier
-	if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0, a1)); };
+	if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0)); };
 	# Parsing argument
-	if (a1 == TOKEN_ARGUMENT) { return(simple_argument_expression(a0, a1)); };
+	if (a1 == TOKEN_ARGUMENT) { return(simple_argument_expression(a0)); };
 	# Parsing variable
-	if (a1 == TOKEN_VARIABLE) { return(simple_variable_expression(a0, a1)); };
+	if (a1 == TOKEN_VARIABLE) { return(simple_variable_expression(a0)); };
 	# Parsing syscall
-	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, a1)); };
+	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0)); };
 	# Parsing readchar
-	if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a1)); };
+	if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0)); };
 	# Parsing parantheses grouping
-	if (a1 == '(') { return(simple_parantheses_expression(a0, a1)); };
+	if (a1 == '(') { return(simple_parantheses_expression(a0)); };
 	# Parsing constant expression
 	return(constant_expression(a0, a1));
 };
 
 ## Parse simple identifier expression
 # a0 - parser
-# a1 - current token
 # @return statement
-simple_identifier_expression : (a0, a1) {
+simple_identifier_expression : (a0) {
 	parser_error(a0, "Simple identifier expressions are not implemented yet");
 };
 
 ## Parse simple argument expression
 # a0 - parser
-# a1 - current token
 # @return statement
-simple_argument_expression : (a0, a1) {
+simple_argument_expression : (a0) {
 	parser_error(a0, "Simple argument expressions are not implemented yet");
 };
 
 ## Parse simple variable expression
 # a0 - parser
-# a1 - current token
 # @return statement
-simple_variable_expression : (a0, a1) {
+simple_variable_expression : (a0) {
 	parser_error(a0, "Simple variable expressions are not implemented yet");
 };
 
 ## Parse simple syscall expression
 # a0 - parser
-# a1 - current token
 # @return statement
-simple_syscall_expression : (a0, a1) {
+simple_syscall_expression : (a0) {
 	parser_error(a0, "Simple syscall expressions are not implemented yet");
 };
 
 ## Parse simple readchar expression
 # a0 - parser
-# a1 - current token
 # @return statement
-simple_readchar_expression : (a0, a1) {
+simple_readchar_expression : (a0) {
 	parser_error(a0, "Simple readchar expressions are not implemented yet");
 };
 
 ## Parse simple parantheses expression
 # a0 - parser
-# a1 - current token
 # @return statement
-simple_parantheses_expression : (a0, a1) {
+simple_parantheses_expression : (a0) {
 	# x0 - next token
 	# x1 - expression
 	allocate(2);
@@ -2357,17 +2351,16 @@ label simple_parantheses_expression_invalid;
 # @return statement
 constant_expression : (a0, a1) {
 	# Parsing integer
-	if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0, a1)); };
+	if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0)); };
 	# Parsing string
-	if (a1 == TOKEN_STRING) { return(constant_string_expression(a0, a1)); };
+	if (a1 == TOKEN_STRING) { return(constant_string_expression(a0)); };
 	parser_error(a0, "Syntax error - no available statements matched");
 };
 
 ## Parse constant integer expression
 # a0 - parser
-# a1 - current token
 # @return statement
-constant_integer_expression : (a0, a1) {
+constant_integer_expression : (a0) {
 	# x0 - ops vector
 	allocate(1);
 	# Allocating operand vector
@@ -2381,9 +2374,8 @@ constant_integer_expression : (a0, a1) {
 
 ## Parse constant string expression
 # a0 - parser
-# a1 - current token
 # @return statement
-constant_string_expression : (a0, a1) {
+constant_string_expression : (a0) {
 	# x0 - duplicated string
 	# x1 - ops vector
 	allocate(2);
