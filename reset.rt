@@ -2703,7 +2703,7 @@ label debug_ast_children;
 	# Debugging children
 	while (x0 < vector_size(a0[1])) {
 		# Debugging child
-		debug_ast(vector_get(a0[1], x0), a1 + 1);
+		debug_ast(vector_get(a0[1], x0), a1 + 2);
 		x0 = x0 + 1;
 	};
 	# Exitting
