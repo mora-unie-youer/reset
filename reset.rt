@@ -2300,7 +2300,7 @@ additive_expression : (a0, a1) {
 	# x1 - next token
 	allocate(2);
 	# Fetching first operand
-	x0 = multiplicative_expression(a0, a1);
+	x0 = multiplicative_expression(a0, a1, NULL);
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Parsing addition
@@ -2339,25 +2339,25 @@ additive_expr : (a0, a1, a2) {
 ## Try to parse multiplicative expression
 # a0 - parser
 # a1 - current token
+# a2 - expression
 # @return statement
-multiplicative_expression : (a0, a1) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
+multiplicative_expression : (a0, a1, a2) {
+	# x0 - next token
+	allocate(1);
 	# Fetching first operand
-	x0 = prefix_expression(a0, a1);
+	if (a2 == NULL) { a2 = prefix_expression(a0, a1); };
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Parsing multiplication
-	if (x1 == '*') { return(multiplicative_expr(a0, x0, STMT_EXPR_MUL)); };
+	if (x1 == '*') { return(multiplicative_expr(a0, a2, STMT_EXPR_MUL)); };
 	# Parsing integer division
-	if (x1 == '/') { return(multiplicative_expr(a0, x0, STMT_EXPR_DIV)); };
+	if (x1 == '/') { return(multiplicative_expr(a0, a2, STMT_EXPR_DIV)); };
 	# Parsing modulus division
-	if (x1 == '%') { return(multiplicative_expr(a0, x0, STMT_EXPR_MOD)); };
+	if (x1 == '%') { return(multiplicative_expr(a0, a2, STMT_EXPR_MOD)); };
 	# Holding token
 	parser_lexer_hold(a0);
 	# Returning operand
-	return(x0);
+	return(a2);
 };
 
 ## Parse multiplicative expression
@@ -2373,14 +2373,14 @@ multiplicative_expr : (a0, a1, a2) {
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
-	x1 = multiplicative_expression(a0, x0);
+	x1 = prefix_expression(a0, x0);
 	# Allocating operand vector
 	x2 = vector(0, 2);
 	# Pushing operands to vector
 	vector_push(x2, a1);
 	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(a2, x2));
+	return(multiplicative_expression(a0, NULL, tuple2(a2, x2)));
 };
 
 ## Try to parse prefix expression
