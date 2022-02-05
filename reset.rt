@@ -2683,7 +2683,7 @@ debug_ast : (a0, a1) {
 	if (x1 == STMT_BLOCK)     { puts("BLOCK: ");     goto &debug_ast_children; };
 
 	if (x1 == STMT_GLOBAL)    {
-		puts("global: ");
+		puts("GLOBAL: ");
 		# Printing global symbols
 		while (x0 < vector_size(a0[1])) {
 			# Printing comma, if not first element
@@ -2693,8 +2693,6 @@ debug_ast : (a0, a1) {
 			# Moving to next symbol
 			x0 = x0 + 1;
 		};
-		# Flushing statement
-		putc('\n');
 	};
 
 	putc('\n');
