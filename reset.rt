@@ -2325,7 +2325,33 @@ simple_argvar_expression : (a0, a1) {
 # a0 - parser
 # @return statement
 simple_syscall_expression : (a0) {
-	parser_error(a0, "Simple syscall expressions are not implemented yet");
+	# x0 - ops vector
+	# x1 - token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != '(') { goto &simple_syscall_expression_invalid };
+label simple_syscall_expression_loop;
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if there is next expression as argument
+	if (x1 == ',') { goto &simple_syscall_expression_loop; };
+	# Checking for correct syntax
+	if (x1 != ')') { goto &simple_syscall_expression_invalid; };
+	# Returning expression
+	return(tuple2(STMT_EXPR_SYSCALL, x0));
+label simple_syscall_expression_invalid;
+	parser_error(a0, "Incorrect syscall expression");
 };
 
 ## Parse simple readchar expression
