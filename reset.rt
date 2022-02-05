@@ -2282,9 +2282,9 @@ simple_expression : (a0, a1) {
 	# Parsing identifier
 	if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0)); };
 	# Parsing argument
-	if (a1 == TOKEN_ARGUMENT) { return(simple_argument_expression(a0)); };
+	if (a1 == TOKEN_ARGUMENT) { return(simple_argvar_expression(a0, TRUE)); };
 	# Parsing variable
-	if (a1 == TOKEN_VARIABLE) { return(simple_variable_expression(a0)); };
+	if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE)); };
 	# Parsing syscall
 	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0)); };
 	# Parsing readchar
@@ -2302,25 +2302,23 @@ simple_identifier_expression : (a0) {
 	parser_error(a0, "Simple identifier expressions are not implemented yet");
 };
 
-## Parse simple argument expression
+## Parse simple argument/variable expression
 # a0 - parser
+# a1 - is argument
 # @return statement
-simple_argument_expression : (a0) {
-	# x0 - ops vector
-	allocate(1);
+simple_argvar_expression : (a0, a1) {
+	# x0 - expression type
+	# x1 - ops vector
+	allocate(2);
+	# Getting expression type
+	x0 = STMT_EXPR_VARIABLE;
+	if (a1) { x0 = STMT_EXPR_ARGUMENT; };
 	# Allocating operand vector
-	x0 = vector(0, 1);
+	x1 = vector(0, 1);
 	# Pushing value to vector
-	vector_push(x0, lexer_token_value(parser_lexer(a0)));
+	vector_push(x1, lexer_token_value(parser_lexer(a0)));
 	# Returning expression
-	return(tuple2(STMT_EXPR_ARGUMENT, x0));
-};
-
-## Parse simple variable expression
-# a0 - parser
-# @return statement
-simple_variable_expression : (a0) {
-	parser_error(a0, "Simple variable expressions are not implemented yet");
+	return(tuple2(x0, x1));
 };
 
 ## Parse simple syscall expression
