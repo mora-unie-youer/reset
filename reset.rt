@@ -2004,7 +2004,8 @@ label return_statement_end;
 # a0 - parser
 # @return statement
 syscall_statement : (a0) {
-	parser_error(a0, "Syscall statements are not implemented yet");
+	# Just using already implemented `simple_syscall_expression`
+	return(simple_syscall_expression(a0, TRUE));
 };
 
 ## Parse writechar statement
@@ -2568,7 +2569,7 @@ simple_expression : (a0, a1) {
 	# Parsing variable
 	if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE)); };
 	# Parsing syscall
-	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0)); };
+	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, FALSE)); };
 	# Parsing readchar
 	if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0)); };
 	# Parsing parantheses grouping
@@ -2615,12 +2616,14 @@ simple_argvar_expression : (a0, a1) {
 
 ## Parse simple syscall expression
 # a0 - parser
+# a1 - is statement
 # @return statement
-simple_syscall_expression : (a0) {
+simple_syscall_expression : (a0, a1) {
 	# x0 - ops vector
 	# x1 - token
 	# x2 - expression
-	allocate(3);
+	# x3 - node type
+	allocate(4);
 	# Allocating operand vector
 	x0 = vector(0, 1);
 	# Fetching next token
@@ -2642,8 +2645,11 @@ label simple_syscall_expression_loop;
 	if (x1 != ')') { goto &simple_syscall_expression_invalid; };
 	# Checking for argument count
 	if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; };
+	# Getting node type
+	x3 = STMT_EXPR_SYSCALL;
+	if (a1) { x3 = STMT_SYSCALL; };
 	# Returning expression
-	return(tuple2(STMT_EXPR_SYSCALL, x0));
+	return(tuple2(x3, x0));
 label simple_syscall_expression_invalid;
 	parser_error(a0, "Invalid syscall expression");
 label simple_syscall_expression_too_many;
