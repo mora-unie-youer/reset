@@ -2663,12 +2663,13 @@ debug_ast : (a0, a1) {
 	# Get statement ID
 	x1 = a0[NODE_TYPE];
 	# Printing expressions
-	if (x1 == STMT_EXPR_INTEGER)  { puts("INTEGER: ");  putd(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_STRING)   { puts("STRING: ");   puts(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_ARGUMENT) { puts("ARGUMENT: "); putd(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_VARIABLE) { puts("VARIABLE: "); putd(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_SYSCALL)  { puts("syscall: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_READCHAR) { puts("readchar: "); goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_INTEGER)   { puts("INTEGER: ");  putd(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_STRING)    { puts("STRING: ");   puts(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_IDENTIFIER){puts("IDENTIFIER: ");puts(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_ARGUMENT)  { puts("ARGUMENT: "); putd(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_VARIABLE)  { puts("VARIABLE: "); putd(vector_get(a0[1], 0)); };
+	if (x1 == STMT_EXPR_SYSCALL)   { puts("syscall: ");  goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_READCHAR)  { puts("readchar: "); goto &debug_ast_children; };
 
 	if (x1 == STMT_EXPR_PLUS)        { puts("+: ");  goto &debug_ast_children; };
 	if (x1 == STMT_EXPR_MINUS)       { puts("-: ");  goto &debug_ast_children; };
