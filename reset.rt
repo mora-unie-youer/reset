@@ -1744,6 +1744,8 @@ label function_declaration_arg_loop;
 	if (x2 == ')') { goto &function_declaration_arg_end; };
 	# Checking for argument
 	if (x2 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
+	if (x1 != lexer_token_value(parser_lexer(a0)))
+		{ goto &function_declaration_arg_invalid; };
 	# Incrementing argument count
 	x1 = x1 + 1;
 	# Fetching next token
