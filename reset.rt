@@ -2520,8 +2520,6 @@ multiplicative_expr : (a0, a1, a2) {
 # a1 - current token
 # @return statement
 prefix_expression : (a0, a1) {
-	# x0 - op1
-	allocate(1);
 	# Parsing unary plus
 	if (a1 == '+') { return(prefix_expr(a0, STMT_EXPR_PLUS)); };
 	# Parsing unary minus
@@ -2574,7 +2572,7 @@ simple_expression : (a0, a1) {
 	# Parsing parantheses grouping
 	if (a1 == '(') { return(simple_parantheses_expression(a0)); };
 	# Parsing constant expression
-	return(constant_expression(a0, a1));
+	return(simple_postfix_expression(a0, constant_expression(a0, a1)));
 };
 
 ## Parse simple identifier expression
@@ -2591,7 +2589,7 @@ simple_identifier_expression : (a0) {
 	# Pushing value to vector
 	vector_push(x1, x0);
 	# Returning expression
-	return(tuple2(STMT_EXPR_IDENTIFIER, x1));
+	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_IDENTIFIER, x1)));
 };
 
 ## Parse simple argument/variable expression
@@ -2610,7 +2608,7 @@ simple_argvar_expression : (a0, a1) {
 	# Pushing value to vector
 	vector_push(x1, lexer_token_value(parser_lexer(a0)));
 	# Returning expression
-	return(tuple2(x0, x1));
+	return(simple_postfix_expression(a0, tuple2(x0, x1)));
 };
 
 ## Parse simple syscall expression
@@ -2648,7 +2646,7 @@ label simple_syscall_expression_loop;
 	x3 = STMT_EXPR_SYSCALL;
 	if (a1) { x3 = STMT_SYSCALL; };
 	# Returning expression
-	return(tuple2(x3, x0));
+	return(simple_postfix_expression(a0, tuple2(x3, x0)));
 label simple_syscall_expression_invalid;
 	parser_error(a0, "Invalid syscall expression");
 label simple_syscall_expression_too_many;
@@ -2686,7 +2684,7 @@ label simple_readchar_expression_loop;
 	if (vector_size(x0) < 2) { goto &simple_readchar_expression_not_enough; };
 	if (vector_size(x0) > 2) { goto &simple_readchar_expression_too_many; };
 	# Returning expression
-	return(tuple2(STMT_EXPR_SYSCALL, x0));
+	return(simple_postfix_expression(tuple2(STMT_EXPR_SYSCALL, x0)));
 label simple_readchar_expression_invalid;
 	parser_error(a0, "Invalid readchar expression");
 label simple_readchar_expression_not_enough;
@@ -2711,9 +2709,44 @@ simple_parantheses_expression : (a0) {
 	# Checking parantheses are closed
 	if (x0 != ')') { goto &simple_parantheses_expression_invalid; };
 	# Returning expression
-	return(x1);
+	return(simple_postfix_expression(x1));
 label simple_parantheses_expression_invalid;
 	parser_error(a0, "Parantheses expression is not closed");
+};
+
+## Parse simple expression postfixes
+# a0 - parser
+# a1 - expression
+# @return statement
+simple_postfix_expression : (a0, a1) {
+	# x0 - next token
+	allocate(1);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Parsing address call
+	if (x0 == '(') { return(simple_address_call_expression(a0, a1)); };
+	# Parsing address indexing
+	if (x0 == '[') { return(simple_address_index_expression(a0, a1)); };
+	# Holding the token
+	parser_lexer_hold(a0);
+	# Returning expression
+	return(a1);
+};
+
+## Parse simple address call expression
+# a0 - parser
+# a1 - expression
+# @return statement
+simple_address_call_expression : (a0, a1) {
+	parser_error(a0, "Simple address calls are not implemented yet");
+};
+
+## Parse simple address indexing expression
+# a0 - parser
+# a1 - expression
+# @return statement
+simple_address_index_expression : (a0, a1) {
+	parser_error(a0, "Simple address indexing is not implemented yet");
 };
 
 ## Try to parse constant expression
