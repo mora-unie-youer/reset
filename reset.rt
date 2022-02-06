@@ -1860,9 +1860,8 @@ statement : (a0, a1) {
 	if (a1 == TOKEN_SYSCALL) { return(syscall_statement(a0)); };
 	# Parsing writechar statement
 	if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0)); };
-	# For test purposes, returning expression statement
+	# Returning expression, as statements were not found here
 	return(expression(a0, a1));
-	parser_error(a0, "Syntax error - none of available statements matched");
 };
 
 ## Parse if statement
