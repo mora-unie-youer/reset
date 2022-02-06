@@ -1478,7 +1478,8 @@ STMT_WRITECHAR        => 37;
 # Block statement
 STMT_BLOCK            => 38;
 # Top level statements
-STMT_GLOBAL           => 39;
+STMT_MACRO            => 39;
+STMT_GLOBAL           => 40;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1560,31 +1561,34 @@ label parser_parse_error;
 # @return statement
 top_level_statement : (a0, a1) {
 	# x0 - next token
-	allocate(1);
+	# x1 - identifier
+	allocate(2);
 	# Parsing global statement
 	if (a1 == TOKEN_GLOBAL) { return(global_statement(a0)); };
 	# Parsing include statement
 	if (a1 == TOKEN_INCLUDE) { return(include_statement(a0)); };
 	# Parsing statements starting with identifier
 	if (a1 == TOKEN_IDENTIFIER) {
+		# Duplicating identifier
+		x1 = strdup(lexer_token_text(parser_lexer(a0)));
 		# Fetching next token
 		x0 = parser_lex(a0);
 		# Parsing macro definition
-		if (x0 == TOKEN_ARROW) { return(macro_declaration(a0)); };
+		if (x0 == TOKEN_ARROW) { return(macro_declaration(a0, x1)); };
 		# Parsing identifier declarations
 		if (x0 == ':') {
 			# Fetching next token
 			x0 = parser_lex(a0);
 			# Parsing function declaration
-			if (x0 == '(') { return(function_declaration(a0)); };
+			if (x0 == '(') { return(function_declaration(a0, x1)); };
 			# Parsing array declaration
-			if (x0 == '[') { return(array_declaration(a0)); };
+			if (x0 == '[') { return(array_declaration(a0, x1)); };
 			# Parsing reserved char array declaration
-			if (x0 == TOKEN_TYPE_CHAR) { return(char_array_declaration(a0)); };
+			if (x0 == TOKEN_TYPE_CHAR) { return(char_array_declaration(a0, x1)); };
 			# Parsing reserved int array declaration
-			if (x0 == TOKEN_TYPE_INT) { return(int_array_declaration(a0)); };
+			if (x0 == TOKEN_TYPE_INT) { return(int_array_declaration(a0, x1)); };
 			# Parsing simple variable declaration
-			return(variable_declaration(a0, x0));
+			return(variable_declaration(a0, x1, x0));
 		};
 	};
 	# For test purposes, returning block statement
@@ -1694,49 +1698,69 @@ label include_statement_invalid;
 
 ## Parse macro declaration
 # a0 - parser
+# a1 - identifier
 # @return statement
-macro_declaration : (a0) {
-	# TODO: implement macro declaration
-	parser_error(a0, "declarations of macros are not implemented yet");
+macro_declaration : (a0, a1) {
+	# x0 - ops vector
+	# x1 - token
+	# x2 - expression
+	allocate(3);
+	# Allocate ops vector
+	x0 = vector(0, 2);
+	# Pushing identifier to operand vector
+	vector_push(x0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Returning expression
+	return(tuple2(STMT_MACRO, x0));
 };
 
 ## Parse function declaration
 # a0 - parser
+# a1 - identifier
 # @return statement
-function_declaration : (a0) {
+function_declaration : (a0, a1) {
 	# TODO: implement function declaration
 	parser_error(a0, "declarations of functions are not implemented yet");
 };
 
 ## Parse array declaration
 # a0 - parser
+# a1 - identifier
 # @return statement
-array_declaration : (a0) {
+array_declaration : (a0, a1) {
 	# TODO: implement array declaration
 	parser_error(a0, "declarations of arrays are not implemented yet");
 };
 
 ## Parse char array declaration
 # a0 - parser
+# a1 - identifier
 # @return statement
-char_array_declaration : (a0) {
+char_array_declaration : (a0, a1) {
 	# TODO: implement char array declaration
 	parser_error(a0, "declarations of char arrays are not implemented yet");
 };
 
 ## Parse int array declaration
 # a0 - parser
+# a1 - identifier
 # @return statement
-int_array_declaration : (a0) {
+int_array_declaration : (a0, a1) {
 	# TODO: implement int array declaration
 	parser_error(a0, "declarations of int arrays are not implemented yet");
 };
 
 ## Parse variable declaration
 # a0 - parser
-# a1 - current token
+# a1 - identifier
+# a2 - current token
 # @return statement
-variable_declaration : (a0, a1) {
+variable_declaration : (a0, a1, a2) {
 	# TODO: implement variable declaration
 	parser_error(a0, "declarations of variables are not implemented yet");
 };
@@ -2688,6 +2712,16 @@ debug_ast : (a0, a1) {
 	if (x1 == STMT_SYSCALL)   { puts("syscall: ");   goto &debug_ast_children; };
 	if (x1 == STMT_WRITECHAR) { puts("writechar: "); goto &debug_ast_children; };
 	if (x1 == STMT_BLOCK)     { puts("BLOCK: ");     goto &debug_ast_children; };
+
+	if (x1 == STMT_MACRO) {
+		puts("MACRO: ");
+		# Print identifier
+		puts(vector_get(a0[1], 0));
+		# Starting from second element
+		x0 = 1;
+		# Print child
+		goto &debug_ast_children;
+	};
 
 	if (x1 == STMT_GLOBAL)    {
 		puts("GLOBAL: ");
