@@ -1592,8 +1592,6 @@ top_level_statement : (a0, a1) {
 			return(variable_declaration(a0, x1, x0));
 		};
 	};
-	# For test purposes, returning block statement
-	return(block_statement(a0, a1));
 	parser_error(a0, "Syntax error - none of available top level statements matched");
 };
 
