@@ -1982,7 +1982,22 @@ label allocate_statement_invalid;
 # a0 - parser
 # @return statement
 return_statement : (a0) {
-	parser_error(a0, "Return statements are not implemented yet");
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if we are returning with no result
+	if (x1 == ';') { parser_lexer_hold(a0); goto &return_statement_end; };
+	# Fetching return expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+label return_statement_end;
+	return(tuple2(STMT_RETURN, x0));
 };
 
 ## Parse syscall statement
