@@ -2011,7 +2011,40 @@ syscall_statement : (a0) {
 # a0 - parser
 # @return statement
 writechar_statement : (a0) {
-	parser_error(a0, "Writechar statements are not implemented yet");
+	# x0 - ops vector
+	# x1 - token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != '(') { goto &writechar_statement_invalid };
+label writechar_statement_loop;
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking if there is next expression as argument
+	if (x1 == ',') { goto &writechar_statement_loop; };
+	# Checking for correct syntax
+	if (x1 != ')') { goto &writechar_statement_invalid; };
+	# Checking for argument count
+	if (vector_size(x0) < 3) { goto &writechar_statement_not_enough; };
+	if (vector_size(x0) > 3) { goto &writechar_statement_too_many; };
+	# Returning expression
+	return(tuple2(STMT_WRITECHAR, x0));
+label writechar_statement_invalid;
+	parser_error(a0, "Invalid writechar expression");
+label writechar_statement_not_enough;
+	parser_error(a0, "Not enough arguments in writechar expression");
+label writechar_statement_too_many;
+	parser_error(a0, "Too many arguments in writechar expression");
 };
 
 ## Parse expression
@@ -2684,7 +2717,7 @@ label simple_readchar_expression_loop;
 	if (vector_size(x0) < 2) { goto &simple_readchar_expression_not_enough; };
 	if (vector_size(x0) > 2) { goto &simple_readchar_expression_too_many; };
 	# Returning expression
-	return(simple_postfix_expression(tuple2(STMT_EXPR_SYSCALL, x0)));
+	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_READCHAR, x0)));
 label simple_readchar_expression_invalid;
 	parser_error(a0, "Invalid readchar expression");
 label simple_readchar_expression_not_enough;
@@ -2709,7 +2742,7 @@ simple_parantheses_expression : (a0) {
 	# Checking parantheses are closed
 	if (x0 != ')') { goto &simple_parantheses_expression_invalid; };
 	# Returning expression
-	return(simple_postfix_expression(x1));
+	return(simple_postfix_expression(a0, x1));
 label simple_parantheses_expression_invalid;
 	parser_error(a0, "Parantheses expression is not closed");
 };
