@@ -2916,7 +2916,28 @@ label simple_address_call_expression_invalid;
 # a1 - expression
 # @return statement
 simple_address_index_expression : (a0, a1) {
-	parser_error(a0, "Simple address indexing is not implemented yet");
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 2);
+	# Pushing expression to operand vector
+	vector_push(x0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != ']') { goto &simple_address_index_expression_invalid; };
+	# Returning expression
+	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_INDEX, x0)));
+label simple_address_index_expression_invalid;
+	parser_error(a0, "Index expression is not closed");
 };
 
 ## Try to parse constant expression
@@ -2986,6 +3007,7 @@ debug_ast : (a0, a1) {
 	if (x1 == STMT_EXPR_READCHAR)  { puts("readchar: "); goto &debug_ast_children; };
 
 	if (x1 == STMT_EXPR_CALL)      { puts("(): "); goto &debug_ast_children; };
+	if (x1 == STMT_EXPR_INDEX)     { puts("[]: "); goto &debug_ast_children; };
 
 	if (x1 == STMT_EXPR_PLUS)        { puts("+: ");  goto &debug_ast_children; };
 	if (x1 == STMT_EXPR_MINUS)       { puts("-: ");  goto &debug_ast_children; };
