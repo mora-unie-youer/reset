@@ -1791,7 +1791,7 @@ label array_declaration_loop;
 	x2 = expression(a0, x1);
 	# Pushing expression to operand vector
 	vector_push(x0, x2);
-	# FEtching next token
+	# Fetching next token
 	x1 = parser_lex(a0);
 	# Checking if there is another element
 	if (x1 == ',') { goto &array_declaration_loop; };
@@ -1808,8 +1808,32 @@ label array_declaration_invalid;
 # a1 - identifier
 # @return statement
 char_array_declaration : (a0, a1) {
-	# TODO: implement char array declaration
-	parser_error(a0, "declarations of char arrays are not implemented yet");
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Pushing identifier to operand vector
+	vector_push(x0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != '[') { goto &char_array_declaration_invalid; };
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching next expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != ']') { goto &char_array_declaration_invalid; };
+	# Returning statement
+	return(tuple2(STMT_CHAR_ARRAY_DECL, x0));
+label char_array_declaration_invalid;
+	parser_error(a0, "Invalid char array declaration syntax");
 };
 
 ## Parse int array declaration
@@ -2978,6 +3002,16 @@ debug_ast : (a0, a1) {
 
 	if (x1 == STMT_ARRAY_DECL) {
 		puts("ARRAY: ");
+		# Print identifier
+		puts(vector_get(a0[1], 0));
+		# Starting from second element
+		x0 = 1;
+		# Print children
+		goto &debug_ast_children;
+	};
+
+	if (x1 == STMT_CHAR_ARRAY_DECL) {
+		puts("CHAR_ARRAY: ");
 		# Print identifier
 		puts(vector_get(a0[1], 0));
 		# Starting from second element
