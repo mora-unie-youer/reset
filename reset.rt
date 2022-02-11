@@ -1589,9 +1589,9 @@ top_level_statement : (a0, a1) {
 			# Parsing array declaration
 			if (x0 == '[') { return(array_declaration(a0, x1)); };
 			# Parsing reserved char array declaration
-			if (x0 == TOKEN_TYPE_CHAR) { return(char_array_declaration(a0, x1)); };
+			if (x0 == TOKEN_TYPE_CHAR) { return(type_array_declaration(a0, x1, STMT_CHAR_ARRAY_DECL)); };
 			# Parsing reserved int array declaration
-			if (x0 == TOKEN_TYPE_INT) { return(int_array_declaration(a0, x1)); };
+			if (x0 == TOKEN_TYPE_INT) { return(type_array_declaration(a0, x1, STMT_INT_ARRAY_DECL)); };
 			# Parsing simple variable declaration
 			return(variable_declaration(a0, x1, x0));
 		};
@@ -1803,11 +1803,12 @@ label array_declaration_invalid;
 	parser_error(a0, "Invalid array declaration syntax");
 };
 
-## Parse char array declaration
+## Parse type array declaration
 # a0 - parser
 # a1 - identifier
+# a2 - type
 # @return statement
-char_array_declaration : (a0, a1) {
+type_array_declaration : (a0, a1, a2) {
 	# x0 - ops vector
 	# x1 - next token
 	# x2 - expression
@@ -1819,7 +1820,7 @@ char_array_declaration : (a0, a1) {
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != '[') { goto &char_array_declaration_invalid; };
+	if (x1 != '[') { goto &type_array_declaration_invalid; };
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Fetching next expression
@@ -1829,20 +1830,11 @@ char_array_declaration : (a0, a1) {
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != ']') { goto &char_array_declaration_invalid; };
+	if (x1 != ']') { goto &type_array_declaration_invalid; };
 	# Returning statement
-	return(tuple2(STMT_CHAR_ARRAY_DECL, x0));
-label char_array_declaration_invalid;
+	return(tuple2(a2, x0));
+label type_array_declaration_invalid;
 	parser_error(a0, "Invalid char array declaration syntax");
-};
-
-## Parse int array declaration
-# a0 - parser
-# a1 - identifier
-# @return statement
-int_array_declaration : (a0, a1) {
-	# TODO: implement int array declaration
-	parser_error(a0, "declarations of int arrays are not implemented yet");
 };
 
 ## Parse variable declaration
@@ -3012,6 +3004,16 @@ debug_ast : (a0, a1) {
 
 	if (x1 == STMT_CHAR_ARRAY_DECL) {
 		puts("CHAR_ARRAY: ");
+		# Print identifier
+		puts(vector_get(a0[1], 0));
+		# Starting from second element
+		x0 = 1;
+		# Print children
+		goto &debug_ast_children;
+	};
+
+	if (x1 == STMT_INT_ARRAY_DECL) {
+		puts("INT_ARRAY: ");
 		# Print identifier
 		puts(vector_get(a0[1], 0));
 		# Starting from second element
