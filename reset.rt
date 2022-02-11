@@ -1491,16 +1491,18 @@ STMT_ALLOCATE         => 48;
 STMT_RETURN           => 49;
 STMT_SYSCALL          => 50;
 STMT_WRITECHAR        => 51;
+STMT_LABEL            => 52;
+STMT_GOTO             => 53;
 # Block statement
-STMT_BLOCK            => 52;
+STMT_BLOCK            => 54;
 # Top level statements
-STMT_GLOBAL           => 53;
-STMT_MACRO            => 54;
-STMT_FUN_DECL         => 55;
-STMT_ARRAY_DECL       => 56;
-STMT_CHAR_ARRAY_DECL  => 57;
-STMT_INT_ARRAY_DECL   => 58;
-STMT_VAR_DECL         => 59;
+STMT_GLOBAL           => 55;
+STMT_MACRO            => 56;
+STMT_FUN_DECL         => 57;
+STMT_ARRAY_DECL       => 58;
+STMT_CHAR_ARRAY_DECL  => 59;
+STMT_INT_ARRAY_DECL   => 60;
+STMT_VAR_DECL         => 61;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1930,6 +1932,10 @@ statement : (a0, a1) {
 	if (a1 == TOKEN_SYSCALL) { return(syscall_statement(a0)); };
 	# Parsing writechar statement
 	if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0)); };
+	# Parsing label statement
+	if (a1 == TOKEN_LABEL) { return(label_statement(a0)); };
+	# Parsing goto statement
+	if (a1 == TOKEN_GOTO) { return(goto_statement(a0)); };
 	# Returning expression, as statements were not found here
 	return(expression(a0, a1));
 };
@@ -2115,6 +2121,20 @@ label writechar_statement_not_enough;
 	parser_error(a0, "Not enough arguments in writechar expression");
 label writechar_statement_too_many;
 	parser_error(a0, "Too many arguments in writechar expression");
+};
+
+## Parse label statement
+# a0 - parser
+# @return statement
+label_statement : (a0) {
+	parser_error(a0, "Label statements are not implemented yet");
+};
+
+## Parse goto statement
+# a0 - parser
+# @return statement
+goto_statement : (a0) {
+	parser_error(a0, "Goto statements are not implemented yet");
 };
 
 ## Parse expression
