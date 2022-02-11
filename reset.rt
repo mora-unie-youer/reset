@@ -163,7 +163,7 @@ malloc : (a0) {
 	# Setting address
 	x0 = free_start;
 	# Moving free segment pointer
-	free_start = align(x0 + a0, 16);
+	free_start = align(x0 + a0, 8);
 	# Returning memory address
 	return(x0);
 };
