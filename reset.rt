@@ -2895,6 +2895,8 @@ simple_address_call_expression : (a0, a1) {
 label simple_address_call_expression_loop;
 	# Fetching next token
 	x1 = parser_lex(a0);
+	# Checking if arguments ended
+	if (x1 == ')') { goto &simple_address_call_expression_end; };
 	# Fetching expression
 	x2 = expression(a0, x1);
 	# Pushing expression to operand vector
@@ -2905,6 +2907,7 @@ label simple_address_call_expression_loop;
 	if (x1 == ',') { goto &simple_address_call_expression_loop; };
 	# Checking for correct syntax
 	if (x1 != ')') { goto &simple_address_call_expression_invalid; };
+label simple_address_call_expression_end;
 	# Returning expression
 	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_CALL, x0)));
 label simple_address_call_expression_invalid;
