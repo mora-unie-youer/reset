@@ -2127,7 +2127,24 @@ label writechar_statement_too_many;
 # a0 - parser
 # @return statement
 label_statement : (a0) {
-	parser_error(a0, "Label statements are not implemented yet");
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - duplicated identifier
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x1 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
+	# Duplicating identifier
+	x2 = strdup(lexer_token_text(parser_lexer(a0)));
+	# Pushing identifier to operand vector
+	vector_push(x0, x2);
+	# Returning statement
+	return(tuple2(STMT_LABEL, x0));
+label label_statement_invalid;
+	parser_error(a0, "Invalid label statement syntax");
 };
 
 ## Parse goto statement
@@ -3075,6 +3092,13 @@ debug_ast : (a0, a1) {
 	if (x1 == STMT_RETURN)    { puts("return: ");    goto &debug_ast_children; };
 	if (x1 == STMT_SYSCALL)   { puts("syscall: ");   goto &debug_ast_children; };
 	if (x1 == STMT_WRITECHAR) { puts("writechar: "); goto &debug_ast_children; };
+
+	if (x1 == STMT_LABEL) {
+		puts("LABEL: ");
+		# Print identifier
+		puts(vector_get(a0[1], 0));
+	};
+
 	if (x1 == STMT_BLOCK)     { puts("BLOCK: ");     goto &debug_ast_children; };
 
 	if (x1 == STMT_GLOBAL)    {
