@@ -1481,6 +1481,10 @@ STMT_BLOCK            => 38;
 STMT_GLOBAL           => 39;
 STMT_MACRO            => 40;
 STMT_FUN_DECL         => 41;
+STMT_ARRAY_DECL       => 42;
+STMT_CHAR_ARRAY_DECL  => 43;
+STMT_INT_ARRAY_DECL   => 44;
+STMT_VAR_DECL         => 45;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1800,8 +1804,19 @@ int_array_declaration : (a0, a1) {
 # a2 - current token
 # @return statement
 variable_declaration : (a0, a1, a2) {
-	# TODO: implement variable declaration
-	parser_error(a0, "declarations of variables are not implemented yet");
+	# x0 - ops vector
+	# x1 - expression
+	allocate(2);
+	# Allocating operand vector
+	x0 = vector(0, 2);
+	# Pushing identifier to operand vector
+	vector_push(x0, a1);
+	# Fetching next expression
+	x1 = expression(a0, a2);
+	# Pushing expression to operand vector
+	vector_push(x0, x1);
+	# Returning statement
+	return(tuple2(STMT_VAR_DECL, x0));
 };
 
 ## Parse block of statements
@@ -2924,6 +2939,16 @@ debug_ast : (a0, a1) {
 		putc(')');
 		# Starting from third element
 		x0 = 2;
+		# Print child
+		goto &debug_ast_children;
+	};
+
+	if (x1 == STMT_VAR_DECL) {
+		puts("VAR: ");
+		# Print identifier
+		puts(vector_get(a0[1], 0));
+		# Starting from second element
+		x0 = 1;
 		# Print child
 		goto &debug_ast_children;
 	};
