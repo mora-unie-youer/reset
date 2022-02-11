@@ -1431,62 +1431,76 @@ STMT_EXPR_ARGUMENT    => 3;
 STMT_EXPR_VARIABLE    => 4;
 STMT_EXPR_SYSCALL     => 5;
 STMT_EXPR_READCHAR    => 6;
+# Postfix
+STMT_EXPR_CALL        => 7;
+STMT_EXPR_INDEX       => 8;
 # Prefix
-STMT_EXPR_PLUS        => 7;
-STMT_EXPR_MINUS       => 8;
-STMT_EXPR_LOGICAL_NOT => 9;
-STMT_EXPR_NOT         => 10;
-STMT_EXPR_DEREF       => 11;
-STMT_EXPR_ADDROF      => 12;
+STMT_EXPR_PLUS        => 9;
+STMT_EXPR_MINUS       => 10;
+STMT_EXPR_LOGICAL_NOT => 11;
+STMT_EXPR_NOT         => 12;
+STMT_EXPR_DEREF       => 13;
+STMT_EXPR_ADDROF      => 14;
 # Multiplicative
-STMT_EXPR_MUL         => 13;
-STMT_EXPR_DIV         => 14;
-STMT_EXPR_MOD         => 15;
+STMT_EXPR_MUL         => 15;
+STMT_EXPR_DIV         => 16;
+STMT_EXPR_MOD         => 17;
 # Additive
-STMT_EXPR_ADD         => 16;
-STMT_EXPR_SUB         => 17;
+STMT_EXPR_ADD         => 18;
+STMT_EXPR_SUB         => 19;
 # Bitwise shift
-STMT_EXPR_SHL         => 18;
-STMT_EXPR_SHR         => 19;
+STMT_EXPR_SHL         => 20;
+STMT_EXPR_SHR         => 21;
 # Relational
-STMT_EXPR_LESS        => 20;
-STMT_EXPR_GREATER     => 21;
-STMT_EXPR_LE          => 22;
-STMT_EXPR_GE          => 23;
+STMT_EXPR_LESS        => 22;
+STMT_EXPR_GREATER     => 23;
+STMT_EXPR_LE          => 24;
+STMT_EXPR_GE          => 25;
 # Equality
-STMT_EXPR_EQ          => 24;
-STMT_EXPR_NE          => 25;
+STMT_EXPR_EQ          => 26;
+STMT_EXPR_NE          => 27;
 # Bitwise and
-STMT_EXPR_AND         => 26;
+STMT_EXPR_AND         => 28;
 # Bitwise xor
-STMT_EXPR_XOR         => 27;
+STMT_EXPR_XOR         => 29;
 # Bitwise or
-STMT_EXPR_OR          => 28;
+STMT_EXPR_OR          => 30;
 # Logical and
-STMT_EXPR_LOGICAL_AND => 29;
+STMT_EXPR_LOGICAL_AND => 31;
 # Logical or
-STMT_EXPR_LOGICAL_OR  => 30;
+STMT_EXPR_LOGICAL_OR  => 32;
 # Ternary
-STMT_EXPR_TERNARY     => 31;
+STMT_EXPR_TERNARY     => 33;
 # Assignment
-STMT_EXPR_ASSIGN      => 32;
+STMT_EXPR_ASSIGN      => 34;
+STMT_EXPR_ADD_ASSIGN  => 35;
+STMT_EXPR_SUB_ASSIGN  => 36;
+STMT_EXPR_MUL_ASSIGN  => 37;
+STMT_EXPR_DIV_ASSIGN  => 38;
+STMT_EXPR_MOD_ASSIGN  => 39;
+STMT_EXPR_NOT_ASSIGN  => 40;
+STMT_EXPR_AND_ASSIGN  => 41;
+STMT_EXPR_XOR_ASSIGN  => 42;
+STMT_EXPR_OR_ASSIGN   => 43;
+STMT_EXPR_SHR_ASSIGN  => 44;
+STMT_EXPR_SHL_ASSIGN  => 45;
 # Statements
-STMT_IF               => 33;
-STMT_WHILE            => 34;
-STMT_ALLOCATE         => 35;
-STMT_RETURN           => 36;
-STMT_SYSCALL          => 37;
-STMT_WRITECHAR        => 38;
+STMT_IF               => 46;
+STMT_WHILE            => 47;
+STMT_ALLOCATE         => 48;
+STMT_RETURN           => 49;
+STMT_SYSCALL          => 50;
+STMT_WRITECHAR        => 51;
 # Block statement
-STMT_BLOCK            => 39;
+STMT_BLOCK            => 52;
 # Top level statements
-STMT_GLOBAL           => 40;
-STMT_MACRO            => 41;
-STMT_FUN_DECL         => 42;
-STMT_ARRAY_DECL       => 43;
-STMT_CHAR_ARRAY_DECL  => 44;
-STMT_INT_ARRAY_DECL   => 45;
-STMT_VAR_DECL         => 46;
+STMT_GLOBAL           => 53;
+STMT_MACRO            => 54;
+STMT_FUN_DECL         => 55;
+STMT_ARRAY_DECL       => 56;
+STMT_CHAR_ARRAY_DECL  => 57;
+STMT_INT_ARRAY_DECL   => 58;
+STMT_VAR_DECL         => 59;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2870,7 +2884,31 @@ simple_postfix_expression : (a0, a1) {
 # a1 - expression
 # @return statement
 simple_address_call_expression : (a0, a1) {
-	parser_error(a0, "Simple address calls are not implemented yet");
+	# x0 - ops vector
+	# x1 - next token
+	# x2 - expression
+	allocate(3);
+	# Allocating operand vector
+	x0 = vector(0, 1);
+	# Pushing expression to operand vector
+	vector_push(x0, a1);
+label simple_address_call_expression_loop;
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Fetching expression
+	x2 = expression(a0, x1);
+	# Pushing expression to operand vector
+	vector_push(x0, x2);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Checking for next argument
+	if (x1 == ',') { goto &simple_address_call_expression_loop; };
+	# Checking for correct syntax
+	if (x1 != ')') { goto &simple_address_call_expression_invalid; };
+	# Returning expression
+	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_CALL, x0)));
+label simple_address_call_expression_invalid;
+	parser_error(a0, "Call expression is not closed");
 };
 
 ## Parse simple address indexing expression
@@ -2946,6 +2984,8 @@ debug_ast : (a0, a1) {
 	if (x1 == STMT_EXPR_VARIABLE)  { puts("VARIABLE: "); putd(vector_get(a0[1], 0)); };
 	if (x1 == STMT_EXPR_SYSCALL)   { puts("syscall: ");  goto &debug_ast_children; };
 	if (x1 == STMT_EXPR_READCHAR)  { puts("readchar: "); goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_CALL)      { puts("(): "); goto &debug_ast_children; };
 
 	if (x1 == STMT_EXPR_PLUS)        { puts("+: ");  goto &debug_ast_children; };
 	if (x1 == STMT_EXPR_MINUS)       { puts("-: ");  goto &debug_ast_children; };
