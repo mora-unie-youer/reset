@@ -1468,23 +1468,25 @@ STMT_EXPR_LOGICAL_AND => 29;
 STMT_EXPR_LOGICAL_OR  => 30;
 # Ternary
 STMT_EXPR_TERNARY     => 31;
+# Assignment
+STMT_EXPR_ASSIGN      => 32;
 # Statements
-STMT_IF               => 32;
-STMT_WHILE            => 33;
-STMT_ALLOCATE         => 34;
-STMT_RETURN           => 35;
-STMT_SYSCALL          => 36;
-STMT_WRITECHAR        => 37;
+STMT_IF               => 33;
+STMT_WHILE            => 34;
+STMT_ALLOCATE         => 35;
+STMT_RETURN           => 36;
+STMT_SYSCALL          => 37;
+STMT_WRITECHAR        => 38;
 # Block statement
-STMT_BLOCK            => 38;
+STMT_BLOCK            => 39;
 # Top level statements
-STMT_GLOBAL           => 39;
-STMT_MACRO            => 40;
-STMT_FUN_DECL         => 41;
-STMT_ARRAY_DECL       => 42;
-STMT_CHAR_ARRAY_DECL  => 43;
-STMT_INT_ARRAY_DECL   => 44;
-STMT_VAR_DECL         => 45;
+STMT_GLOBAL           => 40;
+STMT_MACRO            => 41;
+STMT_FUN_DECL         => 42;
+STMT_ARRAY_DECL       => 43;
+STMT_CHAR_ARRAY_DECL  => 44;
+STMT_INT_ARRAY_DECL   => 45;
+STMT_VAR_DECL         => 46;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2105,7 +2107,50 @@ label writechar_statement_too_many;
 # a0 - parser
 # a1 - current token
 # @return statement
-expression : (a0, a1) { return(ternary_expression(a0, a1)); };
+expression : (a0, a1) { return(assignment_expression(a0, a1)); };
+
+## Try to parse assignment expression
+# a0 - parser
+# a1 - current token
+# @return statement
+assignment_expression : (a0, a1) {
+	# x0 - op1
+	# x1 - next token
+	allocate(2);
+	# Fetching first operand
+	x0 = ternary_expression(a0, a1);
+	# Fetching next token
+	x1 = parser_lex(a0);
+	# Parsing assignment
+	# TODO: make +=, -= and etc. expressions
+	if (x1 == '=') { return(assignment_expr(a0, x0)); };
+	# Holding token
+	parser_lexer_hold(a0);
+	# Returning operand
+	return(x0);
+};
+
+## Parse assignment expression
+# a0 - parser
+# a1 - op1
+# @return statement
+assignment_expr : (a0, a1) {
+	# x0 - next token
+	# x1 - op2
+	# x2 - ops vector
+	allocate(3);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching second operand
+	x1 = ternary_expression(a0, x0);
+	# Allocating operand vector
+	x2 = vector(0, 2);
+	# Pushing operands to vector
+	vector_push(x2, a1);
+	vector_push(x2, x1);
+	# Returning expression
+	return(tuple2(STMT_EXPR_ASSIGN, x2));
+};
 
 ## Try to parse ternary expression
 # a0 - parser
@@ -2935,6 +2980,8 @@ debug_ast : (a0, a1) {
 	if (x1 == STMT_EXPR_LOGICAL_OR)  { puts("||: "); goto &debug_ast_children; };
 
 	if (x1 == STMT_EXPR_TERNARY)     { puts("?: ");  goto &debug_ast_children; };
+
+	if (x1 == STMT_EXPR_ASSIGN)      { puts("=: ");  goto &debug_ast_children; };
 
 	# Printing statements
 	if (x1 == STMT_IF)        { puts("if: ");        goto &debug_ast_children; };
