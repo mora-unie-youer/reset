@@ -1477,7 +1477,7 @@ PARSER_LEX    => 0;
 PARSER_SWITCH => 1;
 ## Node parts
 NODE_TYPE => 0;
-NODE_OPS  => 1;
+# 1, 2, ... are used as operands
 ## Statement IDs
 # Constant
 STMT_EXPR_INTEGER     => 0;
@@ -1779,22 +1779,15 @@ label include_statement_invalid;
 # a1 - identifier
 # @return statement
 macro_declaration : (a0, a1) {
-	# x0 - ops vector
-	# x1 - token
-	# x2 - expression
-	allocate(3);
-	# Allocate ops vector
-	x0 = vector(0, 2);
-	# Pushing identifier to operand vector
-	vector_push(x0, a1);
+	# x0 - token
+	# x1 - expression
+	allocate(2);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Fetching expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
+	x1 = expression(a0, x0);
 	# Returning expression
-	return(tuple2(STMT_MACRO, x0));
+	return(tuple3(STMT_MACRO, a1, x1));
 };
 
 ## Parse function declaration
@@ -1802,46 +1795,37 @@ macro_declaration : (a0, a1) {
 # a1 - identifier
 # @return statement
 function_declaration : (a0, a1) {
-	# x0 - ops vector
-	# x1 - arg count
-	# x2 - token
-	# x3 - block statement
-	allocate(4);
-	# Allocating operand vector
-	x0 = vector(0, 3);
-	# Pushing identifier to operand vector
-	vector_push(x0, a1);
+	# x0 - arg count
+	# x1 - token
+	# x2 - block statement
+	allocate(3);
 	# Resetting arg count
-	x1 = 0;
+	x0 = 0;
 	## Parsing arguments
 label function_declaration_arg_loop;
 	# Fetching next token
-	x2 = parser_lex(a0);
+	x1 = parser_lex(a0);
 	# Checking if arguments ended
-	if (x2 == ')') { goto &function_declaration_arg_end; };
+	if (x1 == ')') { goto &function_declaration_arg_end; };
 	# Checking for argument
-	if (x2 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
-	if (x1 != lexer_token_value(parser_lexer(a0)))
+	if (x1 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
+	if (x0 != lexer_token_value(parser_lexer(a0)))
 		{ goto &function_declaration_arg_invalid; };
 	# Incrementing argument count
-	x1 = x1 + 1;
+	x0 = x0 + 1;
 	# Fetching next token
-	x2 = parser_lex(a0);
+	x1 = parser_lex(a0);
 	# Checking for next argument
-	if (x2 == ',') { goto &function_declaration_arg_loop; };
+	if (x1 == ',') { goto &function_declaration_arg_loop; };
 label function_declaration_arg_end;
 	# Checking we actually exitted arguments correctly
-	if (x2 != ')') { goto &function_declaration_arg_invalid; };
-	# Pushing argument count to operand vector
-	vector_push(x0, x1);
+	if (x1 != ')') { goto &function_declaration_arg_invalid; };
 	# Fetching next token
-	x2 = parser_lex(a0);
+	x1 = parser_lex(a0);
 	# Fetching block statement
-	x3 = block_statement(a0, x2);
-	# Pushing block statement to operand vector
-	vector_push(x0, x3);
+	x2 = block_statement(a0, x1);
 	# Returning statement
-	return(tuple2(STMT_FUN_DECL, x0));
+	return(tuple4(STMT_FUN_DECL, a1, x0, x2));
 label function_declaration_arg_invalid;
 	parser_error(a0, "Invalid function arguments declaration syntax");
 };
@@ -1857,8 +1841,6 @@ array_declaration : (a0, a1) {
 	allocate(3);
 	# Allocating operand vector
 	x0 = vector(0, 1);
-	# Pushing identifier to operand vector
-	vector_push(x0, a1);
 label array_declaration_loop;
 	# Fetching next token
 	x1 = parser_lex(a0);
@@ -1873,7 +1855,7 @@ label array_declaration_loop;
 	# Checking for correct syntax
 	if (x1 != ']') { goto &array_declaration_invalid; };
 	# Returning statement
-	return(tuple2(STMT_ARRAY_DECL, x0));
+	return(tuple3(STMT_ARRAY_DECL, a1, x0));
 label array_declaration_invalid;
 	parser_error(a0, "Invalid array declaration syntax");
 };
@@ -1890,8 +1872,6 @@ type_array_declaration : (a0, a1, a2) {
 	allocate(3);
 	# Allocating operand vector
 	x0 = vector(0, 1);
-	# Pushing identifier to operand vector
-	vector_push(x0, a1);
 	# Fetching next token
 	x1 = parser_lex(a0);
 	# Checking for correct syntax
@@ -1907,7 +1887,7 @@ type_array_declaration : (a0, a1, a2) {
 	# Checking for correct syntax
 	if (x1 != ']') { goto &type_array_declaration_invalid; };
 	# Returning statement
-	return(tuple2(a2, x0));
+	return(tuple3(a2, a1, x0));
 label type_array_declaration_invalid;
 	parser_error(a0, "Invalid char array declaration syntax");
 };
@@ -1918,19 +1898,12 @@ label type_array_declaration_invalid;
 # a2 - current token
 # @return statement
 variable_declaration : (a0, a1, a2) {
-	# x0 - ops vector
-	# x1 - expression
-	allocate(2);
-	# Allocating operand vector
-	x0 = vector(0, 2);
-	# Pushing identifier to operand vector
-	vector_push(x0, a1);
+	# x0 - expression
+	allocate(1);
 	# Fetching next expression
-	x1 = expression(a0, a2);
-	# Pushing expression to operand vector
-	vector_push(x0, x1);
+	x0 = expression(a0, a2);
 	# Returning statement
-	return(tuple2(STMT_VAR_DECL, x0));
+	return(tuple3(STMT_VAR_DECL, a1, x0));
 };
 
 ## Parse block of statements
@@ -2048,34 +2021,28 @@ label if_statement_invalid;
 # a0 - parser
 # @return statement
 while_statement : (a0) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
+	# x0 - next token
+	# x1 - cond expression
+	# x2 - block statement
 	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 3);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != '(') { goto &while_statement_invalid; };
+	if (x0 != '(') { goto &while_statement_invalid; };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Fetching condition expression
-	x2 = expression(a0, x1);
-	# Append condition to vector
-	vector_push(x0, x2);
+	x1 = expression(a0, x0);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != ')') { goto &while_statement_invalid; };
+	if (x0 != ')') { goto &while_statement_invalid; };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Fetching block statement
-	x2 = block_statement(a0, x1);
-	# Append if block to vector
-	vector_push(x0, x2);
+	x2 = block_statement(a0, x0);
 	# Return statement
-	return(tuple2(STMT_WHILE, x0));
+	return(tuple4(STMT_WHILE, x0, x1, x2));
 label while_statement_invalid;
 	parser_error(a0, "Invalid while statement syntax");
 };
@@ -2084,28 +2051,23 @@ label while_statement_invalid;
 # a0 - parser
 # @return statement
 allocate_statement : (a0) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
+	# x0 - next token
+	# x1 - expression
+	allocate(2);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != '(') { goto &allocate_statement_invalid; };
+	if (x0 != '(') { goto &allocate_statement_invalid; };
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Fetching size expression
-	x2 = expression(a0, x1);
-	# Pushing size expression to operand vector
-	vector_push(x0, x2);
+	x1 = expression(a0, x0);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != ')') { goto &allocate_statement_invalid; };
+	if (x0 != ')') { goto &allocate_statement_invalid; };
 	# Return statement
-	return(tuple2(STMT_ALLOCATE, x0));
+	return(tuple2(STMT_ALLOCATE, x1));
 label allocate_statement_invalid;
 	parser_error(a0, "Invalid allocate statement syntax");
 };
@@ -2144,62 +2106,60 @@ syscall_statement : (a0) {
 # a0 - parser
 # @return statement
 writechar_statement : (a0) {
-	# x0 - ops vector
-	# x1 - token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
+	# x0 - next token
+	# x1 - array expression
+	# x2 - index expression
+	# x3 - value expression
+	allocate(4);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != '(') { goto &writechar_statement_invalid; };
-label writechar_statement_loop;
+	if (x0 != '(') { goto &writechar_statement_invalid; };
 	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
+	x0 = parser_lex(a0);
+	# Fetching array expression
+	x1 = expression(a0, x0);
 	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if there is next expression as argument
-	if (x1 == ',') { goto &writechar_statement_loop; };
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != ')') { goto &writechar_statement_invalid; };
-	# Checking for argument count
-	if (vector_size(x0) < 3) { goto &writechar_statement_not_enough; };
-	if (vector_size(x0) > 3) { goto &writechar_statement_too_many; };
+	if (x0 != ',') { goto &writechar_statement_invalid; };
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching index expression
+	x2 = expression(a0, x0);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x0 != ',') { goto &writechar_statement_invalid; };
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching value expression
+	x3 = expression(a0, x0);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x0 != ')') { goto &writechar_statement_invalid; };
 	# Returning expression
-	return(tuple2(STMT_WRITECHAR, x0));
+	return(tuple4(STMT_WRITECHAR, x1, x2, x3));
 label writechar_statement_invalid;
 	parser_error(a0, "Invalid writechar expression");
-label writechar_statement_not_enough;
-	parser_error(a0, "Not enough arguments in writechar expression");
-label writechar_statement_too_many;
-	parser_error(a0, "Too many arguments in writechar expression");
 };
 
 ## Parse label statement
 # a0 - parser
 # @return statement
 label_statement : (a0) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - duplicated identifier
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
+	# x0 - next token
+	# x1 - duplicated identifier
+	allocate(2);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
+	if (x0 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
 	# Duplicating identifier
-	x2 = strdup(lexer_token_text(parser_lexer(a0)));
-	# Pushing identifier to operand vector
-	vector_push(x0, x2);
+	x1 = strdup(lexer_token_text(parser_lexer(a0)));
 	# Returning statement
-	return(tuple2(STMT_LABEL, x0));
+	return(tuple2(STMT_LABEL, x1));
 label label_statement_invalid;
 	parser_error(a0, "Invalid label statement syntax");
 };
@@ -2208,20 +2168,15 @@ label label_statement_invalid;
 # a0 - parser
 # @return statement
 goto_statement : (a0) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
+	# x0 - next token
+	# x1 - expression
+	allocate(2);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Fetching goto expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
+	x1 = expression(a0, x0);
 	# Returning statement
-	return(tuple2(STMT_GOTO, x0));
+	return(tuple2(STMT_GOTO, x1));
 };
 
 ## Parse expression
@@ -2269,19 +2224,13 @@ assignment_expression : (a0, a1) {
 assignment_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = ternary_expression(a0, x0);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(tuple2(a2, x2));
+	return(tuple3(a2, a1, x1));
 };
 
 ## Try to parse ternary expression
@@ -2312,8 +2261,7 @@ ternary_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
 	# x2 - op3
-	# x3 - ops vector
-	allocate(4);
+	allocate(3);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
@@ -2326,14 +2274,8 @@ ternary_expr : (a0, a1) {
 	x0 = parser_lex(a0);
 	# Fetching third operand
 	x2 = ternary_expression(a0, x0);
-	# Allocating operand vector
-	x3 = vector(0, 3);
-	# Pushing operands to vector
-	vector_push(x3, a1);
-	vector_push(x3, x1);
-	vector_push(x3, x2);
 	# Returning expression
-	return(tuple2(STMT_EXPR_TERNARY, x3));
+	return(tuple4(STMT_EXPR_TERNARY, a1, x1, x2));
 label ternary_expr_error;
 	parser_error(a0, "Incorrect ternary expression syntax");
 };
@@ -2365,19 +2307,13 @@ logical_or_expression : (a0, a1, a2) {
 logical_or_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = logical_and_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(logical_or_expression(a0, NULL, tuple2(STMT_EXPR_LOGICAL_OR, x2)));
+	return(logical_or_expression(a0, NULL, tuple3(STMT_EXPR_LOGICAL_OR, a1, x1)));
 };
 
 ## Try to parse logical and expression
@@ -2407,19 +2343,13 @@ logical_and_expression : (a0, a1, a2) {
 logical_and_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = equality_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(logical_and_expression(a0, NULL, tuple2(STMT_EXPR_LOGICAL_AND, x2)));
+	return(logical_and_expression(a0, NULL, tuple3(STMT_EXPR_LOGICAL_AND, a1, x1)));
 };
 
 ## Try to parse equality expression
@@ -2452,19 +2382,13 @@ equality_expression : (a0, a1, a2) {
 equality_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = relational_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(equality_expression(a0, NULL, tuple2(a2, x2)));
+	return(equality_expression(a0, NULL, tuple3(a2, a1, x1)));
 };
 
 ## Try to parse relational expression
@@ -2501,19 +2425,13 @@ relational_expression : (a0, a1, a2) {
 relational_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_or_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(relational_expression(a0, NULL, tuple2(a2, x2)));
+	return(relational_expression(a0, NULL, tuple3(a2, a1, x1)));
 };
 
 ## Try to parse bitwise or expression
@@ -2543,19 +2461,13 @@ bitwise_or_expression : (a0, a1, a2) {
 bitwise_or_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_xor_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(bitwise_or_expression(a0, NULL, tuple2(STMT_EXPR_OR, x2)));
+	return(bitwise_or_expression(a0, NULL, tuple3(STMT_EXPR_OR, a1, x1)));
 };
 
 ## Try to parse bitwise xor expression
@@ -2585,19 +2497,13 @@ bitwise_xor_expression : (a0, a1, a2) {
 bitwise_xor_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_and_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(bitwise_xor_expression(a0, NULL, tuple2(STMT_EXPR_XOR, x2)));
+	return(bitwise_xor_expression(a0, NULL, tuple3(STMT_EXPR_XOR, a1, x1)));
 };
 
 ## Try to parse bitwise and expression
@@ -2627,19 +2533,13 @@ bitwise_and_expression : (a0, a1, a2) {
 bitwise_and_expr : (a0, a1) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = bitwise_shift_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(bitwise_and_expression(a0, NULL, tuple2(STMT_EXPR_AND, x2)));
+	return(bitwise_and_expression(a0, NULL, tuple3(STMT_EXPR_AND, a1, x1)));
 };
 
 ## Try to parse bitwise shift expression
@@ -2672,19 +2572,13 @@ bitwise_shift_expression : (a0, a1, a2) {
 bitwise_shift_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = additive_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(bitwise_shift_expression(a0, NULL, tuple2(a2, x2)));
+	return(bitwise_shift_expression(a0, NULL, tuple3(a2, a1, x1)));
 };
 
 ## Try to parse additive expression
@@ -2717,19 +2611,13 @@ additive_expression : (a0, a1, a2) {
 additive_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = multiplicative_expression(a0, x0, NULL);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(additive_expression(a0, NULL, tuple2(a2, x2)));
+	return(additive_expression(a0, NULL, tuple3(a2, a1, x1)));
 };
 
 ## Try to parse multiplicative expression
@@ -2764,19 +2652,13 @@ multiplicative_expression : (a0, a1, a2) {
 multiplicative_expr : (a0, a1, a2) {
 	# x0 - next token
 	# x1 - op2
-	# x2 - ops vector
-	allocate(3);
+	allocate(2);
 	# Fetching next token
 	x0 = parser_lex(a0);
 	# Fetching second operand
 	x1 = prefix_expression(a0, x0);
-	# Allocating operand vector
-	x2 = vector(0, 2);
-	# Pushing operands to vector
-	vector_push(x2, a1);
-	vector_push(x2, x1);
 	# Returning expression
-	return(multiplicative_expression(a0, NULL, tuple2(a2, x2)));
+	return(multiplicative_expression(a0, NULL, tuple3(a2, a1, x1)));
 };
 
 ## Try to parse prefix expression
@@ -2806,16 +2688,11 @@ prefix_expression : (a0, a1) {
 # @return statement
 prefix_expr : (a0, a1) {
 	# x0 - op1
-	# x1 - ops vector
-	allocate(2);
+	allocate(1);
 	# Fetching operand
 	x0 = prefix_expression(a0, parser_lex(a0));
-	# Allocating operand vector
-	x1 = vector(0, 1);
-	# Pushing operand to vector
-	vector_push(x1, x0);
 	# Returning expression
-	return(tuple2(a1, x1));
+	return(tuple2(a1, x0));
 };
 
 ## Try to parse simple expression
@@ -2844,16 +2721,11 @@ simple_expression : (a0, a1) {
 # @return statement
 simple_identifier_expression : (a0) {
 	# x0 - duplicated identifier string
-	# x1 - ops vector
-	allocate(2);
+	allocate(1);
 	# Duplicating the identifier
 	x0 = strdup(lexer_token_text(parser_lexer(a0)));
-	# Allocating operand vector
-	x1 = vector(0, 1);
-	# Pushing value to vector
-	vector_push(x1, x0);
 	# Returning expression
-	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_IDENTIFIER, x1)));
+	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_IDENTIFIER, x0)));
 };
 
 ## Parse simple argument/variable expression
@@ -2862,17 +2734,12 @@ simple_identifier_expression : (a0) {
 # @return statement
 simple_argvar_expression : (a0, a1) {
 	# x0 - expression type
-	# x1 - ops vector
-	allocate(2);
+	allocate(1);
 	# Getting expression type
 	x0 = STMT_EXPR_VARIABLE;
 	if (a1) { x0 = STMT_EXPR_ARGUMENT; };
-	# Allocating operand vector
-	x1 = vector(0, 1);
-	# Pushing value to vector
-	vector_push(x1, lexer_token_value(parser_lexer(a0)));
 	# Returning expression
-	return(simple_postfix_expression(a0, tuple2(x0, x1)));
+	return(simple_postfix_expression(a0, tuple2(x0, lexer_token_value(parser_lexer(a0)))));
 };
 
 ## Parse simple syscall expression
@@ -2921,40 +2788,34 @@ label simple_syscall_expression_too_many;
 # a0 - parser
 # @return statement
 simple_readchar_expression : (a0) {
-	# x0 - ops vector
-	# x1 - token
-	# x2 - expression
+	# x0 - next token
+	# x1 - array expression
+	# x2 - index expression
 	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != '(') { goto &simple_readchar_expression_invalid; };
-label simple_readchar_expression_loop;
+	if (x0 != '(') { goto &simple_readchar_expression_invalid; };
 	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
+	x0 = parser_lex(a0);
+	# Fetching array expression
+	x1 = expression(a0, x0);
 	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if there is next expression as argument
-	if (x1 == ',') { goto &simple_readchar_expression_loop; };
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != ')') { goto &simple_readchar_expression_invalid; };
-	# Checking for argument count
-	if (vector_size(x0) < 2) { goto &simple_readchar_expression_not_enough; };
-	if (vector_size(x0) > 2) { goto &simple_readchar_expression_too_many; };
+	if (x0 != ',') { goto &simple_readchar_expression_invalid; };
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Fetching index expression
+	x2 = expression(a0, x0);
+	# Fetching next token
+	x0 = parser_lex(a0);
+	# Checking for correct syntax
+	if (x0 != ')') { goto &simple_readchar_expression_invalid; };
 	# Returning expression
-	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_READCHAR, x0)));
+	return(simple_postfix_expression(a0, tuple3(STMT_EXPR_READCHAR, x1, x2)));
 label simple_readchar_expression_invalid;
 	parser_error(a0, "Invalid readchar expression");
-label simple_readchar_expression_not_enough;
-	parser_error(a0, "Not enough arguments in readchar expression");
-label simple_readchar_expression_too_many;
-	parser_error(a0, "Too many arguments in readchar expression");
 };
 
 ## Parse simple parantheses expression
@@ -3008,8 +2869,6 @@ simple_address_call_expression : (a0, a1) {
 	allocate(3);
 	# Allocating operand vector
 	x0 = vector(0, 1);
-	# Pushing expression to operand vector
-	vector_push(x0, a1);
 label simple_address_call_expression_loop;
 	# Fetching next token
 	x1 = parser_lex(a0);
@@ -3027,7 +2886,7 @@ label simple_address_call_expression_loop;
 	if (x1 != ')') { goto &simple_address_call_expression_invalid; };
 label simple_address_call_expression_end;
 	# Returning expression
-	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_CALL, x0)));
+	return(simple_postfix_expression(a0, tuple3(STMT_EXPR_CALL, a1, x0)));
 label simple_address_call_expression_invalid;
 	parser_error(a0, "Call expression is not closed");
 };
@@ -3037,26 +2896,19 @@ label simple_address_call_expression_invalid;
 # a1 - expression
 # @return statement
 simple_address_index_expression : (a0, a1) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 2);
-	# Pushing expression to operand vector
-	vector_push(x0, a1);
+	# x0 - next token
+	# x1 - expression
+	allocate(2);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Fetching expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
+	x1 = expression(a0, x0);
 	# Fetching next token
-	x1 = parser_lex(a0);
+	x0 = parser_lex(a0);
 	# Checking for correct syntax
-	if (x1 != ']') { goto &simple_address_index_expression_invalid; };
+	if (x0 != ']') { goto &simple_address_index_expression_invalid; };
 	# Returning expression
-	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_INDEX, x0)));
+	return(simple_postfix_expression(a0, tuple3(STMT_EXPR_INDEX, a1, x1)));
 label simple_address_index_expression_invalid;
 	parser_error(a0, "Index expression is not closed");
 };
@@ -3077,14 +2929,8 @@ constant_expression : (a0, a1) {
 # a0 - parser
 # @return statement
 constant_integer_expression : (a0) {
-	# x0 - ops vector
-	allocate(1);
-	# Allocating operand vector
-	x0 = vector(0, 1);
-	# Pushing value to vector
-	vector_push(x0, lexer_token_value(parser_lexer(a0)));
 	# Returning basic integer expression
-	return(tuple2(STMT_EXPR_INTEGER, x0));
+	return(tuple2(STMT_EXPR_INTEGER, lexer_token_value(parser_lexer(a0))));
 };
 
 ## Parse constant string expression
@@ -3092,16 +2938,11 @@ constant_integer_expression : (a0) {
 # @return statement
 constant_string_expression : (a0) {
 	# x0 - duplicated string
-	# x1 - ops vector
-	allocate(2);
+	allocate(1);
 	# Duplicating the string
 	x0 = strdup(lexer_token_text(parser_lexer(a0)));
-	# Allocating operand vector
-	x1 = vector(0, 1);
-	# Pushing value to vector
-	vector_push(x1, x0);
 	# Returning expression
-	return(tuple2(STMT_EXPR_STRING, x1));
+	return(tuple2(STMT_EXPR_STRING, x0));
 };
 
 ## Debug AST
@@ -3319,7 +3160,7 @@ main : (a0, a1) {
 	# Resetting index
 	x4 = 0;
 	while (x4 < vector_size(x3)) {
-		debug_ast(vector_get(x3, x4), 0);
+		#debug_ast(vector_get(x3, x4), 0);
 		x4 = x4 + 1;
 	};
 	return(a0);
