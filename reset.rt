@@ -2966,7 +2966,7 @@ debug_ast : (a0, a1) {
 	if (x0 == STMT_EXPR_READCHAR)     { puts("READCHAR:");   x2 = 2; goto &debug_ast_children; };
 
 	if (x0 == STMT_EXPR_CALL)         { puts("():");         goto &debug_ast_vector_children; };
-	if (x0 == STMT_EXPR_INDEX)        { puts("[]:");         goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_INDEX)        { puts("[]:");         x2 = 2; goto &debug_ast_children; };
 
 	if (x0 == STMT_EXPR_PLUS)         { puts("+:");          goto &debug_ast_children; };
 	if (x0 == STMT_EXPR_MINUS)        { puts("-:");          goto &debug_ast_children; };
