@@ -988,12 +988,11 @@ TOKEN_ASUB  => 310;
 TOKEN_AMUL  => 311;
 TOKEN_ADIV  => 312;
 TOKEN_AMOD  => 313;
-TOKEN_ANOT  => 314;
-TOKEN_AAND  => 315;
-TOKEN_AXOR  => 316;
-TOKEN_AOR   => 317;
-TOKEN_ASHL  => 318;
-TOKEN_ASHR  => 319;
+TOKEN_AAND  => 314;
+TOKEN_AXOR  => 315;
+TOKEN_AOR   => 316;
+TOKEN_ASHL  => 317;
+TOKEN_ASHR  => 318;
 ## Char table
 char_table : [
 	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -1422,10 +1421,6 @@ label lx17;
 		};
 	};
 
-	if (x0 == '~') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ANOT); };
-	};
-
 	if (x0 == '^') {
 		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AXOR); };
 	};
@@ -1535,31 +1530,30 @@ STMT_EXPR_SUB_ASSIGN  => 36;
 STMT_EXPR_MUL_ASSIGN  => 37;
 STMT_EXPR_DIV_ASSIGN  => 38;
 STMT_EXPR_MOD_ASSIGN  => 39;
-STMT_EXPR_NOT_ASSIGN  => 40;
-STMT_EXPR_AND_ASSIGN  => 41;
-STMT_EXPR_XOR_ASSIGN  => 42;
-STMT_EXPR_OR_ASSIGN   => 43;
-STMT_EXPR_SHL_ASSIGN  => 44;
-STMT_EXPR_SHR_ASSIGN  => 45;
+STMT_EXPR_AND_ASSIGN  => 40;
+STMT_EXPR_XOR_ASSIGN  => 41;
+STMT_EXPR_OR_ASSIGN   => 42;
+STMT_EXPR_SHL_ASSIGN  => 43;
+STMT_EXPR_SHR_ASSIGN  => 44;
 # Statements
-STMT_IF               => 46;
-STMT_WHILE            => 47;
-STMT_ALLOCATE         => 48;
-STMT_RETURN           => 49;
-STMT_SYSCALL          => 50;
-STMT_WRITECHAR        => 51;
-STMT_LABEL            => 52;
-STMT_GOTO             => 53;
+STMT_IF               => 45;
+STMT_WHILE            => 46;
+STMT_ALLOCATE         => 47;
+STMT_RETURN           => 48;
+STMT_SYSCALL          => 49;
+STMT_WRITECHAR        => 50;
+STMT_LABEL            => 51;
+STMT_GOTO             => 52;
 # Block statement
-STMT_BLOCK            => 54;
+STMT_BLOCK            => 53;
 # Top level statements
-STMT_GLOBAL           => 55;
-STMT_MACRO            => 56;
-STMT_FUN_DECL         => 57;
-STMT_ARRAY_DECL       => 58;
-STMT_CHAR_ARRAY_DECL  => 59;
-STMT_INT_ARRAY_DECL   => 60;
-STMT_VAR_DECL         => 61;
+STMT_GLOBAL           => 54;
+STMT_MACRO            => 55;
+STMT_FUN_DECL         => 56;
+STMT_ARRAY_DECL       => 57;
+STMT_CHAR_ARRAY_DECL  => 58;
+STMT_INT_ARRAY_DECL   => 59;
+STMT_VAR_DECL         => 60;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2042,7 +2036,7 @@ while_statement : (a0) {
 	# Fetching block statement
 	x2 = block_statement(a0, x0);
 	# Return statement
-	return(tuple4(STMT_WHILE, x0, x1, x2));
+	return(tuple3(STMT_WHILE, x1, x2));
 label while_statement_invalid;
 	parser_error(a0, "Invalid while statement syntax");
 };
@@ -2204,7 +2198,6 @@ assignment_expression : (a0, a1) {
 	if (x1 == TOKEN_AMUL) { return(assignment_expr(a0, x0, STMT_EXPR_MUL_ASSIGN)); };
 	if (x1 == TOKEN_ADIV) { return(assignment_expr(a0, x0, STMT_EXPR_DIV_ASSIGN)); };
 	if (x1 == TOKEN_AMOD) { return(assignment_expr(a0, x0, STMT_EXPR_MOD_ASSIGN)); };
-	if (x1 == TOKEN_ANOT) { return(assignment_expr(a0, x0, STMT_EXPR_NOT_ASSIGN)); };
 	if (x1 == TOKEN_AAND) { return(assignment_expr(a0, x0, STMT_EXPR_AND_ASSIGN)); };
 	if (x1 == TOKEN_AXOR) { return(assignment_expr(a0, x0, STMT_EXPR_XOR_ASSIGN)); };
 	if (x1 == TOKEN_AOR)  { return(assignment_expr(a0, x0, STMT_EXPR_OR_ASSIGN)); };
@@ -2869,6 +2862,8 @@ simple_address_call_expression : (a0, a1) {
 	allocate(3);
 	# Allocating operand vector
 	x0 = vector(0, 1);
+	# Pushing expression to operand vector
+	vector_push(x0, a1);
 label simple_address_call_expression_loop;
 	# Fetching next token
 	x1 = parser_lex(a0);
@@ -2886,7 +2881,7 @@ label simple_address_call_expression_loop;
 	if (x1 != ')') { goto &simple_address_call_expression_invalid; };
 label simple_address_call_expression_end;
 	# Returning expression
-	return(simple_postfix_expression(a0, tuple3(STMT_EXPR_CALL, a1, x0)));
+	return(simple_postfix_expression(a0, tuple2(STMT_EXPR_CALL, x0)));
 label simple_address_call_expression_invalid;
 	parser_error(a0, "Call expression is not closed");
 };
@@ -2949,97 +2944,94 @@ constant_string_expression : (a0) {
 # a0 - AST
 # a1 - depth
 debug_ast : (a0, a1) {
-	# x0 - i
-	# x1 - statement ID
-	allocate(2);
-	# Printing whitespaces
+	# x0 - index / statement id
+	# x1 - children pos
+	# x2 - children count
+	allocate(3);
+	# Indenting
 	x0 = 0;
-	while (x0 < a1) { putc(' '); x0 = x0 + 1; };
-	# Resetting index
-	x0 = 0;
-	# Get statement ID
-	x1 = a0[NODE_TYPE];
-	# Printing expressions
-	if (x1 == STMT_EXPR_INTEGER)   { puts("INTEGER: ");  putd(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_STRING)    { puts("STRING: ");   puts(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_IDENTIFIER){puts("IDENTIFIER: ");puts(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_ARGUMENT)  { puts("ARGUMENT: "); putd(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_VARIABLE)  { puts("VARIABLE: "); putd(vector_get(a0[1], 0)); };
-	if (x1 == STMT_EXPR_SYSCALL)   { puts("syscall: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_READCHAR)  { puts("readchar: "); goto &debug_ast_children; };
+	while (x0 < a1) { putc('\t'); x0 = x0 + 1; };
+	# Preparing for printing
+	x0 = a0[NODE_TYPE];
+	x1 = 1;
+	x2 = 1;
 
-	if (x1 == STMT_EXPR_CALL)      { puts("(): "); goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_INDEX)     { puts("[]: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_INTEGER)      { puts("INTEGER: ");   putd(a0[1]); };
+	if (x0 == STMT_EXPR_STRING)       { puts("STRING: ");    puts(a0[1]); };
+	if (x0 == STMT_EXPR_IDENTIFIER)   { puts("IDENTIFIER: ");puts(a0[1]); };
+	if (x0 == STMT_EXPR_ARGUMENT)     { puts("ARGUMENT: ");  putd(a0[1]); };
+	if (x0 == STMT_EXPR_VARIABLE)     { puts("VARIABLE: ");  putd(a0[1]); };
 
-	if (x1 == STMT_EXPR_PLUS)        { puts("+: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_MINUS)       { puts("-: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_LOGICAL_NOT) { puts("!: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_NOT)         { puts("~: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_DEREF)       { puts("*: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_ADDROF)      { puts("&: ");  goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SYSCALL)      { puts("SYSCALL:");    goto &debug_ast_vector_children; };
+	if (x0 == STMT_EXPR_READCHAR)     { puts("READCHAR:");   x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_ADD)     { puts("+: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_SUB)     { puts("-: ");  goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_CALL)         { puts("():");         goto &debug_ast_vector_children; };
+	if (x0 == STMT_EXPR_INDEX)        { puts("[]:");         goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_MUL)     { puts("*: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_DIV)     { puts("/: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_MOD)     { puts("%: ");  goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_PLUS)         { puts("+:");          goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_MINUS)        { puts("-:");          goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_LOGICAL_NOT)  { puts("!:");          goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_NOT)          { puts("~:");          goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_DEREF)        { puts("*:");          goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_ADDROF)       { puts("&:");          goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_SHL)     { puts("<<: "); goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_SHR)     { puts(">>: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_ADD)          { puts("+:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SUB)          { puts("-:");          x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_LESS)    { puts("<: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_GREATER) { puts(">: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_LE)      { puts("<=: "); goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_GE)      { puts(">=: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_MUL)          { puts("*:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_DIV)          { puts("/:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_MOD)          { puts("%:");          x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_EQ)      { puts("==: "); goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_NE)      { puts("!=: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SHL)          { puts("<<:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SHR)          { puts(">>:");         x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_AND)     { puts("&: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_XOR)     { puts("^: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_OR)      { puts("|: ");  goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_LESS)         { puts("<:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_GREATER)      { puts(">:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_LE)           { puts("<=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_GE)           { puts(">=:");         x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_LOGICAL_AND) { puts("&&: "); goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_LOGICAL_OR)  { puts("||: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_EQ)           { puts("==:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_NE)           { puts("!=:");         x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_TERNARY)     { puts("?: ");  goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_AND)          { puts("&:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_XOR)          { puts("^:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_OR)           { puts("|:");          x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_EXPR_ASSIGN)     { puts("=: ");   goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_ADD_ASSIGN) { puts("+=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_SUB_ASSIGN) { puts("-=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_MUL_ASSIGN) { puts("*=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_DIV_ASSIGN) { puts("/=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_MOD_ASSIGN) { puts("%=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_NOT_ASSIGN) { puts("~=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_AND_ASSIGN) { puts("&=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_XOR_ASSIGN) { puts("^=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_OR_ASSIGN)  { puts("|=: ");  goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_SHL_ASSIGN) { puts("<<=: "); goto &debug_ast_children; };
-	if (x1 == STMT_EXPR_SHR_ASSIGN) { puts(">>=: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_LOGICAL_AND)  { puts("&&:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_LOGICAL_OR)   { puts("||:");         x2 = 2; goto &debug_ast_children; };
 
-	# Printing statements
-	if (x1 == STMT_IF)        { puts("if: ");        goto &debug_ast_children; };
-	if (x1 == STMT_WHILE)     { puts("while: ");     goto &debug_ast_children; };
-	if (x1 == STMT_ALLOCATE)  { puts("allocate: ");  goto &debug_ast_children; };
-	if (x1 == STMT_RETURN)    { puts("return: ");    goto &debug_ast_children; };
-	if (x1 == STMT_SYSCALL)   { puts("syscall: ");   goto &debug_ast_children; };
-	if (x1 == STMT_WRITECHAR) { puts("writechar: "); goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_TERNARY)      { puts("?:");          x2 = 3; goto &debug_ast_children; };
 
-	if (x1 == STMT_LABEL) {
-		puts("LABEL: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-	};
+	if (x0 == STMT_EXPR_ASSIGN)       { puts("=:");          x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_ADD_ASSIGN)   { puts("+=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SUB_ASSIGN)   { puts("-=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_MUL_ASSIGN)   { puts("*=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_DIV_ASSIGN)   { puts("/=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_MOD_ASSIGN)   { puts("%=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_AND_ASSIGN)   { puts("&=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_XOR_ASSIGN)   { puts("^=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_OR_ASSIGN)    { puts("|=:");         x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SHL_ASSIGN)   { puts(">>=:");        x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_EXPR_SHR_ASSIGN)   { puts("<<=:");        x2 = 2; goto &debug_ast_children; };
 
-	if (x1 == STMT_GOTO)      { puts("GOTO: ");      goto &debug_ast_children; };
-	if (x1 == STMT_BLOCK)     { puts("BLOCK: ");     goto &debug_ast_children; };
+	if (x0 == STMT_IF)                { puts("if:");         goto &debug_ast_vector_children; };
+	if (x0 == STMT_WHILE)             { puts("while:");      x2 = 2; goto &debug_ast_children; };
+	if (x0 == STMT_ALLOCATE)          { puts("allocate:");   goto &debug_ast_children; };
+	if (x0 == STMT_RETURN)            { puts("return:");     goto &debug_ast_vector_children; };
+	if (x0 == STMT_SYSCALL)           { puts("syscall:");    goto &debug_ast_vector_children; };
+	if (x0 == STMT_WRITECHAR)         { puts("writechar:");  x2 = 3; goto &debug_ast_children; };
 
-	if (x1 == STMT_GLOBAL)    {
+	if (x0 == STMT_LABEL)             { puts("LABEL:");      puts(a0[1]); };
+	if (x0 == STMT_GOTO)              { puts("GOTO:");       goto &debug_ast_children; };
+
+	if (x0 == STMT_BLOCK)             { puts("BLOCK:");      goto &debug_ast_vector_children; };
+
+	if (x0 == STMT_GLOBAL) {
 		puts("GLOBAL: ");
 		# Printing global symbols
+		x0 = 0;
 		while (x0 < vector_size(a0[1])) {
-			# Printing comma, if not first element
+			# Printing comma
 			if (x0 != 0) { puts(", "); };
 			# Printing identifier
 			puts(vector_get(a0[1], x0));
@@ -3048,67 +3040,61 @@ debug_ast : (a0, a1) {
 		};
 	};
 
-	if (x1 == STMT_MACRO) {
+	if (x0 == STMT_MACRO) {
 		puts("MACRO: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-		# Starting from second element
-		x0 = 1;
-		# Print child
+		# Printing identifier
+		puts(a0[1]);
+		# Printing value
+		x1 = 2;
 		goto &debug_ast_children;
 	};
 
-	if (x1 == STMT_FUN_DECL) {
+	if (x0 == STMT_FUN_DECL) {
 		puts("FUNC: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-		# Print number of arguments
+		# Printing identifier
+		puts(a0[1]);
+		# Printing number of arguments
 		puts(" (");
-		putd(vector_get(a0[1], 1));
+		putd(a0[2]);
 		putc(')');
-		# Starting from third element
-		x0 = 2;
-		# Print child
+		# Printing block statement
+		x1 = 3;
 		goto &debug_ast_children;
 	};
 
-	if (x1 == STMT_VAR_DECL) {
-		puts("VAR: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-		# Starting from second element
-		x0 = 1;
-		# Print child
-		goto &debug_ast_children;
-	};
-
-	if (x1 == STMT_ARRAY_DECL) {
+	if (x0 == STMT_ARRAY_DECL) {
 		puts("ARRAY: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-		# Starting from second element
-		x0 = 1;
-		# Print children
-		goto &debug_ast_children;
+		# Printing identifier
+		puts(a0[1]);
+		# Printing array
+		x1 = 2;
+		goto &debug_ast_vector_children;
 	};
 
-	if (x1 == STMT_CHAR_ARRAY_DECL) {
+	if (x0 == STMT_CHAR_ARRAY_DECL) {
 		puts("CHAR_ARRAY: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-		# Starting from second element
-		x0 = 1;
-		# Print children
+		# Printing identifier
+		puts(a0[1]);
+		# Printing size
+		x1 = 2;
 		goto &debug_ast_children;
 	};
 
-	if (x1 == STMT_INT_ARRAY_DECL) {
+	if (x0 == STMT_INT_ARRAY_DECL) {
 		puts("INT_ARRAY: ");
-		# Print identifier
-		puts(vector_get(a0[1], 0));
-		# Starting from second element
-		x0 = 1;
-		# Print children
+		# Printing identifier
+		puts(a0[1]);
+		# Printing size
+		x1 = 2;
+		goto &debug_ast_children;
+	};
+
+	if (x0 == STMT_VAR_DECL) {
+		puts("VAR: ");
+		# Printing identifier
+		puts(a0[1]);
+		# Printing value
+		x1 = 2;
 		goto &debug_ast_children;
 	};
 
@@ -3118,9 +3104,21 @@ label debug_ast_exit;
 label debug_ast_children;
 	putc('\n');
 	# Debugging children
-	while (x0 < vector_size(a0[1])) {
+	x0 = 0;
+	while (x0 < x2) {
 		# Debugging child
-		debug_ast(vector_get(a0[1], x0), a1 + 2);
+		debug_ast(a0[x1 + x0], a1 + 1);
+		x0 = x0 + 1;
+	};
+	# Exitting
+	goto &debug_ast_exit;
+label debug_ast_vector_children;
+	putc('\n');
+	# Debugging children
+	x0 = 0;
+	while (x0 < vector_size(a0[x1])) {
+		# Debugging child
+		debug_ast(vector_get(a0[x1], x0), a1 + 1);
 		x0 = x0 + 1;
 	};
 	# Exitting
@@ -3160,7 +3158,7 @@ main : (a0, a1) {
 	# Resetting index
 	x4 = 0;
 	while (x4 < vector_size(x3)) {
-		#debug_ast(vector_get(x3, x4), 0);
+		debug_ast(vector_get(x3, x4), 0);
 		x4 = x4 + 1;
 	};
 	return(a0);
