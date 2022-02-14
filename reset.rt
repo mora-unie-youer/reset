@@ -163,7 +163,7 @@ malloc : (a0) {
 	# Setting address
 	x0 = free_start;
 	# Moving free segment pointer
-	free_start = align(x0 + a0, 8);
+	free_start = x0 + a0;
 	# Returning memory address
 	return(x0);
 };
@@ -435,7 +435,7 @@ tuple7 : (a0, a1, a2, a3, a4, a5, a6) {
 tuple8 : (a0, a1, a2, a3, a4, a5, a6, a7) {
 	# x0 - tuple
 	allocate(1);
-	x0 = allocate_tuple(7);
+	x0 = allocate_tuple(8);
 	# Fill tuple
 	x0[0] = a0;
 	x0[1] = a1;
