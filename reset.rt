@@ -2970,12 +2970,21 @@ compiler_error : (a0, a1) {
 compiler_compile : (a0, a1) {
 	# x0 - i
 	allocate(1);
+	# Using macros in AST instead of matching identifiers
+	use_macro_statements(a0, a1);
 	# Resetting index
 	x0 = 0;
 	while (x0 < vector_size(a1)) {
 		compile_top_level_statement(a0, vector_get(a1, x0));
 		x0 = x0 + 1;
 	};
+};
+
+## Use macros instead of identifiers matching their name
+# a0 - compiler
+# a1 - AST
+use_macro_statements : (a0, a1) {
+	compiler_error(a0, "Using macros is not implemented yet.");
 };
 
 ## Compile top level statement
