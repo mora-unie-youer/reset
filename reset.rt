@@ -937,6 +937,10 @@ LEX_HOLD   => 4;
 LEX_TID    => 5;
 LEX_TVALUE => 6;
 LEX_TTEXT  => 7;
+## Token location parts
+LOC_FILE   => 0;
+LOC_LINE   => 1;
+LOC_COLUMN => 2;
 ### Token IDs
 TOKEN_END        => 256;
 TOKEN_INTEGER    => 257;
@@ -1147,6 +1151,13 @@ lexer_token_length : (a0) { return(vector_size(a0[LEX_TTEXT])); };
 # @return token value
 lexer_token_value : (a0) { return(a0[LEX_TVALUE]); };
 
+## Get token location
+# a0 - lexer
+# @return token location
+lexer_token_location : (a0) {
+	return(tuple3(a0[LEX_FILE], a0[LEX_LINE], a0[LEX_COLUMN]));
+};
+
 ## Hold token
 # a0 - lexer
 lexer_hold : (a0) {
@@ -1164,15 +1175,15 @@ lexer_reset_token : (a0) {
 	char_vector_push(a0[LEX_TTEXT], '\0');
 };
 
-## Print location to channel
-# a0 - lexer
-# a1 - channel
-lexer_fputloc : (a0, a1) {
-	fputs(a1, a0[LEX_FILE]);
+## Print token location to output channel
+# a0 - token location
+# a1 - output channel
+fputloc : (a0, a1) {
+	fputs(a1, a0[LOC_FILE]);
 	fputc(a1, ':');
-	fputn(a1, a0[LEX_LINE], 10);
+	fputn(a1, a0[LOC_LINE], 10);
 	fputc(a1, ':');
-	fputn(a1, a0[LEX_COLUMN] - lexer_token_length(a0) + 1, 10);
+	fputn(a1, a0[LOC_COLUMN], 10);
 };
 
 ## Print lexer error
@@ -1180,7 +1191,7 @@ lexer_fputloc : (a0, a1) {
 # a1 - error message
 lexer_error : (a0, a1) {
 	# Printing location
-	lexer_fputloc(a0, stderr);
+	fputloc(lexer_token_location(a0), stderr);
 	eputs(": ");
 	# Printing message
 	eputs(a1);
@@ -1564,6 +1575,13 @@ parser : (a0) { return(tuple2(list(a0), FALSE)); };
 # a0 - parser
 # @return lexer
 parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
+
+## Get current token location
+# a0 - parser
+# @return token location
+parser_token_location : (a0) {
+	return(lexer_token_location(parser_lexer(a0)));
+};
 
 ## Hold current lexer in parser
 # a0 - parser
