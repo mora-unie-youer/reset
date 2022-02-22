@@ -339,7 +339,7 @@ strlitdup : (a0) {
 ## Allocate tuple
 # a0 - size
 # @return allocated tuple
-allocate_tuple : (a0) { return malloc(4 * a0); };
+allocate_tuple : (a0) { return(malloc(4 * a0)); };
 
 ## Make tuple with 1 value
 # a0 - value
@@ -2959,11 +2959,17 @@ compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
 # a1 - AST
 compiler_compile : (a0, a1) {
 	# x0 - output chan
-	allocate(1);
+	# x1 - i
+	allocate(2);
 	# Getting output chan
 	x0 = compiler_output_chan(a0);
-	# Writing something to output file
-	fputs(x0, "Hello, world\n");
+	# Resetting index
+	x1 = 0;
+	while (x1 < vector_size(a1)) {
+		# Writing something to output file
+		fputs(x0, "Hello, world\n");
+		x1 = x1 + 1;
+	};
 };
 
 ## Print usage
