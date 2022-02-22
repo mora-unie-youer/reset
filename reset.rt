@@ -2954,22 +2954,92 @@ compiler : (a0) { return(tuple1(a0)); };
 # @return output channel
 compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
 
+## Print compiler error
+# a0 - compiler
+# a1 - error message
+compiler_error : (a0, a1) {
+	eputs("ERROR: ");
+	eputs(a1);
+	eputc('\n');
+	exit(1);
+};
+
 ## Compile AST
 # a0 - compiler
 # a1 - AST
 compiler_compile : (a0, a1) {
-	# x0 - output chan
-	# x1 - i
-	allocate(2);
-	# Getting output chan
-	x0 = compiler_output_chan(a0);
+	# x0 - i
+	allocate(1);
 	# Resetting index
-	x1 = 0;
-	while (x1 < vector_size(a1)) {
-		# Writing something to output file
-		fputs(x0, "Hello, world\n");
-		x1 = x1 + 1;
+	x0 = 0;
+	while (x0 < vector_size(a1)) {
+		compile_top_level_statement(a0, vector_get(a1, x0));
+		x0 = x0 + 1;
 	};
+};
+
+## Compile top level statement
+# a0 - compiler
+# a1 - top level statement
+compile_top_level_statement : (a0, a1) {
+	# x0 - statement ID
+	allocate(1);
+	# Getting statement ID
+	x0 = a1[NODE_TYPE];
+	# Compiling global statement
+	if (x0 == STMT_GLOBAL)          { compile_global_statement(a0, a1); };
+	# Compiling function declaration
+	if (x0 == STMT_FUN_DECL)        { compile_function_declaration(a0, a1); };
+	# Compiling array declaration
+	if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); };
+	# Compiling char array declaration
+	if (x0 == STMT_CHAR_ARRAY_DECL) { compile_char_array_declaration(a0, a1); };
+	# Compiling int array declaration
+	if (x0 == STMT_INT_ARRAY_DECL)  { compile_int_array_declaration(a0, a1); };
+	# Compiling variable declaration
+	if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
+};
+
+## Compile global statement
+# a0 - compiler
+# a1 - statement
+compile_global_statement : (a0, a1) {
+	compiler_error(a0, "Compilation of global statements is not implemented yet.");
+};
+
+## Compile function declaration
+# a0 - compiler
+# a1 - statement
+compile_function_declaration : (a0, a1) {
+	compiler_error(a0, "Compilation of function declarations is not implemented yet.");
+};
+
+## Compile array declaration
+# a0 - compiler
+# a1 - statement
+compile_array_declaration : (a0, a1) {
+	compiler_error(a0, "Compilation of array declarations is not implemented yet.");
+};
+
+## Compile char array declaration
+# a0 - compiler
+# a1 - statement
+compile_char_array_declaration : (a0, a1) {
+	compiler_error(a0, "Compilation of char array declarations is not implemented yet.");
+};
+
+## Compile int array declaration
+# a0 - compiler
+# a1 - statement
+compile_int_array_declaration : (a0, a1) {
+	compiler_error(a0, "Compilation of int array declarations is not implemented yet.");
+};
+
+## Compile variable declaration
+# a0 - compiler
+# a1 - statement
+compile_variable_declaration : (a0, a1) {
+	compiler_error(a0, "Compilation of variable declarations is not implemented yet.");
 };
 
 ## Print usage
