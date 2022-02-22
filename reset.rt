@@ -2940,189 +2940,30 @@ constant_string_expression : (a0) {
 	return(tuple2(STMT_EXPR_STRING, x0));
 };
 
-## Debug AST
-# a0 - AST
-# a1 - depth
-debug_ast : (a0, a1) {
-	# x0 - index / statement id
-	# x1 - children pos
-	# x2 - children count
-	allocate(3);
-	# Indenting
-	x0 = 0;
-	while (x0 < a1) { putc('\t'); x0 = x0 + 1; };
-	# Preparing for printing
-	x0 = a0[NODE_TYPE];
-	x1 = 1;
-	x2 = 1;
+### Compiler
+## Compiler parts
+COM_OCHAN => 0;
 
-	if (x0 == STMT_EXPR_INTEGER)      { puts("INTEGER: ");   putd(a0[1]); };
-	if (x0 == STMT_EXPR_STRING)       { puts("STRING: ");    puts(a0[1]); };
-	if (x0 == STMT_EXPR_IDENTIFIER)   { puts("IDENTIFIER: ");puts(a0[1]); };
-	if (x0 == STMT_EXPR_ARGUMENT)     { puts("ARGUMENT: ");  putd(a0[1]); };
-	if (x0 == STMT_EXPR_VARIABLE)     { puts("VARIABLE: ");  putd(a0[1]); };
+## Create new compiler
+# a0 - output chan
+# @return parser
+compiler : (a0) { return(tuple1(a0)); };
 
-	if (x0 == STMT_EXPR_SYSCALL)      { puts("SYSCALL:");    goto &debug_ast_vector_children; };
-	if (x0 == STMT_EXPR_READCHAR)     { puts("READCHAR:");   x2 = 2; goto &debug_ast_children; };
+## Compiler's output channel
+# a0 - compiler
+# @return output channel
+compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
 
-	if (x0 == STMT_EXPR_CALL)         { puts("():");         goto &debug_ast_vector_children; };
-	if (x0 == STMT_EXPR_INDEX)        { puts("[]:");         x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_PLUS)         { puts("+:");          goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_MINUS)        { puts("-:");          goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_LOGICAL_NOT)  { puts("!:");          goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_NOT)          { puts("~:");          goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_DEREF)        { puts("*:");          goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_ADDROF)       { puts("&:");          goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_ADD)          { puts("+:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_SUB)          { puts("-:");          x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_MUL)          { puts("*:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_DIV)          { puts("/:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_MOD)          { puts("%:");          x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_SHL)          { puts("<<:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_SHR)          { puts(">>:");         x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_LESS)         { puts("<:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_GREATER)      { puts(">:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_LE)           { puts("<=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_GE)           { puts(">=:");         x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_EQ)           { puts("==:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_NE)           { puts("!=:");         x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_AND)          { puts("&:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_XOR)          { puts("^:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_OR)           { puts("|:");          x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_LOGICAL_AND)  { puts("&&:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_LOGICAL_OR)   { puts("||:");         x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_TERNARY)      { puts("?:");          x2 = 3; goto &debug_ast_children; };
-
-	if (x0 == STMT_EXPR_ASSIGN)       { puts("=:");          x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_ADD_ASSIGN)   { puts("+=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_SUB_ASSIGN)   { puts("-=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_MUL_ASSIGN)   { puts("*=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_DIV_ASSIGN)   { puts("/=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_MOD_ASSIGN)   { puts("%=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_AND_ASSIGN)   { puts("&=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_XOR_ASSIGN)   { puts("^=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_OR_ASSIGN)    { puts("|=:");         x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_SHL_ASSIGN)   { puts(">>=:");        x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_EXPR_SHR_ASSIGN)   { puts("<<=:");        x2 = 2; goto &debug_ast_children; };
-
-	if (x0 == STMT_IF)                { puts("if:");         goto &debug_ast_vector_children; };
-	if (x0 == STMT_WHILE)             { puts("while:");      x2 = 2; goto &debug_ast_children; };
-	if (x0 == STMT_ALLOCATE)          { puts("allocate:");   goto &debug_ast_children; };
-	if (x0 == STMT_RETURN)            { puts("return:");     goto &debug_ast_vector_children; };
-	if (x0 == STMT_SYSCALL)           { puts("syscall:");    goto &debug_ast_vector_children; };
-	if (x0 == STMT_WRITECHAR)         { puts("writechar:");  x2 = 3; goto &debug_ast_children; };
-
-	if (x0 == STMT_LABEL)             { puts("LABEL:");      puts(a0[1]); };
-	if (x0 == STMT_GOTO)              { puts("GOTO:");       goto &debug_ast_children; };
-
-	if (x0 == STMT_BLOCK)             { puts("BLOCK:");      goto &debug_ast_vector_children; };
-
-	if (x0 == STMT_GLOBAL) {
-		puts("GLOBAL: ");
-		# Printing global symbols
-		x0 = 0;
-		while (x0 < vector_size(a0[1])) {
-			# Printing comma
-			if (x0 != 0) { puts(", "); };
-			# Printing identifier
-			puts(vector_get(a0[1], x0));
-			# Moving to next symbol
-			x0 = x0 + 1;
-		};
-	};
-
-	if (x0 == STMT_MACRO) {
-		puts("MACRO: ");
-		# Printing identifier
-		puts(a0[1]);
-		# Printing value
-		x1 = 2;
-		goto &debug_ast_children;
-	};
-
-	if (x0 == STMT_FUN_DECL) {
-		puts("FUNC: ");
-		# Printing identifier
-		puts(a0[1]);
-		# Printing number of arguments
-		puts(" (");
-		putd(a0[2]);
-		putc(')');
-		# Printing block statement
-		x1 = 3;
-		goto &debug_ast_children;
-	};
-
-	if (x0 == STMT_ARRAY_DECL) {
-		puts("ARRAY: ");
-		# Printing identifier
-		puts(a0[1]);
-		# Printing array
-		x1 = 2;
-		goto &debug_ast_vector_children;
-	};
-
-	if (x0 == STMT_CHAR_ARRAY_DECL) {
-		puts("CHAR_ARRAY: ");
-		# Printing identifier
-		puts(a0[1]);
-		# Printing size
-		x1 = 2;
-		goto &debug_ast_children;
-	};
-
-	if (x0 == STMT_INT_ARRAY_DECL) {
-		puts("INT_ARRAY: ");
-		# Printing identifier
-		puts(a0[1]);
-		# Printing size
-		x1 = 2;
-		goto &debug_ast_children;
-	};
-
-	if (x0 == STMT_VAR_DECL) {
-		puts("VAR: ");
-		# Printing identifier
-		puts(a0[1]);
-		# Printing value
-		x1 = 2;
-		goto &debug_ast_children;
-	};
-
-	putc('\n');
-label debug_ast_exit;
-	return;
-label debug_ast_children;
-	putc('\n');
-	# Debugging children
-	x0 = 0;
-	while (x0 < x2) {
-		# Debugging child
-		debug_ast(a0[x1 + x0], a1 + 1);
-		x0 = x0 + 1;
-	};
-	# Exitting
-	goto &debug_ast_exit;
-label debug_ast_vector_children;
-	putc('\n');
-	# Debugging children
-	x0 = 0;
-	while (x0 < vector_size(a0[x1])) {
-		# Debugging child
-		debug_ast(vector_get(a0[x1], x0), a1 + 1);
-		x0 = x0 + 1;
-	};
-	# Exitting
-	goto &debug_ast_exit;
+## Compile AST
+# a0 - compiler
+# a1 - AST
+compiler_compile : (a0, a1) {
+	# x0 - output chan
+	allocate(1);
+	# Getting output chan
+	x0 = compiler_output_chan(a0);
+	# Writing something to output file
+	fputs(x0, "Hello, world\n");
 };
 
 ## Print usage
@@ -3139,29 +2980,30 @@ usage : (a0) {
 # @return exit code
 main : (a0, a1) {
 	# x0 - input channel
-	# x1 - lexer
-	# x2 - parser
-	# x3 - AST
-	# x4 - i
-	allocate(5);
+	# x1 - output channel
+	# x2 - lexer
+	# x3 - parser
+	# x4 - AST
+	# x5 - compiler
+	allocate(6);
 	# If no additional args - printing usage
 	if (a0 < 2) { usage(a1[0]); return(1); };
 	# TODO: implement option parser
 	# Creating input channel
 	x0 = input_chan_file(a1[1]);
+	# Creating output channel
+	x1 = output_chan_file("output.asm");
 	# Creating lexer
-	x1 = lexer(x0, a1[1]);
+	x2 = lexer(x0, a1[1]);
 	# Creating parser
-	x2 = parser(x1);
-	# Print address in memory of AST
-	x3 = parser_parse(x2);
-	# Resetting index
-	x4 = 0;
-	while (x4 < vector_size(x3)) {
-		debug_ast(vector_get(x3, x4), 0);
-		x4 = x4 + 1;
-	};
-	return(a0);
+	x3 = parser(x2);
+	# Parsing code to AST
+	x4 = parser_parse(x3);
+	# Creating compiler
+	x5 = compiler(x1);
+	# Compiling AST
+	compiler_compile(x5, x4);
+	return(0);
 };
 
 # Entry point of the entire program
