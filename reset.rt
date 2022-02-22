@@ -2971,9 +2971,10 @@ compiler_compile : (a0, a1) {
 	# x0 - i
 	allocate(1);
 	# Using macros in AST instead of matching identifiers
-	use_macro_statements(a0, a1);
+	compiler_use_macros(a0, a1);
 	# Resetting index
 	x0 = 0;
+	# Iterating through statements
 	while (x0 < vector_size(a1)) {
 		compile_top_level_statement(a0, vector_get(a1, x0));
 		x0 = x0 + 1;
@@ -2983,8 +2984,35 @@ compiler_compile : (a0, a1) {
 ## Use macros instead of identifiers matching their name
 # a0 - compiler
 # a1 - AST
-use_macro_statements : (a0, a1) {
+compiler_use_macros : (a0, a1) {
+	# x0 - i
+	# x1 - statement
+	allocate(2);
+	# Resetting index
+	x0 = 0;
+	# Iterating through statements
+	while (x0 < vector_size(a1)) {
+		# Getting current statement
+		x1 = vector_get(a1, x0);
+		# Checking if current statement is a macro
+		if (x1[NODE_TYPE] == STMT_MACRO) {
+			# Using macro in AST
+			compiler_use_macro(a0, a1, x0 + 1, x1);
+		};
+		# Moving to next statement
+		x0 = x0 + 1;
+	};
 	compiler_error(a0, "Using macros is not implemented yet.");
+};
+
+## Use macro in the rest of AST
+# a0 - compiler
+# a1 - AST
+# a2 - statement index
+# a3 - macro statement
+compiler_use_macro : (a0, a1, a2, a3) {
+	eputs(a3[1]);
+	eputc('\n');
 };
 
 ## Compile top level statement
