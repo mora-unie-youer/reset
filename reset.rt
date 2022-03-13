@@ -3169,8 +3169,8 @@ string_buffer_push : (a0, a1) {
   };
   # Copying string to buffer
   strcpy(a1, a0[STRBUF_BUFFER] + x1);
-  # Setting new offset and length
-  a0[STRBUF_OFFSET] = x0 + stresclen(a1) + 1;
+  # Setting new offset and length (strings are with "")
+  a0[STRBUF_OFFSET] = x0 + stresclen(a1) - 1;
   a0[STRBUF_LENGTH] = x1 + x2 + 1;
   # Returning old offset
   return(x0);
