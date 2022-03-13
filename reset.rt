@@ -3382,12 +3382,9 @@ compile_type_array_declaration : (a0, a1, a2) {
   fputs(x0, ".comm ");
   # Writing array name
   fputs(x0, a1[2]);
-  # Writing type size
-  fputc(x0, ',');
-  fputd(x0, a2);
-  fputc(x0, ',');
   # Writing array size
-  fputd(x0, x1[2]);
+  fputc(x0, ',');
+  fputd(x0, x1[2] * a2);
   # Writing new line to finish macro
   fputc(x0, '\n');
 };
