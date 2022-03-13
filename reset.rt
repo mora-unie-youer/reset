@@ -1915,28 +1915,23 @@ label array_declaration_invalid;
 # a3 - token location
 # @return statement
 type_array_declaration : (a0, a1, a2, a3) {
-  # x0 - ops vector
-  # x1 - next token
-  # x2 - expression
-  allocate(3);
-  # Allocating operand vector
-  x0 = vector(0, 1);
+  # x0 - next token
+  # x1 - expression
+  allocate(2);
   # Fetching next token
-  x1 = parser_lex(a0);
+  x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != '[') { goto &type_array_declaration_invalid; };
+  if (x0 != '[') { goto &type_array_declaration_invalid; };
   # Fetching next token
-  x1 = parser_lex(a0);
+  x0 = parser_lex(a0);
   # Fetching next expression
-  x2 = expression(a0, x1);
-  # Pushing expression to operand vector
-  vector_push(x0, x2);
+  x1 = expression(a0, x0);
   # Fetching next token
-  x1 = parser_lex(a0);
+  x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != ']') { goto &type_array_declaration_invalid; };
+  if (x0 != ']') { goto &type_array_declaration_invalid; };
   # Returning statement
-  return(tuple4(a2, a3, a1, x0));
+  return(tuple4(a2, a3, a1, x1));
 label type_array_declaration_invalid;
   parser_error(a0, a3, "Invalid char array declaration syntax");
 };
