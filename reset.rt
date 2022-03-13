@@ -3201,17 +3201,23 @@ string_buffer_export : (a0, a1) {
 
 ### Compiler
 ## Compiler parts
-COM_OCHAN => 0;
+COM_OCHAN  => 0;
+COM_STRBUF => 1;
 
 ## Create new compiler
 # a0 - output chan
 # @return compiler
-compiler : (a0) { return(tuple1(a0)); };
+compiler : (a0) { return(tuple2(a0, string_buffer())); };
 
-## Compiler's output channel
+## Get compiler's output channel
 # a0 - compiler
 # @return output channel
 compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
+
+## Get compiler's string buffer
+# a0 - compiler
+# @return string buffer
+compiler_string_buffer : (a0) { return(a0[COM_STRBUF]); };
 
 ## Print compiler error
 # a0 - compiler
@@ -3238,6 +3244,8 @@ compiler_compile : (a0, a1) {
     compile_top_level_statement(a0, vector_get(a1, x0));
     x0 = x0 + 1;
   };
+  # Exporting string buffer
+  string_buffer_export(a0[COM_STRBUF], a0[COM_OCHAN]);
 };
 
 ## Use macros instead of identifiers matching their name
