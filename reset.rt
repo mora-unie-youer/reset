@@ -3383,6 +3383,50 @@ compile_variable_declaration : (a0, a1) {
   compiler_error(a0, "Compilation of variable declarations is not implemented yet.");
 };
 
+## Compile simple value
+# a0 - compiler
+# a1 - statement
+compile_simple_value : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - compiler string buffer
+  # x2 - statement ID
+  # x3 - string buffer offset
+  allocate(4);
+  # Fetching compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching compiler string buffer
+  x1 = compiler_string_buffer(a0);
+  # Fetching statement ID
+  x2 = a1[NODE_TYPE];
+  # Checking if we can compile this statement
+  # TODO: check if statement can be precalculated, e.g. `2 + 2`
+  if (x2 == STMT_EXPR_INTEGER) {
+    # Writing integer
+    fputd(x0, a1[2]);
+    # Returning
+    return;
+  };
+
+  if (x2 == STMT_EXPR_STRING) {
+    # Pushing string to buffer and getting offset
+    x3 = string_buffer_push(x1, a1[2]);
+    # Writing string buffer address
+    fputs(x0, "strbuf+");
+    fputd(x0, x3);
+    # Returning
+    return;
+  };
+
+  if (x2 == STMT_EXPR_IDENTIFIER) {
+    # Writing identifier
+    fputs(x0, a1[2]);
+    # Returning
+    return;
+  };
+
+  compiler_error(a0, "Expression can't be compiled as simple.");
+};
+
 ## Print usage
 # a0 - program name
 usage : (a0) {
