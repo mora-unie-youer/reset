@@ -3141,6 +3141,37 @@ string_buffer_offset : (a0) { return(a0[STRBUF_OFFSET]); };
 # @return offset
 string_buffer_length : (a0) { return(a0[STRBUF_LENGTH]); };
 
+## Push string to string buffer
+# a0 - string buffer
+# a1 - string
+# @return string offset
+string_buffer_push : (a0, a1) {
+  # x0 - old offset
+  # x1 - old length
+  # x2 - string length
+  allocate(3);
+  # Fetching string buffer offset
+  x0 = string_buffer_offset(a0);
+  # Fetching string buffer length
+  x1 = string_buffer_length(a0);
+  # Getting length of string
+  x2 = strlen(a1);
+  # If buffer can't hold new string, printing error.
+  #  TODO: when `free` function will be done, reallocate buffer. For now it can
+  # take too much memory for our purposes.
+  if (x1 + x2 >= STRBUF_SIZE) {
+    eputs("ERROR: string buffer is full.\n");
+    exit(1);
+  };
+  # Copying string to buffer
+  strcpy(a1, a0[STRBUF_BUFFER] + x1);
+  # Setting new offset and length
+  a0[STRBUF_OFFSET] = x0 + stresclen(a1) + 1;
+  a0[STRBUF_LENGTH] = x1 + x2 + 1;
+  # Returning old offset
+  return(x0);
+};
+
 ### Compiler
 ## Compiler parts
 COM_OCHAN => 0;
