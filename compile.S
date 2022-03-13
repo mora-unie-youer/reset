@@ -1941,24 +1941,18 @@ _return_array_value:
 	jne _syntax_error
 	/* Restoring base address */
 	call popl_ebx
-	/* Calculating offset */
-	call imul
-	movl $4, (%esp)
-	call value
-	call comma
-	call eax
-	call newline
-	/* Adding offset to base */
-	call addl
-	call ebx
-	call comma
-	call eax
-	call newline
 	/* Loading value from address */
 	call movl
 	movb $'(, (%esp)
 	call putc
+	call ebx
+	movb $',, (%esp)
+	call putc
 	call eax
+	movb $',, (%esp)
+	call putc
+	movl $4, (%esp)
+	call putd
 	movb $'), (%esp)
 	call putc
 	call comma
