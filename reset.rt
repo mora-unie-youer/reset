@@ -65,7 +65,7 @@ munmap : (a0, a1) { return(syscall(SYS_munmap, a0, a1)); };
 # a4 - fd
 # a5 - offset
 mmap2 : (a0, a1, a2, a3, a4, a5) {
-	return(syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5));
+  return(syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5));
 };
 
 ### Useful functions
@@ -74,7 +74,7 @@ mmap2 : (a0, a1, a2, a3, a4, a5) {
 # a1 - number align to
 # @return aligned number
 align : (a0, a1) {
-	return((a0 + a1 - 1) & ~(a1 - 1));
+  return((a0 + a1 - 1) & ~(a1 - 1));
 };
 
 ## Align number down to another number (which is power of 2)
@@ -82,7 +82,7 @@ align : (a0, a1) {
 # a1 - number align to
 # @return aligned number
 align_down : (a0, a1) {
-	return(a0 - (a0 & (a1 - 1)));
+  return(a0 - (a0 & (a1 - 1)));
 };
 
 ### Conversions
@@ -92,46 +92,46 @@ align_down : (a0, a1) {
 # a2 - base
 itoa_digits : "0123456789abcdefghijklmnopqrstuvwxyz";
 itoa : (a0, a1, a2) {
-	# x0 - i
-	# x1 - j
-	# x2 - tmp
-	allocate(3);
-	x0 = 0;
-	x1 = 0;
+  # x0 - i
+  # x1 - j
+  # x2 - tmp
+  allocate(3);
+  x0 = 0;
+  x1 = 0;
 
-	# Writing first digit
-	writechar(a1, x0, readchar(itoa_digits, a0 % a2));
-	# Going to next unit
-	a0 = a0 / a2;
-	# Going to next char position
-	x0 = x0 + 1;
+  # Writing first digit
+  writechar(a1, x0, readchar(itoa_digits, a0 % a2));
+  # Going to next unit
+  a0 = a0 / a2;
+  # Going to next char position
+  x0 = x0 + 1;
 
-	# Iterating while value is not zero
-	while (a0 != 0) {
-		# Writing needed char to result buffer
-		writechar(a1, x0, readchar(itoa_digits, a0 % a2));
-		# Going to next unit
-		a0 = a0 / a2;
-		# Going to next char position
-		x0 = x0 + 1;
-	};
-	# Writing '\0' to the end of string
-	writechar(a1, x0, '\0');
-	# Reversing string
-	while (x1 < x0) {
-		# Starting from penultimate char
-		x0 = x0 - 1;
-		# Storing char to temp
-		x2 = readchar(a1, x1);
-		# Moving a1[x0] to a1[x1]
-		writechar(a1, x1, readchar(a1, x0));
-		# Moving temp to a1[x0]
-		writechar(a1, x0, x2);
-		# Reversing next chars
-		x1 = x1 + 1;
-	};
-	# Returning result buffer
-	return(a1);
+  # Iterating while value is not zero
+  while (a0 != 0) {
+    # Writing needed char to result buffer
+    writechar(a1, x0, readchar(itoa_digits, a0 % a2));
+    # Going to next unit
+    a0 = a0 / a2;
+    # Going to next char position
+    x0 = x0 + 1;
+  };
+  # Writing '\0' to the end of string
+  writechar(a1, x0, '\0');
+  # Reversing string
+  while (x1 < x0) {
+    # Starting from penultimate char
+    x0 = x0 - 1;
+    # Storing char to temp
+    x2 = readchar(a1, x1);
+    # Moving a1[x0] to a1[x1]
+    writechar(a1, x1, readchar(a1, x0));
+    # Moving temp to a1[x0]
+    writechar(a1, x0, x2);
+    # Reversing next chars
+    x1 = x1 + 1;
+  };
+  # Returning result buffer
+  return(a1);
 };
 
 ### Memory Management
@@ -143,29 +143,29 @@ free_end   : NULL;
 
 ## Allocate new memory page
 allocate_new_page : () {
-	# If free_end is NULL, finding brk(NULL)
-	if (free_end == NULL) { free_end = brk(NULL); };
-	# Moving free memory segment pointers
-	free_start = free_end;
-	free_end = brk(free_end + PAGE_SIZE);
+  # If free_end is NULL, finding brk(NULL)
+  if (free_end == NULL) { free_end = brk(NULL); };
+  # Moving free memory segment pointers
+  free_start = free_end;
+  free_end = brk(free_end + PAGE_SIZE);
 };
 
 ## Allocate memory
 # a0 - size
 # @return allocated memory
 malloc : (a0) {
-	# x0 - address
-	allocate(1);
-	# Checking if requested size is too big
-	assert(a0 <= PAGE_SIZE, "Requested memory is bigger than PAGE_SIZE");
-	# Checking if we need to allocate more memory
-	if (free_start + a0 > free_end) { allocate_new_page(); };
-	# Setting address
-	x0 = free_start;
-	# Moving free segment pointer
-	free_start = x0 + a0;
-	# Returning memory address
-	return(x0);
+  # x0 - address
+  allocate(1);
+  # Checking if requested size is too big
+  assert(a0 <= PAGE_SIZE, "Requested memory is bigger than PAGE_SIZE");
+  # Checking if we need to allocate more memory
+  if (free_start + a0 > free_end) { allocate_new_page(); };
+  # Setting address
+  x0 = free_start;
+  # Moving free segment pointer
+  free_start = x0 + a0;
+  # Returning memory address
+  return(x0);
 };
 
 ## Free memory
@@ -177,13 +177,13 @@ free : (a0) {};
 # a0 - size
 # @return allocated and cleared memory
 calloc : (a0) {
-	# x0 - address
-	allocate(1);
-	# Allocating memory
-	x0 = malloc(a0);
-	# Clearing memory with zeroes
-	memset(0, x0, a0);
-	return(x0);
+  # x0 - address
+  allocate(1);
+  # Allocating memory
+  x0 = malloc(a0);
+  # Clearing memory with zeroes
+  memset(0, x0, a0);
+  return(x0);
 };
 
 ## Reallocate memory with new size
@@ -192,19 +192,19 @@ calloc : (a0) {
 # a2 - new size
 # @return new allocated memory
 realloc : (a0, a1, a2) {
-	# x0 - old size/min size
-	# x1 - new allocated memory space
-	allocate(2);
-	# Finding out the amount of memory to be copied
-	x0 = a1;
-	if (a2 < a1) { x0 = a2; };
-	# Allocating new memory
-	x1 = calloc(a2);
-	# Copying data to new memory space
-	memcpy(a0, x1, x0);
-	# Freeing old memory space
-	free(a0);
-	return(x1);
+  # x0 - old size/min size
+  # x1 - new allocated memory space
+  allocate(2);
+  # Finding out the amount of memory to be copied
+  x0 = a1;
+  if (a2 < a1) { x0 = a2; };
+  # Allocating new memory
+  x1 = calloc(a2);
+  # Copying data to new memory space
+  memcpy(a0, x1, x0);
+  # Freeing old memory space
+  free(a0);
+  return(x1);
 };
 
 ### Memory/String operations
@@ -213,16 +213,16 @@ realloc : (a0, a1, a2) {
 # a1 - address
 # a2 - size
 memset : (a0, a1, a2) {
-	# x0 - pos
-	allocate(1);
-	x0 = 0;
-	# Writing value to memory block
-	while (x0 < a2) {
-		# Writing byte
-		writechar(a1, x0, a0);
-		# Moving to next byte
-		x0 = x0 + 1;
-	};
+  # x0 - pos
+  allocate(1);
+  x0 = 0;
+  # Writing value to memory block
+  while (x0 < a2) {
+    # Writing byte
+    writechar(a1, x0, a0);
+    # Moving to next byte
+    x0 = x0 + 1;
+  };
 };
 
 ## Copy data from one memory block to another
@@ -230,50 +230,50 @@ memset : (a0, a1, a2) {
 # a1 - dest
 # a2 - size
 memcpy : (a0, a1, a2) {
-	# x0 - pos
-	allocate(1);
-	x0 = 0;
-	while (x0 < a2) {
-		# Writing byte
-		writechar(a1, x0, readchar(a0, x0));
-		# Moving to next byte
-		x0 = x0 + 1;
-	};
+  # x0 - pos
+  allocate(1);
+  x0 = 0;
+  while (x0 < a2) {
+    # Writing byte
+    writechar(a1, x0, readchar(a0, x0));
+    # Moving to next byte
+    x0 = x0 + 1;
+  };
 };
 
 ## Get length of string
 # a0 - string
 # @return string length
 strlen : (a0) {
-	# x0 - string length
-	allocate(1);
-	x0 = 0;
-	# While char is not NULL, incrementing length
-	while (readchar(a0, x0) != '\0') { x0 = x0 + 1; };
-	return(x0);
+  # x0 - string length
+  allocate(1);
+  x0 = 0;
+  # While char is not NULL, incrementing length
+  while (readchar(a0, x0) != '\0') { x0 = x0 + 1; };
+  return(x0);
 };
 
 ## Copy string
 # a0 - src
 # a1 - dest
 strcpy : (a0, a1) {
-	# x0 - pos
-	# x1 - char
-	allocate(2);
-	x0 = 0;
-	# Reading char from string
-	x1 = readchar(a0, x0);
-	# Checking if char is not NULL
-	while (x1 != '\0') {
-		# Copying char from one string to another
-		writechar(a1, x0, x1);
-		# Moving to next char
-		x0 = x0 + 1;
-		# Reading next char
-		x1 = readchar(a0, x0);
-	};
-	# Writing NULL character
-	writechar(a1, x0, '\0');
+  # x0 - pos
+  # x1 - char
+  allocate(2);
+  x0 = 0;
+  # Reading char from string
+  x1 = readchar(a0, x0);
+  # Checking if char is not NULL
+  while (x1 != '\0') {
+    # Copying char from one string to another
+    writechar(a1, x0, x1);
+    # Moving to next char
+    x0 = x0 + 1;
+    # Reading next char
+    x1 = readchar(a0, x0);
+  };
+  # Writing NULL character
+  writechar(a1, x0, '\0');
 };
 
 ## Compare string
@@ -281,58 +281,58 @@ strcpy : (a0, a1) {
 # a1 - second string
 # @return difference between different chars (0 if strings are equal)
 strcmp : (a0, a1) {
-	# x0 - pos
-	# x1 - char from first string
-	# x2 - char from second string
-	allocate(3);
-	x0 = 0;
-	# Reading first chars from strings
-	x1 = readchar(a0, x0);
-	x2 = readchar(a1, x0);
-	# Comparing char by char
-	while (x1 != '\0') {
-		if (x1 != x2) { return(x1 - x2); };
-		# Moving to next char
-		x0 = x0 + 1;
-		# Reading next char
-		x1 = readchar(a0, x0);
-		x2 = readchar(a1, x0);
-	};
-	# As first string ended, finding the difference between ending chars
-	return(x1 - x2);
+  # x0 - pos
+  # x1 - char from first string
+  # x2 - char from second string
+  allocate(3);
+  x0 = 0;
+  # Reading first chars from strings
+  x1 = readchar(a0, x0);
+  x2 = readchar(a1, x0);
+  # Comparing char by char
+  while (x1 != '\0') {
+    if (x1 != x2) { return(x1 - x2); };
+    # Moving to next char
+    x0 = x0 + 1;
+    # Reading next char
+    x1 = readchar(a0, x0);
+    x2 = readchar(a1, x0);
+  };
+  # As first string ended, finding the difference between ending chars
+  return(x1 - x2);
 };
 
 ## Duplicate string
 # a0 - string
 # @return new string
 strdup : (a0) {
-	# x0 - string length
-	# x1 - new string
-	allocate(2);
-	# Allocating new string
-	x0 = strlen(a0);
-	x1 = calloc(x0 + 1);
-	# Copying data to new string
-	memcpy(a0, x1, x0);
-	# Return new string
-	return(x1);
+  # x0 - string length
+  # x1 - new string
+  allocate(2);
+  # Allocating new string
+  x0 = strlen(a0);
+  x1 = calloc(x0 + 1);
+  # Copying data to new string
+  memcpy(a0, x1, x0);
+  # Return new string
+  return(x1);
 };
 
 ## Duplicate string literal (without double quotes)
 # a0 - string
 # @return new string
 strlitdup : (a0) {
-	# x0 - string length
-	# x1 - new string
-	allocate(2);
-	# Calculating length
-	x0 = strlen(a0) - 2;
-	# Allocating string
-	x1 = calloc(x0 + 1);
-	# Copying data to new string
-	memcpy(a0 + 1, x1, x0);
-	# Return new string
-	return(x1);
+  # x0 - string length
+  # x1 - new string
+  allocate(2);
+  # Calculating length
+  x0 = strlen(a0) - 2;
+  # Allocating string
+  x1 = calloc(x0 + 1);
+  # Copying data to new string
+  memcpy(a0 + 1, x1, x0);
+  # Return new string
+  return(x1);
 };
 
 ### Tuples
@@ -345,107 +345,107 @@ allocate_tuple : (a0) { return(malloc(4 * a0)); };
 # a0 - value
 # @return tuple
 tuple1 : (a0) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(1);
-	# Fill tuple
-	x0[0] = a0;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(1);
+  # Fill tuple
+  x0[0] = a0;
+  return(x0);
 };
 
 ## Make tuple with 2 values
 # a0, a1 - values
 # @return tuple
 tuple2 : (a0, a1) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(2);
-	# Fill tuple
-	x0[0] = a0;
-	x0[1] = a1;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(2);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  return(x0);
 };
 
 ## Make tuple with 3 values
 # a0, a1, a2 - values
 # @return tuple
 tuple3 : (a0, a1, a2) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(3);
-	# Fill tuple
-	x0[0] = a0;
-	x0[1] = a1;
-	x0[2] = a2;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(3);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  x0[2] = a2;
+  return(x0);
 };
 
 ## Make tuple with 4 values
 # a0, a1, a2, a3 - values
 # @return tuple
 tuple4 : (a0, a1, a2, a3) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(4);
-	# Fill tuple
-	x0[0] = a0;
-	x0[1] = a1;
-	x0[2] = a2;
-	x0[3] = a3;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(4);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  x0[2] = a2;
+  x0[3] = a3;
+  return(x0);
 };
 
 ## Make tuple with 5 values
 # a0, a1, a2, a3, a4 - values
 # @return tuple
 tuple5 : (a0, a1, a2, a3, a4) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(5);
-	# Fill tuple
-	x0[0] = a0;
-	x0[1] = a1;
-	x0[2] = a2;
-	x0[3] = a3;
-	x0[4] = a4;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(5);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  x0[2] = a2;
+  x0[3] = a3;
+  x0[4] = a4;
+  return(x0);
 };
 
 ## Make tuple with 7 values
 # a0, a1, a2, a3, a4, a5, a6 - values
 # @return tuple
 tuple7 : (a0, a1, a2, a3, a4, a5, a6) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(7);
-	# Fill tuple
-	x0[0] = a0;
-	x0[1] = a1;
-	x0[2] = a2;
-	x0[3] = a3;
-	x0[4] = a4;
-	x0[5] = a5;
-	x0[6] = a6;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(7);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  x0[2] = a2;
+  x0[3] = a3;
+  x0[4] = a4;
+  x0[5] = a5;
+  x0[6] = a6;
+  return(x0);
 };
 
 ## Make tuple with 8 values
 # a0, a1, a2, a3, a4, a5, a6, a7 - values
 # @return tuple
 tuple8 : (a0, a1, a2, a3, a4, a5, a6, a7) {
-	# x0 - tuple
-	allocate(1);
-	x0 = allocate_tuple(8);
-	# Fill tuple
-	x0[0] = a0;
-	x0[1] = a1;
-	x0[2] = a2;
-	x0[3] = a3;
-	x0[4] = a4;
-	x0[5] = a5;
-	x0[6] = a6;
-	x0[7] = a7;
-	return(x0);
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(8);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  x0[2] = a2;
+  x0[3] = a3;
+  x0[4] = a4;
+  x0[5] = a5;
+  x0[6] = a6;
+  x0[7] = a7;
+  return(x0);
 };
 
 ### Linked List
@@ -478,13 +478,13 @@ list_value : (a0) { return(a0[LIST_VALUE]); };
 # a0 - list
 # @return reduced list
 list_pop : (a0) {
-	# x0 - list continuation
-	allocate(1);
-	# Fetching next element
-	x0 = list_next(a0);
-	# Deallocating current element
-	free(a0);
-	return(x0);
+  # x0 - list continuation
+  allocate(1);
+  # Fetching next element
+  x0 = list_next(a0);
+  # Deallocating current element
+  free(a0);
+  return(x0);
 };
 
 ### Vector
@@ -519,46 +519,46 @@ vector_size : (a0) { return(a0[VEC_SIZE]); };
 # a0 - char vector
 # a1 - new capacity
 char_vector_reserve : (a0, a1) {
-	# Reserving, if new capacity is bigger
-	if (a1 > a0[VEC_CAP]) {
-		# Reallocating buffer
-		a0[VEC_BUF] = realloc(a0[VEC_BUF], a0[VEC_CAP], a1);
-		# Setting new capacity
-		a0[VEC_CAP] = a1;
-	};
+  # Reserving, if new capacity is bigger
+  if (a1 > a0[VEC_CAP]) {
+    # Reallocating buffer
+    a0[VEC_BUF] = realloc(a0[VEC_BUF], a0[VEC_CAP], a1);
+    # Setting new capacity
+    a0[VEC_CAP] = a1;
+  };
 };
 
 ## Reserve more space for vector buffer
 # a0 - vector
 # a1 - new capacity
 vector_reserve : (a0, a1) {
-	# Reserving, if new capacity is bigger
-	if (a1 > a0[VEC_CAP]) {
-		# Reallocating buffer
-		a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a0[VEC_CAP], 4 * a1);
-		# Setting new capacity
-		a0[VEC_CAP] = a1;
-	};
+  # Reserving, if new capacity is bigger
+  if (a1 > a0[VEC_CAP]) {
+    # Reallocating buffer
+    a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a0[VEC_CAP], 4 * a1);
+    # Setting new capacity
+    a0[VEC_CAP] = a1;
+  };
 };
 
 ## Resize char vector
 # a0 - char vector
 # a1 - new size
 char_vector_resize : (a0, a1) {
-	# Reserving, if required
-	if (a1 > a0[VEC_SIZE]) { char_vector_reserve(a0, a1); };
-	# Setting new size
-	a0[VEC_SIZE] = a1;
+  # Reserving, if required
+  if (a1 > a0[VEC_SIZE]) { char_vector_reserve(a0, a1); };
+  # Setting new size
+  a0[VEC_SIZE] = a1;
 };
 
 ## Resize vector
 # a0 - vector
 # a1 - new size
 vector_resize : (a0, a1) {
-	# Reserving, if required
-	if (a1 > a0[VEC_SIZE]) { vector_reserve(a0, a1); };
-	# Setting new size
-	a0[VEC_SIZE] = a1;
+  # Reserving, if required
+  if (a1 > a0[VEC_SIZE]) { vector_reserve(a0, a1); };
+  # Setting new size
+  a0[VEC_SIZE] = a1;
 };
 
 ## Get value at index in char vector
@@ -584,67 +584,67 @@ char_vector_set : (a0, a1, a2) { writechar(a0[VEC_BUF], a1, a2); };
 # a1 - index
 # a2 - value
 vector_set : (a0, a1, a2) {
-	# x0 - buffer
-	allocate(1);
-	x0 = a0[VEC_BUF];
-	x0[a1] = a2;
+  # x0 - buffer
+  allocate(1);
+  x0 = a0[VEC_BUF];
+  x0[a1] = a2;
 };
 
 ## Insert value in the end of char vector
 # a0 - char vector
 # a1 - value
 char_vector_push : (a0, a1) {
-	# If vector buffer is full, reserving more
-	if (a0[VEC_SIZE] == a0[VEC_CAP]) {
-		char_vector_reserve(a0, a0[VEC_CAP] * 2);
-	};
-	# Putting new value
-	char_vector_set(a0, a0[VEC_SIZE], a1);
-	# Incrementing size
-	a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
+  # If vector buffer is full, reserving more
+  if (a0[VEC_SIZE] == a0[VEC_CAP]) {
+    char_vector_reserve(a0, a0[VEC_CAP] * 2);
+  };
+  # Putting new value
+  char_vector_set(a0, a0[VEC_SIZE], a1);
+  # Incrementing size
+  a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
 };
 
 ## Insert value in the end of vector
 # a0 - vector
 # a1 - value
 vector_push : (a0, a1) {
-	# If vector buffer is full, reserving more
-	if (a0[VEC_SIZE] == a0[VEC_CAP]) {
-		vector_reserve(a0, a0[VEC_CAP] * 2);
-	};
-	# Putting new value
-	vector_set(a0, a0[VEC_SIZE], a1);
-	# Incrementing size
-	a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
+  # If vector buffer is full, reserving more
+  if (a0[VEC_SIZE] == a0[VEC_CAP]) {
+    vector_reserve(a0, a0[VEC_CAP] * 2);
+  };
+  # Putting new value
+  vector_set(a0, a0[VEC_SIZE], a1);
+  # Incrementing size
+  a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
 };
 
 ## Remove and return last value from char vector
 # a0 - char vector
 # @return char
 char_vector_pop : (a0) {
-	# Decrementing size
-	a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
-	# Returning the value
-	return(char_vector_get(a0, a0[VEC_SIZE]));
+  # Decrementing size
+  a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
+  # Returning the value
+  return(char_vector_get(a0, a0[VEC_SIZE]));
 };
 
 ## Remove and return last value from vector
 # a0 - vector
 # @return value
 vector_pop : (a0) {
-	# Decrementing size
-	a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
-	# Returning the value
-	return(vector_get(a0, a0[VEC_SIZE]));
+  # Decrementing size
+  a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
+  # Returning the value
+  return(vector_get(a0, a0[VEC_SIZE]));
 };
 
 ## Destroy vector
 # a0 - vector
 vector_destroy : (a0) {
-	# Deallocating buffer
-	free(a0[VEC_BUF]);
-	# Deallocating vector
-	free(a0);
+  # Deallocating buffer
+  free(a0[VEC_BUF]);
+  # Deallocating vector
+  free(a0);
 };
 
 ### I/O
@@ -673,121 +673,121 @@ stderr : NULL;
 # a0 - fd
 # @return channel
 input_chan : (a0) {
-	# x0 - buffer/channel
-	allocate(1);
-	# Allocating buffer
-	x0 = malloc(IBUFFER_SIZE);
-	# Creating channel
-	x0 = tuple5(a0, x0, 0, 0, FALSE);
-	return(x0);
+  # x0 - buffer/channel
+  allocate(1);
+  # Allocating buffer
+  x0 = malloc(IBUFFER_SIZE);
+  # Creating channel
+  x0 = tuple5(a0, x0, 0, 0, FALSE);
+  return(x0);
 };
 
 ## Create new input channel based on file
 # a0 - file name
 # @return channel
 input_chan_file : (a0) {
-	# x0 - fd/channel
-	allocate(1);
-	# Opening file with read permission
-	x0 = open(a0, O_RDONLY, 0);
-	# Checking for success
-	assert(x0 > 0, "Couldn't open file input channel");
-	# Returning new channel
-	return(input_chan(x0));
+  # x0 - fd/channel
+  allocate(1);
+  # Opening file with read permission
+  x0 = open(a0, O_RDONLY, 0);
+  # Checking for success
+  assert(x0 > 0, "Couldn't open file input channel");
+  # Returning new channel
+  return(input_chan(x0));
 };
 
 ## Close input channel
 # a0 - channel
 input_chan_close : (a0) {
-	# Closing fd
-	close(a0[CHAN_FD]);
-	# Deallocating buffer
-	free(a0[CHAN_BUF]);
-	# Deallocating channel
-	free(a0);
+  # Closing fd
+  close(a0[CHAN_FD]);
+  # Deallocating buffer
+  free(a0[CHAN_BUF]);
+  # Deallocating channel
+  free(a0);
 };
 
 ## Create new output channel
 # a0 - fd
 # @return channel
 output_chan : (a0) {
-	# x0 - buffer/channel
-	allocate(1);
-	# Allocating buffer
-	x0 = malloc(OBUFFER_SIZE);
-	# Creating channel
-	x0 = tuple3(a0, x0, 0);
-	return(x0);
+  # x0 - buffer/channel
+  allocate(1);
+  # Allocating buffer
+  x0 = malloc(OBUFFER_SIZE);
+  # Creating channel
+  x0 = tuple3(a0, x0, 0);
+  return(x0);
 };
 
 ## Create new output channel based on file
 # a0 - file name
 # @return channel
 output_chan_file : (a0) {
-	# x0 - fd/channel
-	allocate(1);
-	# Opening file with read permission
-	x0 = open(a0, O_WRONLY|O_CREAT|O_TRUNC, 420); # 420 = 0644
-	# Checking for success
-	assert(x0 > 0, "Couldn't open file output channel");
-	# Returning new channel
-	return(output_chan(x0));
+  # x0 - fd/channel
+  allocate(1);
+  # Opening file with read permission
+  x0 = open(a0, O_WRONLY|O_CREAT|O_TRUNC, 420); # 420 = 0644
+  # Checking for success
+  assert(x0 > 0, "Couldn't open file output channel");
+  # Returning new channel
+  return(output_chan(x0));
 };
 
 ## Close output channel
 # a0 - channel
 output_chan_close : (a0) {
-	# Flushing buffer
-	flush(a0);
-	# Closing fd
-	close(a0[CHAN_FD]);
-	# Deallocating buffer
-	free(a0[CHAN_BUF]);
-	# Deallocating channel
-	free(a0);
+  # Flushing buffer
+  flush(a0);
+  # Closing fd
+  close(a0[CHAN_FD]);
+  # Deallocating buffer
+  free(a0[CHAN_BUF]);
+  # Deallocating channel
+  free(a0);
 };
 
 ## Initialize standard I/O
 initialize_io : () {
-	stdin  = input_chan(0);  # stdin=0
-	stdout = output_chan(1); # stdout=1
-	stderr = output_chan(2); # stderr=2
+  stdin  = input_chan(0);  # stdin=0
+  stdout = output_chan(1); # stdout=1
+  stderr = output_chan(2); # stderr=2
 };
 
 ## Fill input channel
 # a0 - channel
 fill : (a0) {
-	# x0 - read count
-	allocate(1);
-	# Checking if file is ended
-	if (a0[ICHAN_EOF]) { return; };
-	# Checking if buffer is exhausted
-	if (a0[CHAN_IDX] == a0[ICHAN_END]) {
-		# Input buffer is empty, refilling
-		x0 = read(a0[CHAN_FD], a0[CHAN_BUF], IBUFFER_SIZE);
-		# Resetting index and setting size
-		a0[CHAN_IDX]  = 0;
-		a0[ICHAN_END] = x0;
-		# Setting EOF flag, if file is ended
-		if (a0[ICHAN_END] == 0) { a0[ICHAN_EOF] = TRUE; };
-	};
+  # x0 - read count
+  allocate(1);
+  # Checking if file is ended
+  if (a0[ICHAN_EOF]) { return; };
+  # Checking if buffer is exhausted
+  if (a0[CHAN_IDX] == a0[ICHAN_END]) {
+    # Input buffer is empty, refilling
+    x0 = read(a0[CHAN_FD], a0[CHAN_BUF], IBUFFER_SIZE);
+    # Resetting index and setting size
+    a0[CHAN_IDX]  = 0;
+    a0[ICHAN_END] = x0;
+    # Setting EOF flag, if file is ended
+    if (a0[ICHAN_END] == 0) { a0[ICHAN_EOF] = TRUE; };
+  };
 };
 
 ## Read char
 # a0 - channel
 # @return char
 fgetc : (a0) {
-	# x0 - char
-	allocate(1);
-	# Filling buffer, if needed
-	fill(a0);
-	# Checking if input is ended
-	if (a0[CHAN_IDX] == a0[ICHAN_END]) { return(EOF); };
-	# Fetching char
-	x0 = readchar(a0[CHAN_BUF], a0[CHAN_IDX]);
-	# Incrementing index and returning char
-	a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
-	return(x0);
+  # x0 - char
+  allocate(1);
+  # Filling buffer, if needed
+  fill(a0);
+  # Checking if input is ended
+  if (a0[CHAN_IDX] == a0[ICHAN_END]) { return(EOF); };
+  # Fetching char
+  x0 = readchar(a0[CHAN_BUF], a0[CHAN_IDX]);
+  # Incrementing index and returning char
+  a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
+  return(x0);
 };
 
 ## Read char from stdin
@@ -799,12 +799,12 @@ getc : () { return(fgetc(stdin)); };
 # a1 - offset
 # @return char
 fnextc : (a0, a1) {
-	# Filling buffer, if needed
-	fill(a0);
-	# Checking if input is ended
-	if (a0[CHAN_IDX] + a1 >= a0[ICHAN_END]) { return(EOF); };
-	# Fetching char
-	return(readchar(a0[CHAN_BUF], a0[CHAN_IDX] + a1));
+  # Filling buffer, if needed
+  fill(a0);
+  # Checking if input is ended
+  if (a0[CHAN_IDX] + a1 >= a0[ICHAN_END]) { return(EOF); };
+  # Fetching char
+  return(readchar(a0[CHAN_BUF], a0[CHAN_IDX] + a1));
 };
 
 ## Look ahead next char from stdin
@@ -815,24 +815,24 @@ nextc : (a0) { return(fnextc(stdin, a0)); };
 ## Flush output channel
 # a0 - channel
 flush : (a0) {
-	# If buffer is not empty
-	if (a0[CHAN_IDX] > 0) {
-		write(a0[CHAN_FD], a0[CHAN_BUF], a0[CHAN_IDX]);
-		a0[CHAN_IDX] = 0;
-	};
+  # If buffer is not empty
+  if (a0[CHAN_IDX] > 0) {
+    write(a0[CHAN_FD], a0[CHAN_BUF], a0[CHAN_IDX]);
+    a0[CHAN_IDX] = 0;
+  };
 };
 
 ## Put character
 # a0 - channel
 # a1 - char
 fputc : (a0, a1) {
-	# Writing to buffer
-	writechar(a0[CHAN_BUF], a0[CHAN_IDX], a1);
-	# Incrementing index
-	a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
-	# Checking if need to flush
-	if (a0[CHAN_IDX] == OBUFFER_SIZE) { flush(a0); return; };
-	if (a1 == '\n') { flush(a0); return; };
+  # Writing to buffer
+  writechar(a0[CHAN_BUF], a0[CHAN_IDX], a1);
+  # Incrementing index
+  a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
+  # Checking if need to flush
+  if (a0[CHAN_IDX] == OBUFFER_SIZE) { flush(a0); return; };
+  if (a1 == '\n') { flush(a0); return; };
 };
 
 ## Put character in stdout
@@ -846,18 +846,18 @@ eputc : (a0) { fputc(stderr, a0); };
 # a0 - channel
 # a1 - string
 fputs : (a0, a1) {
-	# x0 - char
-	allocate(1);
-	# Fetching first char
-	x0 = readchar(a1, 0);
-	# Iterating, until we'll find '\0'
-	while (x0 != '\0') {
-		# Putting character
-		fputc(a0, x0);
-		# Reading next character
-		a1 = a1 + 1;
-		x0 = readchar(a1, 0);
-	};
+  # x0 - char
+  allocate(1);
+  # Fetching first char
+  x0 = readchar(a1, 0);
+  # Iterating, until we'll find '\0'
+  while (x0 != '\0') {
+    # Putting character
+    fputc(a0, x0);
+    # Reading next character
+    a1 = a1 + 1;
+    x0 = readchar(a1, 0);
+  };
 };
 
 ## Put string in stdout
@@ -873,14 +873,14 @@ eputs : (a0) { fputs(stderr, a0); };
 # a2 - base
 fputn_buffer : NULL;
 fputn : (a0, a1, a2) {
-	# Allocating number buffer, if needed
-	if (fputn_buffer == NULL) { fputn_buffer = malloc(33); };
-	# Clearing buffer
-	memset(0, fputn_buffer, 33);
-	# Convering number to string
-	itoa(a1, fputn_buffer, a2);
-	# Putting string
-	fputs(a0, fputn_buffer);
+  # Allocating number buffer, if needed
+  if (fputn_buffer == NULL) { fputn_buffer = malloc(33); };
+  # Clearing buffer
+  memset(0, fputn_buffer, 33);
+  # Convering number to string
+  itoa(a1, fputn_buffer, a2);
+  # Putting string
+  fputs(a0, fputn_buffer);
 };
 
 ## Put decimal number in stdout
@@ -900,15 +900,15 @@ eputx : (a0) { fputn(stderr, a0, 16); };
 # a0 - condition
 # a1 - error string
 assert : (a0, a1) {
-	# If condition success, returning
-	if (a0) { return; };
-	# Printing assertion error
-	eputs("ASSERT: ");
-	# If error string is null, printing default message. If not, print a1
-	if (a1) { eputs(a1); } else { eputs("assertion failed"); };
-	eputc('\n');
-	# Exitting
-	exit(1);
+  # If condition success, returning
+  if (a0) { return; };
+  # Printing assertion error
+  eputs("ASSERT: ");
+  # If error string is null, printing default message. If not, print a1
+  if (a1) { eputs(a1); } else { eputs("assertion failed"); };
+  eputc('\n');
+  # Exitting
+  exit(1);
 };
 
 ### Lexer
@@ -959,7 +959,7 @@ TOKEN_WHILE      => 273;
 TOKEN_ALLOCATE   => 274;
 TOKEN_RETURN     => 275;
 TOKEN_SYSCALL    => 276;
-# Labels
+#labels
 TOKEN_GLOBAL     => 277;
 TOKEN_GOTO       => 278;
 TOKEN_LABEL      => 279;
@@ -999,47 +999,47 @@ TOKEN_ASHL  => 317;
 TOKEN_ASHR  => 318;
 ## Char table
 char_table : [
-	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
-	   0,  1,  1,  1,  1,  1,  1,  1,  1,  2,  3,  1,  1,  2,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   2, 14, 12, 14, 14, 14, 14, 11, 14, 14, 14, 14, 14, 14, 14, 14,
-	   4,  5,  5,  5,  5,  5,  5,  5,  6,  6, 14, 14, 14, 14, 14, 14,
-	  14,  7,  7,  7,  7,  7,  7,  8,  8,  8,  8,  8,  8,  8,  8,  8,
-	   8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8, 14, 13, 14, 14,  7,
-	  14,  9,  7,  7,  7,  7,  7,  8,  8,  8,  8,  8,  8,  8,  8,  8,
-	   8,  8,  8,  8,  8,  8,  8,  8, 10,  8,  8, 14, 14, 14, 14,  1,
-	# We're not using Extended-ASCII - marking as invalid
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-	   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
+  # X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
+     0,  1,  1,  1,  1,  1,  1,  1,  1,  2,  3,  1,  1,  2,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     2, 14, 12, 14, 14, 14, 14, 11, 14, 14, 14, 14, 14, 14, 14, 14,
+     4,  5,  5,  5,  5,  5,  5,  5,  6,  6, 14, 14, 14, 14, 14, 14,
+    14,  7,  7,  7,  7,  7,  7,  8,  8,  8,  8,  8,  8,  8,  8,  8,
+     8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8, 14, 13, 14, 14,  7,
+    14,  9,  7,  7,  7,  7,  7,  8,  8,  8,  8,  8,  8,  8,  8,  8,
+     8,  8,  8,  8,  8,  8,  8,  8, 10,  8,  8, 14, 14, 14, 14,  1,
+  # We're not using Extended-ASCII - marking as invalid
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 ];
 ## Char to escape table (only first 128 ASCII chars)
 char_to_escape : [
-	# X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
-	   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	   0,  0, 34,  0,  0,  0,  0, 39,  0,  0,  0,  0,  0,  0,  0,  0,
-	   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 63,
-	   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 92,  0,  0,  0,
-	   0,  7,  8,  0,  0, 27, 12,  0,  0,  0,  0,  0,  0,  0, 10,  0,
-	   0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
+  # X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0, 34,  0,  0,  0,  0, 39,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 63,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 92,  0,  0,  0,
+     0,  7,  8,  0,  0, 27, 12,  0,  0,  0,  0,  0,  0,  0, 10,  0,
+     0,  0, 13,  0,  9,  0, 11,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ];
 ## Reserved keywords
 reserved_keywords : [
-	"if", "else",                    # Conditionals
-	"break", "while",                # Loops
-	"allocate", "return", "syscall", # Functions
-	"global", "goto", "label",       # Labels
-	"readchar", "writechar",         # Byte operations
-	"char", "int",                   # Array types
-	"include",
-	NULL
+  "if", "else",                    # Conditionals
+  "break", "while",                # Loops
+  "allocate", "return", "syscall", # Functions
+  "global", "goto", "label",       #labels
+  "readchar", "writechar",         # Byte operations
+  "char", "int",                   # Array types
+  "include",
+  NULL
 ];
 ## Lexer triggers
 lx00n:[lx01,le00,lx00,lx00,lx02,lx06,lx06,lx07,lx07,lx09,lx09,lx11,lx15,le00,lx17];
@@ -1059,16 +1059,16 @@ lx15n:[le07,le00,lx15,le07,lx15,lx15,lx15,lx15,lx15,lx15,lx15,lx15,lx16,lx15,lx1
 # a1 - filename
 # @return lexer
 lexer : (a0, a1) {
-	# x0 - token buffer
-	# x1 - lexer
-	allocate(2);
-	# Creating empty token buffer
-	x0 = char_vector(0, 1);
-	# Pushing '\0' to token buffer
-	char_vector_push(x0, '\0');
-	# Allocating lexer
-	x1 = tuple8(a0, a1, 1, 1, FALSE, 0, 0, x0);
-	return(x1);
+  # x0 - token buffer
+  # x1 - lexer
+  allocate(2);
+  # Creating empty token buffer
+  x0 = char_vector(0, 1);
+  # Pushing '\0' to token buffer
+  char_vector_push(x0, '\0');
+  # Allocating lexer
+  x1 = tuple8(a0, a1, 1, 1, FALSE, 0, 0, x0);
+  return(x1);
 };
 
 ## Create new lexer using file name
@@ -1079,51 +1079,51 @@ lexer_file : (a0) { return(lexer(input_chan_file(a0), a0)); };
 ## Destroy lexer
 # a0 - lexer
 lexer_destroy : (a0) {
-	# Destroying token char vector
-	vector_destroy(a0[LEX_TTEXT]);
-	# Destroying input channel
-	input_chan_close(a0[LEX_ICHAN]);
-	# Freeing filename string
-	free(a0[LEX_FILE]);
-	# Destroying lexer
-	free(a0);
+  # Destroying token char vector
+  vector_destroy(a0[LEX_TTEXT]);
+  # Destroying input channel
+  input_chan_close(a0[LEX_ICHAN]);
+  # Freeing filename string
+  free(a0[LEX_FILE]);
+  # Destroying lexer
+  free(a0);
 };
 
 ## Look ahead for next character
 # a0 - lexer
 # @return char type
 lexer_look : (a0) {
-	# x0 - char
-	allocate(1);
-	# Reading char
-	x0 = fnextc(a0[LEX_ICHAN], 0);
-	# If got EOF, returning CHAR_NULL
-	if (x0 == EOF) { return(CHAR_NULL); };
-	# Returning char type
-	return(char_table[x0]);
+  # x0 - char
+  allocate(1);
+  # Reading char
+  x0 = fnextc(a0[LEX_ICHAN], 0);
+  # If got EOF, returning CHAR_NULL
+  if (x0 == EOF) { return(CHAR_NULL); };
+  # Returning char type
+  return(char_table[x0]);
 };
 
 ## Consume char to token buffer
 # a0 - lexer
 # @return char
 lexer_consume : (a0) {
-	# x0 - char
-	allocate(1);
-	# Reading char
-	x0 = fgetc(a0[LEX_ICHAN]);
-	# If newline, moving to new line
-	if (x0 == '\n') {
-		a0[LEX_LINE] = a0[LEX_LINE] + 1;
-		a0[LEX_COLUMN] = 0;
-	};
-	# Incrementing column
-	a0[LEX_COLUMN] = a0[LEX_COLUMN] + 1;
-	# Replacing last char (NULL) in buffer
-	char_vector_set(a0[LEX_TTEXT], lexer_token_length(a0) - 1, x0);
-	# Pushing NULL to the end
-	char_vector_push(a0[LEX_TTEXT], '\0');
-	# Returning char
-	return(x0);
+  # x0 - char
+  allocate(1);
+  # Reading char
+  x0 = fgetc(a0[LEX_ICHAN]);
+  # If newline, moving to new line
+  if (x0 == '\n') {
+    a0[LEX_LINE] = a0[LEX_LINE] + 1;
+    a0[LEX_COLUMN] = 0;
+  };
+  # Incrementing column
+  a0[LEX_COLUMN] = a0[LEX_COLUMN] + 1;
+  # Replacing last char (NULL) in buffer
+  char_vector_set(a0[LEX_TTEXT], lexer_token_length(a0) - 1, x0);
+  # Pushing NULL to the end
+  char_vector_push(a0[LEX_TTEXT], '\0');
+  # Returning char
+  return(x0);
 };
 
 ## Set token ID
@@ -1155,326 +1155,326 @@ lexer_token_value : (a0) { return(a0[LEX_TVALUE]); };
 # a0 - lexer
 # @return token location
 lexer_token_location : (a0) {
-	return(tuple3(a0[LEX_FILE], a0[LEX_LINE], a0[LEX_COLUMN]));
+  return(tuple3(a0[LEX_FILE], a0[LEX_LINE], a0[LEX_COLUMN]));
 };
 
 ## Hold token
 # a0 - lexer
 lexer_hold : (a0) {
-	assert(a0[LEX_HOLD] == FALSE, "tried to hold two or more tokens");
-	a0[LEX_HOLD] = TRUE;
+  assert(a0[LEX_HOLD] == FALSE, "tried to hold two or more tokens");
+  a0[LEX_HOLD] = TRUE;
 };
 
 ## Reset token data
 # a0 - lexer
 lexer_reset_token : (a0) {
-	a0[LEX_TID] = 0;    # Resetting token id
-	a0[LEX_TVALUE] = 0; # Resetting token value
-	# Resetting token text buffer
-	char_vector_resize(a0[LEX_TTEXT], 0);
-	char_vector_push(a0[LEX_TTEXT], '\0');
+  a0[LEX_TID] = 0;    # Resetting token id
+  a0[LEX_TVALUE] = 0; # Resetting token value
+  # Resetting token text buffer
+  char_vector_resize(a0[LEX_TTEXT], 0);
+  char_vector_push(a0[LEX_TTEXT], '\0');
 };
 
 ## Print token location to output channel
 # a0 - token location
 # a1 - output channel
 fputloc : (a0, a1) {
-	fputs(a1, a0[LOC_FILE]);
-	fputc(a1, ':');
-	fputn(a1, a0[LOC_LINE], 10);
-	fputc(a1, ':');
-	fputn(a1, a0[LOC_COLUMN], 10);
+  fputs(a1, a0[LOC_FILE]);
+  fputc(a1, ':');
+  fputn(a1, a0[LOC_LINE], 10);
+  fputc(a1, ':');
+  fputn(a1, a0[LOC_COLUMN], 10);
 };
 
 ## Print lexer error
 # a0 - lexer
 # a1 - error message
 lexer_error : (a0, a1) {
-	# Printing location
-	fputloc(lexer_token_location(a0), stderr);
-	eputs(": ");
-	# Printing message
-	eputs(a1);
-	# Flushing
-	eputc('\n');
-	# Exitting
-	exit(1);
+  # Printing location
+  fputloc(lexer_token_location(a0), stderr);
+  eputs(": ");
+  # Printing message
+  eputs(a1);
+  # Flushing
+  eputc('\n');
+  # Exitting
+  exit(1);
 };
 
 ## Fetch token
 # a0 - lexer
 # @return token type
 lexer_lex : (a0) {
-	# x0 - current char
-	# x1, x2 - used variables by triggers
-	allocate(3);
-	# Checking if we are holding token
-	if (a0[LEX_HOLD]) {
-		a0[LEX_HOLD] = FALSE;
-		return(a0[LEX_TID]);
-	};
+  # x0 - current char
+  # x1, x2 - used variables by triggers
+  allocate(3);
+  # Checking if we are holding token
+  if (a0[LEX_HOLD]) {
+    a0[LEX_HOLD] = FALSE;
+    return(a0[LEX_TID]);
+  };
 
 label lx00;
-	## Entry point of lexer
-	# If token is space/tab/newline, skip it
-	# NOTE: We're using here + instead of || as we don't have it now
-	if ((lexer_look(a0) == CHAR_SPACES) + (lexer_look(a0) == CHAR_NEWLINE)) {
-		# Consuming char
-		lexer_consume(a0);
-		# Retrying
-		goto &lx00;
-	};
-	# Resetting token buffer
-	lexer_reset_token(a0);
-	# Moving to next trigger
-	goto lx00n[lexer_look(a0)];
+  ## Entry point of lexer
+  # If token is space/tab/newline, skip it
+  # NOTE: We're using here + instead of || as we don't have it now
+  if ((lexer_look(a0) == CHAR_SPACES) + (lexer_look(a0) == CHAR_NEWLINE)) {
+    # Consuming char
+    lexer_consume(a0);
+    # Retrying
+    goto &lx00;
+  };
+  # Resetting token buffer
+  lexer_reset_token(a0);
+  # Moving to next trigger
+  goto lx00n[lexer_look(a0)];
 label lx01;
-	## We got NULL char
-	return(TOKEN_END);
+  ## We got NULL char
+  return(TOKEN_END);
 label lx02;
-	##  We got zero. It means we have either zero number, octal (e.g. 0664) or
-	## hex number (e.g. 0xffff)
-	# Consuming zero char
-	lexer_consume(a0);
-	# Setting integer token ID
-	lexer_token_set(a0, TOKEN_INTEGER);
-	# Moving to next trigger
-	goto lx02n[lexer_look(a0)];
+  ##  We got zero. It means we have either zero number, octal (e.g. 0664) or
+  ## hex number (e.g. 0xffff)
+  # Consuming zero char
+  lexer_consume(a0);
+  # Setting integer token ID
+  lexer_token_set(a0, TOKEN_INTEGER);
+  # Moving to next trigger
+  goto lx02n[lexer_look(a0)];
 label lx03;
-	## We have to parse octal number
-	# Fetching digit
-	x0 = lexer_consume(a0);
-	# Adding digit to number
-	a0[LEX_TVALUE] = a0[LEX_TVALUE] * 8 + (x0 - '0');
-	# Moving to next trigger
-	goto lx03n[lexer_look(a0)];
+  ## We have to parse octal number
+  # Fetching digit
+  x0 = lexer_consume(a0);
+  # Adding digit to number
+  a0[LEX_TVALUE] = a0[LEX_TVALUE] * 8 + (x0 - '0');
+  # Moving to next trigger
+  goto lx03n[lexer_look(a0)];
 label lx04;
-	## Trying to parse hexadecimal number
-	# We have 'x' symbol. Consuming it
-	lexer_consume(a0);
-	# Moving to next trigger
-	goto lx04n[lexer_look(a0)];
+  ## Trying to parse hexadecimal number
+  # We have 'x' symbol. Consuming it
+  lexer_consume(a0);
+  # Moving to next trigger
+  goto lx04n[lexer_look(a0)];
 label lx05;
-	## Parsing hexadecimal number
-	# Fetching digit
-	x0 = lexer_consume(a0);
-	# Checking if it is lower case hexadecimal digit
-	if (x0 >= 'a') {
-		x0 = x0 - 'a' + 10;
-	} else {
-		# Checking if it is higher case hexadecimal digit
-		if (x0 >= 'A') {
-			x0 = x0 - 'A' + 10;
-		} else {
-			# It is decimal digit
-			x0 = x0 - '0';
-		};
-	};
-	# Adding digit to number
-	a0[LEX_TVALUE] = a0[LEX_TVALUE] * 16 + x0;
-	# Moving to next trigger
-	goto lx05n[lexer_look(a0)];
+  ## Parsing hexadecimal number
+  # Fetching digit
+  x0 = lexer_consume(a0);
+  # Checking if it is lower case hexadecimal digit
+  if (x0 >= 'a') {
+    x0 = x0 - 'a' + 10;
+  } else {
+    # Checking if it is higher case hexadecimal digit
+    if (x0 >= 'A') {
+      x0 = x0 - 'A' + 10;
+    } else {
+      # It is decimal digit
+      x0 = x0 - '0';
+    };
+  };
+  # Adding digit to number
+  a0[LEX_TVALUE] = a0[LEX_TVALUE] * 16 + x0;
+  # Moving to next trigger
+  goto lx05n[lexer_look(a0)];
 label lx06;
-	## We have to parse decimal number
-	# We have to set integer token ID
-	lexer_token_set(a0, TOKEN_INTEGER);
-	# Fetching digit
-	x0 = lexer_consume(a0);
-	# Adding digit to number
-	a0[LEX_TVALUE] = a0[LEX_TVALUE] * 10 + (x0 - '0');
-	# Moving to next trigger
-	goto lx06n[lexer_look(a0)];
+  ## We have to parse decimal number
+  # We have to set integer token ID
+  lexer_token_set(a0, TOKEN_INTEGER);
+  # Fetching digit
+  x0 = lexer_consume(a0);
+  # Adding digit to number
+  a0[LEX_TVALUE] = a0[LEX_TVALUE] * 10 + (x0 - '0');
+  # Moving to next trigger
+  goto lx06n[lexer_look(a0)];
 label lx07;
-	## We have to parse identifier
-	# We have to set identifier token ID
-	lexer_token_set(a0, TOKEN_IDENTIFIER);
-	# Adding char to token text
-	lexer_consume(a0);
-	# Moving to next trigger
-	goto lx07n[lexer_look(a0)];
+  ## We have to parse identifier
+  # We have to set identifier token ID
+  lexer_token_set(a0, TOKEN_IDENTIFIER);
+  # Adding char to token text
+  lexer_consume(a0);
+  # Moving to next trigger
+  goto lx07n[lexer_look(a0)];
 label lx08;
-	## Checking if identifier is keyword
-	# Resetting reserved keyword index
-	x1 = 0;
-	# Iterating through all reserved keywords
-	while (reserved_keywords[x1] != NULL) {
-		# If strings are equal
-		if (strcmp(reserved_keywords[x1], lexer_token_text(a0)) == NULL) {
-			# Setting keyword token ID
-			lexer_token_set(a0, TOKEN_IF + x1);
-			goto &lx99;
-		};
-		# Checking next keyword
-		x1 = x1 + 1;
-	};
-	# We are here because identifier is not a keyword. Exitting
-	goto &lx99;
+  ## Checking if identifier is keyword
+  # Resetting reserved keyword index
+  x1 = 0;
+  # Iterating through all reserved keywords
+  while (reserved_keywords[x1] != NULL) {
+    # If strings are equal
+    if (strcmp(reserved_keywords[x1], lexer_token_text(a0)) == NULL) {
+      # Setting keyword token ID
+      lexer_token_set(a0, TOKEN_IF + x1);
+      goto &lx99;
+    };
+    # Checking next keyword
+    x1 = x1 + 1;
+  };
+  # We are here because identifier is not a keyword. Exitting
+  goto &lx99;
 label lx09;
-	## We have to parse argument or variable (or identifier)
-	# Fetching char
-	x0 = lexer_consume(a0);
-	# Checking if we have argument or variable
-	x1 = TOKEN_VARIABLE;
-	if (x0 == 'a') { x1 = TOKEN_ARGUMENT; };
-	# Set token type
-	lexer_token_set(a0, x1);
-	# Moving to next trigger
-	goto lx09n[lexer_look(a0)];
+  ## We have to parse argument or variable (or identifier)
+  # Fetching char
+  x0 = lexer_consume(a0);
+  # Checking if we have argument or variable
+  x1 = TOKEN_VARIABLE;
+  if (x0 == 'a') { x1 = TOKEN_ARGUMENT; };
+  # Set token type
+  lexer_token_set(a0, x1);
+  # Moving to next trigger
+  goto lx09n[lexer_look(a0)];
 label lx10;
-	## Parsing number of argument/variable
-	# Fetching char
-	x0 = lexer_consume(a0);
-	# Adding digit to value
-	a0[LEX_TVALUE] = a0[LEX_TVALUE] * 10 + (x0 - '0');
-	# Moving to next trigger
-	goto lx10n[lexer_look(a0)];
+  ## Parsing number of argument/variable
+  # Fetching char
+  x0 = lexer_consume(a0);
+  # Adding digit to value
+  a0[LEX_TVALUE] = a0[LEX_TVALUE] * 10 + (x0 - '0');
+  # Moving to next trigger
+  goto lx10n[lexer_look(a0)];
 label lx11;
-	## Parsing single quote (character literal)
-	# Setting integer token ID
-	lexer_token_set(a0, TOKEN_INTEGER);
-	# Consuming char
-	lexer_consume(a0);
-	# Moving to next trigger
-	goto lx11n[lexer_look(a0)];
+  ## Parsing single quote (character literal)
+  # Setting integer token ID
+  lexer_token_set(a0, TOKEN_INTEGER);
+  # Consuming char
+  lexer_consume(a0);
+  # Moving to next trigger
+  goto lx11n[lexer_look(a0)];
 label lx12;
-	## Parsing single quote 'simple' content (without backslash)
-	# Fetching char
-	x0 = lexer_consume(a0);
-	# Setting value
-	a0[LEX_TVALUE] = x0;
-	goto &lx14;
+  ## Parsing single quote 'simple' content (without backslash)
+  # Fetching char
+  x0 = lexer_consume(a0);
+  # Setting value
+  a0[LEX_TVALUE] = x0;
+  goto &lx14;
 label lx13;
-	## Parsing single quote content with backslash
-	# Consuming backslash
-	lexer_consume(a0);
-	# Fetching char
-	x0 = lexer_consume(a0);
-	# Setting escape value
-	a0[LEX_TVALUE] = char_to_escape[x0];
+  ## Parsing single quote content with backslash
+  # Consuming backslash
+  lexer_consume(a0);
+  # Fetching char
+  x0 = lexer_consume(a0);
+  # Setting escape value
+  a0[LEX_TVALUE] = char_to_escape[x0];
 label lx14;
-	# Checking if quotes are closed
-	if (lexer_look(a0) != CHAR_SQUOTE) { goto &le06; };
-	# Consuming char
-	lexer_consume(a0);
-	goto &lx99;
+  # Checking if quotes are closed
+  if (lexer_look(a0) != CHAR_SQUOTE) { goto &le06; };
+  # Consuming char
+  lexer_consume(a0);
+  goto &lx99;
 label lx15;
-	## Parsing double quote (string literal)
-	# Consuming char
-	lexer_consume(a0);
-	# Moving to next trigger
-	goto lx15n[lexer_look(a0)];
+  ## Parsing double quote (string literal)
+  # Consuming char
+  lexer_consume(a0);
+  # Moving to next trigger
+  goto lx15n[lexer_look(a0)];
 label lx16;
-	## Ending string
-	# Consuming char
-	lexer_consume(a0);
-	# Setting string token ID
-	lexer_token_set(a0, TOKEN_STRING);
-	# Ending
-	goto &lx99;
+  ## Ending string
+  # Consuming char
+  lexer_consume(a0);
+  # Setting string token ID
+  lexer_token_set(a0, TOKEN_STRING);
+  # Ending
+  goto &lx99;
 label lx17;
-	## Parsing symbol
-	# Fetching char
-	x0 = lexer_consume(a0);
-	# Setting token ID to char value
-	lexer_token_set(a0, x0);
-	# Fetching next chars
-	x1 = fnextc(a0[LEX_ICHAN], 0);
-	x2 = fnextc(a0[LEX_ICHAN], 1);
-	# Checking for double-char or triple-char symbols
-	if (x0 == '=') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); };
-		if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); };
-	};
+  ## Parsing symbol
+  # Fetching char
+  x0 = lexer_consume(a0);
+  # Setting token ID to char value
+  lexer_token_set(a0, x0);
+  # Fetching next chars
+  x1 = fnextc(a0[LEX_ICHAN], 0);
+  x2 = fnextc(a0[LEX_ICHAN], 1);
+  # Checking for double-char or triple-char symbols
+  if (x0 == '=') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); };
+    if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); };
+  };
 
-	if (x0 == '!') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_NE); };
-	};
+  if (x0 == '!') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_NE); };
+  };
 
-	if (x0 == '+') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AADD); };
-	};
+  if (x0 == '+') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AADD); };
+  };
 
-	if (x0 == '-') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ASUB); };
-	};
+  if (x0 == '-') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ASUB); };
+  };
 
-	if (x0 == '*') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMUL); };
-	};
+  if (x0 == '*') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMUL); };
+  };
 
-	if (x0 == '/') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ADIV); };
-	};
+  if (x0 == '/') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ADIV); };
+  };
 
-	if (x0 == '%') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMOD); };
-	};
+  if (x0 == '%') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMOD); };
+  };
 
-	if (x0 == '<') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); };
-		if (x1 == '<') {
-			if (x2 == '=') {
-				lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHL);
-			} else {
-				lexer_consume(a0); lexer_token_set(a0, TOKEN_SHL);
-			};
-		};
-	};
+  if (x0 == '<') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); };
+    if (x1 == '<') {
+      if (x2 == '=') {
+        lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHL);
+      } else {
+        lexer_consume(a0); lexer_token_set(a0, TOKEN_SHL);
+      };
+    };
+  };
 
-	if (x0 == '>') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); };
-		if (x1 == '>') {
-			if (x2 == '=') {
-				lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHR);
-			} else {
-				lexer_consume(a0); lexer_token_set(a0, TOKEN_SHR);
-			};
-		};
-	};
+  if (x0 == '>') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); };
+    if (x1 == '>') {
+      if (x2 == '=') {
+        lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHR);
+      } else {
+        lexer_consume(a0); lexer_token_set(a0, TOKEN_SHR);
+      };
+    };
+  };
 
-	if (x0 == '^') {
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AXOR); };
-	};
+  if (x0 == '^') {
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AXOR); };
+  };
 
-	if (x0 == '&') {
-		if (x1 == '&') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LAND); };
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AAND); };
-	};
+  if (x0 == '&') {
+    if (x1 == '&') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LAND); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AAND); };
+  };
 
-	if (x0 == '|') {
-		if (x1 == '|') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LOR); };
-		if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AOR); };
-	};
-	# Checking for comment
-	if (x0 == '#') {
-		## Skipping line
-		# NOTE: using * insead of &&, because we don't have it
-		while ((x0 != '\n') * (x0 != '\0')) { x0 = fgetc(a0[LEX_ICHAN]); };
-		# Resetting line and column
-		a0[LEX_LINE] = a0[LEX_LINE] + 1;
-		a0[LEX_COLUMN] = 1;
-		# Starting lexing from the start
-		goto &lx00;
-	};
+  if (x0 == '|') {
+    if (x1 == '|') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LOR); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AOR); };
+  };
+  # Checking for comment
+  if (x0 == '#') {
+    ## Skipping line
+    # NOTE: using * insead of &&, because we don't have it
+    while ((x0 != '\n') * (x0 != '\0')) { x0 = fgetc(a0[LEX_ICHAN]); };
+    # Resetting line and column
+    a0[LEX_LINE] = a0[LEX_LINE] + 1;
+    a0[LEX_COLUMN] = 1;
+    # Starting lexing from the start
+    goto &lx00;
+  };
 label lx99;
-	## Finishing lexing. Returning current token ID
-	return(a0[LEX_TID]);
+  ## Finishing lexing. Returning current token ID
+  return(a0[LEX_TID]);
 label le00;
-	lexer_error(a0, "Invalid character");
+  lexer_error(a0, "Invalid character");
 label le01;
-	lexer_error(a0, "Unexpected second 0 char");
+  lexer_error(a0, "Unexpected second 0 char");
 label le02;
-	lexer_error(a0, "Unexpected decimal digit (expected octal)");
+  lexer_error(a0, "Unexpected decimal digit (expected octal)");
 label le03;
-	lexer_error(a0, "Unexpected hexadecimal digit (expected octal)");
+  lexer_error(a0, "Unexpected hexadecimal digit (expected octal)");
 label le04;
-	lexer_error(a0, "Unfinished hexadecimal number");
+  lexer_error(a0, "Unfinished hexadecimal number");
 label le05;
-	lexer_error(a0, "Unexpected hexadecimal digit (expected decimal)");
+  lexer_error(a0, "Unexpected hexadecimal digit (expected decimal)");
 label le06;
-	lexer_error(a0, "Unterminated character literal");
+  lexer_error(a0, "Unterminated character literal");
 label le07;
-	lexer_error(a0, "Unterminated string literal");
+  lexer_error(a0, "Unterminated string literal");
 };
 
 ### Parser
@@ -1581,14 +1581,14 @@ parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
 # a0 - parser
 # @return token location
 parser_token_location : (a0) {
-	# x0 - token location
-	allocate(1);
-	# Fetching token location
-	x0 = lexer_token_location(parser_lexer(a0));
-	# Subtracting token length from column
-	x0[LOC_COLUMN] = x0[LOC_COLUMN] - lexer_token_length(parser_lexer(a0)) + 1;
-	# Returning location
-	return(x0);
+  # x0 - token location
+  allocate(1);
+  # Fetching token location
+  x0 = lexer_token_location(parser_lexer(a0));
+  # Subtracting token length from column
+  x0[LOC_COLUMN] = x0[LOC_COLUMN] - lexer_token_length(parser_lexer(a0)) + 1;
+  # Returning location
+  return(x0);
 };
 
 ## Hold current lexer in parser
@@ -1605,68 +1605,68 @@ parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); };
 # a1 - token location
 # a2 - error message
 parser_error : (a0, a1, a2) {
-	# Printing location
-	fputloc(a1, stderr);
-	eputs(": ");
-	# Printing message
-	eputs(a2);
-	# Flushing
-	eputc('\n');
-	# Exitting
-	exit(1);
+  # Printing location
+  fputloc(a1, stderr);
+  eputs(": ");
+  # Printing message
+  eputs(a2);
+  # Flushing
+  eputc('\n');
+  # Exitting
+  exit(1);
 };
 
 ## Parse file
 # a0 - parser
 # @return AST
 parser_parse : (a0) {
-	# x0 - top level statements vector
-	# x1 - token
-	# x2 - statement
-	# x3 - token location
-	allocate(4);
-	# Allocating statements vector
-	x0 = vector(0, 1);
+  # x0 - top level statements vector
+  # x1 - token
+  # x2 - statement
+  # x3 - token location
+  allocate(4);
+  # Allocating statements vector
+  x0 = vector(0, 1);
 label parser_parse_continue;
-	## Parsing file
-	# Fetching token for tests
-	x1 = parser_lex(a0);
-	# Testing until got end of file
-	while (x1 != TOKEN_END) {
-		# If token is ;, skipping it as empty statement
-		if (x1 == ';') { goto &parser_parse_continue; };
-		# Fetching token location
-		x3 = parser_token_location(a0);
-		# Parsing statement
-		x2 = top_level_statement(a0, x1, x3);
-		# Adding statement, if needed
-		if (x2) { vector_push(x0, x2); };
-		# Fetching next token
-		x1 = parser_lex(a0);
-		# Checking statement to be ended with ;
-		if (x1 != ';') {
-			# Checking if we switched to new file before
-			if (a0[PARSER_SWITCH] == FALSE) {
-				goto &parser_parse_error;
-			};
-			# Disabling this flag
-			a0[PARSER_SWITCH] = FALSE;
-			# Holding token
-			lexer_hold(parser_lexer(a0));
-		};
-		# Fetching next token
-		x1 = parser_lex(a0);
-	};
-	# Destroying lexer
-	lexer_destroy(parser_lexer(a0));
-	# Switching to previous lexer
-	a0[PARSER_LEX] = list_next(a0[PARSER_LEX]);
-	# If lexer is not NULL, continuing
-	if (a0[PARSER_LEX] != NULL) { goto &parser_parse_continue; };
-	# Returning statemtents vector
-	return(x0);
+  ## Parsing file
+  # Fetching token for tests
+  x1 = parser_lex(a0);
+  # Testing until got end of file
+  while (x1 != TOKEN_END) {
+    # If token is ;, skipping it as empty statement
+    if (x1 == ';') { goto &parser_parse_continue; };
+    # Fetching token location
+    x3 = parser_token_location(a0);
+    # Parsing statement
+    x2 = top_level_statement(a0, x1, x3);
+    # Adding statement, if needed
+    if (x2) { vector_push(x0, x2); };
+    # Fetching next token
+    x1 = parser_lex(a0);
+    # Checking statement to be ended with ;
+    if (x1 != ';') {
+      # Checking if we switched to new file before
+      if (a0[PARSER_SWITCH] == FALSE) {
+        goto &parser_parse_error;
+      };
+      # Disabling this flag
+      a0[PARSER_SWITCH] = FALSE;
+      # Holding token
+      lexer_hold(parser_lexer(a0));
+    };
+    # Fetching next token
+    x1 = parser_lex(a0);
+  };
+  # Destroying lexer
+  lexer_destroy(parser_lexer(a0));
+  # Switching to previous lexer
+  a0[PARSER_LEX] = list_next(a0[PARSER_LEX]);
+  # If lexer is not NULL, continuing
+  if (a0[PARSER_LEX] != NULL) { goto &parser_parse_continue; };
+  # Returning statemtents vector
+  return(x0);
 label parser_parse_error;
-	parser_error(a0, x3, "Statement is not ended with semicolon");
+  parser_error(a0, x3, "Statement is not ended with semicolon");
 };
 
 ## Parse top level statement
@@ -1675,38 +1675,38 @@ label parser_parse_error;
 # a2 - token location
 # @return statement
 top_level_statement : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - identifier
-	allocate(2);
-	# Parsing global statement
-	if (a1 == TOKEN_GLOBAL) { return(global_statement(a0, a2)); };
-	# Parsing include statement
-	if (a1 == TOKEN_INCLUDE) { return(include_statement(a0, a2)); };
-	# Parsing statements starting with identifier
-	if (a1 == TOKEN_IDENTIFIER) {
-		# Duplicating identifier
-		x1 = strdup(lexer_token_text(parser_lexer(a0)));
-		# Fetching next token
-		x0 = parser_lex(a0);
-		# Parsing macro definition
-		if (x0 == TOKEN_ARROW) { return(macro_declaration(a0, x1, a2)); };
-		# Parsing identifier declarations
-		if (x0 == ':') {
-			# Fetching next token
-			x0 = parser_lex(a0);
-			# Parsing function declaration
-			if (x0 == '(') { return(function_declaration(a0, x1, a2)); };
-			# Parsing array declaration
-			if (x0 == '[') { return(array_declaration(a0, x1, a2)); };
-			# Parsing reserved char array declaration
-			if (x0 == TOKEN_TYPE_CHAR) { return(type_array_declaration(a0, x1, STMT_CHAR_ARRAY_DECL, a2)); };
-			# Parsing reserved int array declaration
-			if (x0 == TOKEN_TYPE_INT) { return(type_array_declaration(a0, x1, STMT_INT_ARRAY_DECL, a2)); };
-			# Parsing simple variable declaration
-			return(variable_declaration(a0, x1, x0, a2));
-		};
-	};
-	parser_error(a0, "Syntax error - none of available top level statements matched");
+  # x0 - next token
+  # x1 - identifier
+  allocate(2);
+  # Parsing global statement
+  if (a1 == TOKEN_GLOBAL) { return(global_statement(a0, a2)); };
+  # Parsing include statement
+  if (a1 == TOKEN_INCLUDE) { return(include_statement(a0, a2)); };
+  # Parsing statements starting with identifier
+  if (a1 == TOKEN_IDENTIFIER) {
+    # Duplicating identifier
+    x1 = strdup(lexer_token_text(parser_lexer(a0)));
+    # Fetching next token
+    x0 = parser_lex(a0);
+    # Parsing macro definition
+    if (x0 == TOKEN_ARROW) { return(macro_declaration(a0, x1, a2)); };
+    # Parsing identifier declarations
+    if (x0 == ':') {
+      # Fetching next token
+      x0 = parser_lex(a0);
+      # Parsing function declaration
+      if (x0 == '(') { return(function_declaration(a0, x1, a2)); };
+      # Parsing array declaration
+      if (x0 == '[') { return(array_declaration(a0, x1, a2)); };
+      # Parsing reserved char array declaration
+      if (x0 == TOKEN_TYPE_CHAR) { return(type_array_declaration(a0, x1, STMT_CHAR_ARRAY_DECL, a2)); };
+      # Parsing reserved int array declaration
+      if (x0 == TOKEN_TYPE_INT) { return(type_array_declaration(a0, x1, STMT_INT_ARRAY_DECL, a2)); };
+      # Parsing simple variable declaration
+      return(variable_declaration(a0, x1, x0, a2));
+    };
+  };
+  parser_error(a0, "Syntax error - none of available top level statements matched");
 };
 
 ## Parse global statement
@@ -1714,44 +1714,44 @@ top_level_statement : (a0, a1, a2) {
 # a1 - token location
 # @return statement
 global_statement : (a0, a1) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - identifier
-	allocate(3);
-	# Allocating ops vector
-	x0 = vector(0, 1);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# If next token is identifier - globalling only one identifier
-	if (x1 == TOKEN_IDENTIFIER) {
-		# Making a copy of identifier
-		x2 = strdup(lexer_token_text(parser_lexer(a0)));
-		# Pushing identifier to op1
-		vector_push(x0, x2);
-	} else {
-		# If not an identifier, check if it is (. If not, errorring.
-		if (x1 == '(') {
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - identifier
+  allocate(3);
+  # Allocating ops vector
+  x0 = vector(0, 1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # If next token is identifier - globalling only one identifier
+  if (x1 == TOKEN_IDENTIFIER) {
+    # Making a copy of identifier
+    x2 = strdup(lexer_token_text(parser_lexer(a0)));
+    # Pushing identifier to op1
+    vector_push(x0, x2);
+  } else {
+    # If not an identifier, check if it is (. If not, errorring.
+    if (x1 == '(') {
 label global_statement_next;
-			# Fetching next token
-			x1 = parser_lex(a0);
-			# Checking if it is identifier
-			if (x1 != TOKEN_IDENTIFIER) { goto &global_statement_invalid; };
-			# Making a copy of identifier
-			x2 = strdup(lexer_token_text(parser_lexer(a0)));
-			# Pushing identifier to ops
-			vector_push(x0, x2);
-			## If next token is , - redoing loop
-			# Fetching next token
-			x1 = parser_lex(a0);
-			if (x1 == ',') { goto &global_statement_next; };
-			# Checking for correct syntax
-			if (x1 != ')') { goto &global_statement_invalid; };
-		} else { goto &global_statement_invalid; };
-	};
-	# Returning statement
-	return(tuple3(STMT_GLOBAL, a1, x0));
+      # Fetching next token
+      x1 = parser_lex(a0);
+      # Checking if it is identifier
+      if (x1 != TOKEN_IDENTIFIER) { goto &global_statement_invalid; };
+      # Making a copy of identifier
+      x2 = strdup(lexer_token_text(parser_lexer(a0)));
+      # Pushing identifier to ops
+      vector_push(x0, x2);
+      ## If next token is , - redoing loop
+      # Fetching next token
+      x1 = parser_lex(a0);
+      if (x1 == ',') { goto &global_statement_next; };
+      # Checking for correct syntax
+      if (x1 != ')') { goto &global_statement_invalid; };
+    } else { goto &global_statement_invalid; };
+  };
+  # Returning statement
+  return(tuple3(STMT_GLOBAL, a1, x0));
 label global_statement_invalid;
-	parser_error(a0, a1, "Invalid global statement");
+  parser_error(a0, a1, "Invalid global statement");
 };
 
 ## Parse include statement
@@ -1759,56 +1759,56 @@ label global_statement_invalid;
 # a1 - token location
 # @return NULL
 include_statement : (a0, a1) {
-	# x0 - file vector
-	# x1 - next token/i
-	# x2 - file
-	allocate(3);
-	# Allocating files vector
-	x0 = vector(0, 1);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# If next token is string - importing one file
-	if (x1 == TOKEN_STRING) {
-		# Making a copy of data in string
-		x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
-		# Pushing file to vector
-		vector_push(x0, x2);
-	} else {
-		# If not an string, check if it is (. If not, erroring.
-		if (x1 == '(') {
+  # x0 - file vector
+  # x1 - next token/i
+  # x2 - file
+  allocate(3);
+  # Allocating files vector
+  x0 = vector(0, 1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # If next token is string - importing one file
+  if (x1 == TOKEN_STRING) {
+    # Making a copy of data in string
+    x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
+    # Pushing file to vector
+    vector_push(x0, x2);
+  } else {
+    # If not an string, check if it is (. If not, erroring.
+    if (x1 == '(') {
 label include_statement_next;
-			# Fetching next token
-			x1 = parser_lex(a0);
-			# Checking if it is string
-			if (x1 != TOKEN_STRING) { goto &include_statement_invalid; };
-			# Making a copy of data in string
-			x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
-			# Pushing file to vector
-			vector_push(x0, x2);
-			## If next token is , - redoing loop
-			# Fetching next token
-			x1 = parser_lex(a0);
-			if (x1 == ',') { goto &include_statement_next; };
-			# Checking for correct syntax
-			if (x1 != ')') { goto &include_statement_invalid; };
-		} else { goto &include_statement_invalid; };
-	};
+      # Fetching next token
+      x1 = parser_lex(a0);
+      # Checking if it is string
+      if (x1 != TOKEN_STRING) { goto &include_statement_invalid; };
+      # Making a copy of data in string
+      x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
+      # Pushing file to vector
+      vector_push(x0, x2);
+      ## If next token is , - redoing loop
+      # Fetching next token
+      x1 = parser_lex(a0);
+      if (x1 == ',') { goto &include_statement_next; };
+      # Checking for correct syntax
+      if (x1 != ')') { goto &include_statement_invalid; };
+    } else { goto &include_statement_invalid; };
+  };
 
-	# Creating lexers for specified files
-	x1 = 0;
-	while (x1 < vector_size(x0)) {
-		# Getting filename
-		x2 = vector_get(x0, x1);
-		# Adding lexer to list
-		a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], lexer_file(x2));
-		# Moving to next file
-		x1 = x1 + 1;
-	};
-	# Marking we switched file
-	a0[PARSER_SWITCH] = TRUE;
-	return(NULL);
+  # Creating lexers for specified files
+  x1 = 0;
+  while (x1 < vector_size(x0)) {
+    # Getting filename
+    x2 = vector_get(x0, x1);
+    # Adding lexer to list
+    a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], lexer_file(x2));
+    # Moving to next file
+    x1 = x1 + 1;
+  };
+  # Marking we switched file
+  a0[PARSER_SWITCH] = TRUE;
+  return(NULL);
 label include_statement_invalid;
-	parser_error(a0, a1, "Invalid include statement");
+  parser_error(a0, a1, "Invalid include statement");
 };
 
 ## Parse macro declaration
@@ -1817,15 +1817,15 @@ label include_statement_invalid;
 # a2 - token location
 # @return statement
 macro_declaration : (a0, a1, a2) {
-	# x0 - token
-	# x1 - expression
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching expression
-	x1 = expression(a0, x0);
-	# Returning expression
-	return(tuple4(STMT_MACRO, a2, a1, x1));
+  # x0 - token
+  # x1 - expression
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching expression
+  x1 = expression(a0, x0);
+  # Returning expression
+  return(tuple4(STMT_MACRO, a2, a1, x1));
 };
 
 ## Parse function declaration
@@ -1834,39 +1834,39 @@ macro_declaration : (a0, a1, a2) {
 # a2 - token location
 # @return statement
 function_declaration : (a0, a1, a2) {
-	# x0 - arg count
-	# x1 - token
-	# x2 - block statement
-	allocate(3);
-	# Resetting arg count
-	x0 = 0;
-	## Parsing arguments
+  # x0 - arg count
+  # x1 - token
+  # x2 - block statement
+  allocate(3);
+  # Resetting arg count
+  x0 = 0;
+  ## Parsing arguments
 label function_declaration_arg_loop;
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if arguments ended
-	if (x1 == ')') { goto &function_declaration_arg_end; };
-	# Checking for argument
-	if (x1 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
-	if (x0 != lexer_token_value(parser_lexer(a0)))
-		{ goto &function_declaration_arg_invalid; };
-	# Incrementing argument count
-	x0 = x0 + 1;
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for next argument
-	if (x1 == ',') { goto &function_declaration_arg_loop; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if arguments ended
+  if (x1 == ')') { goto &function_declaration_arg_end; };
+  # Checking for argument
+  if (x1 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
+  if (x0 != lexer_token_value(parser_lexer(a0)))
+  { goto &function_declaration_arg_invalid; };
+  # Incrementing argument count
+  x0 = x0 + 1;
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for next argument
+  if (x1 == ',') { goto &function_declaration_arg_loop; };
 label function_declaration_arg_end;
-	# Checking we actually exitted arguments correctly
-	if (x1 != ')') { goto &function_declaration_arg_invalid; };
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching block statement
-	x2 = block_statement(a0, x1);
-	# Returning statement
-	return(tuple5(STMT_FUN_DECL, a2, a1, x0, x2));
+  # Checking we actually exitted arguments correctly
+  if (x1 != ')') { goto &function_declaration_arg_invalid; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching block statement
+  x2 = block_statement(a0, x1);
+  # Returning statement
+  return(tuple5(STMT_FUN_DECL, a2, a1, x0, x2));
 label function_declaration_arg_invalid;
-	parser_error(a0, a2, "Invalid function arguments declaration syntax");
+  parser_error(a0, a2, "Invalid function arguments declaration syntax");
 };
 
 ## Parse array declaration
@@ -1875,29 +1875,29 @@ label function_declaration_arg_invalid;
 # a2 - token location
 # @return statement
 array_declaration : (a0, a1, a2) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - expression
+  allocate(3);
+  # Allocating operand vector
+  x0 = vector(0, 1);
 label array_declaration_loop;
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching next expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if there is another element
-	if (x1 == ',') { goto &array_declaration_loop; };
-	# Checking for correct syntax
-	if (x1 != ']') { goto &array_declaration_invalid; };
-	# Returning statement
-	return(tuple4(STMT_ARRAY_DECL, a2, a1, x0));
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching next expression
+  x2 = expression(a0, x1);
+  # Pushing expression to operand vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if there is another element
+  if (x1 == ',') { goto &array_declaration_loop; };
+  # Checking for correct syntax
+  if (x1 != ']') { goto &array_declaration_invalid; };
+  # Returning statement
+  return(tuple4(STMT_ARRAY_DECL, a2, a1, x0));
 label array_declaration_invalid;
-	parser_error(a0, a2, "Invalid array declaration syntax");
+  parser_error(a0, a2, "Invalid array declaration syntax");
 };
 
 ## Parse type array declaration
@@ -1907,30 +1907,30 @@ label array_declaration_invalid;
 # a3 - token location
 # @return statement
 type_array_declaration : (a0, a1, a2, a3) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x1 != '[') { goto &type_array_declaration_invalid; };
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching next expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x1 != ']') { goto &type_array_declaration_invalid; };
-	# Returning statement
-	return(tuple4(a2, a3, a1, x0));
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - expression
+  allocate(3);
+  # Allocating operand vector
+  x0 = vector(0, 1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != '[') { goto &type_array_declaration_invalid; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching next expression
+  x2 = expression(a0, x1);
+  # Pushing expression to operand vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != ']') { goto &type_array_declaration_invalid; };
+  # Returning statement
+  return(tuple4(a2, a3, a1, x0));
 label type_array_declaration_invalid;
-	parser_error(a0, a3, "Invalid char array declaration syntax");
+  parser_error(a0, a3, "Invalid char array declaration syntax");
 };
 
 ## Parse variable declaration
@@ -1940,12 +1940,12 @@ label type_array_declaration_invalid;
 # a3 - token location
 # @return statement
 variable_declaration : (a0, a1, a2, a3) {
-	# x0 - expression
-	allocate(1);
-	# Fetching next expression
-	x0 = expression(a0, a2);
-	# Returning statement
-	return(tuple4(STMT_VAR_DECL, a3, a1, x0));
+  # x0 - expression
+  allocate(1);
+  # Fetching next expression
+  x0 = expression(a0, a2);
+  # Returning statement
+  return(tuple4(STMT_VAR_DECL, a3, a1, x0));
 };
 
 ## Parse block of statements
@@ -1953,44 +1953,44 @@ variable_declaration : (a0, a1, a2, a3) {
 # a1 - current token
 # @return statement
 block_statement : (a0, a1) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	# x3 - token location
-	# x4 - statement token location
-	allocate(5);
-	# Fetching token location
-	x3 = parser_token_location(a0);
-	# Checking for correct syntax
-	if (a1 != '{') { goto &block_statement_invalid; };
-	# Allocating operand (statements) vector
-	x0 = vector(0, 1);
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - expression
+  # x3 - token location
+  # x4 - statement token location
+  allocate(5);
+  # Fetching token location
+  x3 = parser_token_location(a0);
+  # Checking for correct syntax
+  if (a1 != '{') { goto &block_statement_invalid; };
+  # Allocating operand (statements) vector
+  x0 = vector(0, 1);
 label block_statement_loop;
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching statement token location
-	x4 = parser_token_location(a0);
-	# Checking if we need to exit the loop
-	if (x1 == '}') { goto &block_statement_end; };
-	# Checking if we have next block inside this
-	if (x1 == '{') { x2 = block_statement(a0, x1); }
-	# Else fetching statement
-	else { x2 = statement(a0, x1, x4); };
-	# Pushing statement to vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if expression is ended with semicolon
-	if (x1 != ';') { goto &block_statement_content_invalid; };
-	# So, making next iteration
-	goto &block_statement_loop;
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching statement token location
+  x4 = parser_token_location(a0);
+  # Checking if we need to exit the loop
+  if (x1 == '}') { goto &block_statement_end; };
+  # Checking if we have next block inside this
+  if (x1 == '{') { x2 = block_statement(a0, x1); }
+  # Else fetching statement
+  else { x2 = statement(a0, x1, x4); };
+  # Pushing statement to vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if expression is ended with semicolon
+  if (x1 != ';') { goto &block_statement_content_invalid; };
+  # So, making next iteration
+  goto &block_statement_loop;
 label block_statement_end;
-	# Returning block statement
-	return(tuple2(STMT_BLOCK, x0));
+  # Returning block statement
+  return(tuple2(STMT_BLOCK, x0));
 label block_statement_invalid;
-	parser_error(a0, x3, "Invalid block statement syntax");
+  parser_error(a0, x3, "Invalid block statement syntax");
 label block_statement_content_invalid;
-	parser_error(a0, x4, "Statement inside block is not ended with semicolon");
+  parser_error(a0, x4, "Statement inside block is not ended with semicolon");
 };
 
 ## Parse statement
@@ -1999,24 +1999,24 @@ label block_statement_content_invalid;
 # a2 - token location
 # @return statement
 statement : (a0, a1, a2) {
-	# Parsing if statement
-	if (a1 == TOKEN_IF) { return(if_statement(a0, a2)); };
-	# Parsing while statement
-	if (a1 == TOKEN_WHILE) { return(while_statement(a0, a2)); };
-	# Parsing allocate statement
-	if (a1 == TOKEN_ALLOCATE) { return(allocate_statement(a0, a2)); };
-	# Parsing return statement
-	if (a1 == TOKEN_RETURN) { return(return_statement(a0, a2)); };
-	# Parsing syscall statement
-	if (a1 == TOKEN_SYSCALL) { return(syscall_statement(a0, a2)); };
-	# Parsing writechar statement
-	if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0, a2)); };
-	# Parsing label statement
-	if (a1 == TOKEN_LABEL) { return(label_statement(a0, a2)); };
-	# Parsing goto statement
-	if (a1 == TOKEN_GOTO) { return(goto_statement(a0, a2)); };
-	# Returning expression, as statements were not found here
-	return(expression(a0, a1));
+  # Parsing if statement
+  if (a1 == TOKEN_IF) { return(if_statement(a0, a2)); };
+  # Parsing while statement
+  if (a1 == TOKEN_WHILE) { return(while_statement(a0, a2)); };
+  # Parsing allocate statement
+  if (a1 == TOKEN_ALLOCATE) { return(allocate_statement(a0, a2)); };
+  # Parsing return statement
+  if (a1 == TOKEN_RETURN) { return(return_statement(a0, a2)); };
+  # Parsing syscall statement
+  if (a1 == TOKEN_SYSCALL) { return(syscall_statement(a0, a2)); };
+  # Parsing writechar statement
+  if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0, a2)); };
+  # Parsinglabel statement
+  if (a1 == TOKEN_LABEL) { return(label_statement(a0, a2)); };
+  # Parsing goto statement
+  if (a1 == TOKEN_GOTO) { return(goto_statement(a0, a2)); };
+  # Returning expression, as statements were not found here
+  return(expression(a0, a1));
 };
 
 ## Parse if statement
@@ -2024,47 +2024,47 @@ statement : (a0, a1, a2) {
 # a1 - token location
 # @return statement
 if_statement : (a0, a1) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 3);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x1 != '(') { goto &if_statement_invalid; };
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching condition expression
-	x2 = expression(a0, x1);
-	# Append condition to vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x1 != ')') { goto &if_statement_invalid; };
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching block statement
-	x2 = block_statement(a0, x1);
-	# Append if block to vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if we have else statement
-	if (x1 != TOKEN_ELSE) { parser_lexer_hold(a0); goto &if_statement_end; };
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching else block statement
-	x2 = block_statement(a0, x1);
-	# Append else block to vector
-	vector_push(x0, x2);
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - expression
+  allocate(3);
+  # Allocating operand vector
+  x0 = vector(0, 3);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != '(') { goto &if_statement_invalid; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching condition expression
+  x2 = expression(a0, x1);
+  # Append condition to vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != ')') { goto &if_statement_invalid; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching block statement
+  x2 = block_statement(a0, x1);
+  # Append if block to vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if we have else statement
+  if (x1 != TOKEN_ELSE) { parser_lexer_hold(a0); goto &if_statement_end; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching else block statement
+  x2 = block_statement(a0, x1);
+  # Append else block to vector
+  vector_push(x0, x2);
 label if_statement_end;
-	# Return statement
-	return(tuple3(STMT_IF, a1, x0));
+  # Return statement
+  return(tuple3(STMT_IF, a1, x0));
 label if_statement_invalid;
-	parser_error(a0, a1, "Invalid if statement syntax");
+  parser_error(a0, a1, "Invalid if statement syntax");
 };
 
 ## Parse while statement
@@ -2072,30 +2072,30 @@ label if_statement_invalid;
 # a1 - token location
 # @return statement
 while_statement : (a0, a1) {
-	# x0 - next token
-	# x1 - cond expression
-	# x2 - block statement
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != '(') { goto &while_statement_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching condition expression
-	x1 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ')') { goto &while_statement_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching block statement
-	x2 = block_statement(a0, x0);
-	# Return statement
-	return(tuple4(STMT_WHILE, a1, x1, x2));
+  # x0 - next token
+  # x1 - cond expression
+  # x2 - block statement
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != '(') { goto &while_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching condition expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ')') { goto &while_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching block statement
+  x2 = block_statement(a0, x0);
+  # Return statement
+  return(tuple4(STMT_WHILE, a1, x1, x2));
 label while_statement_invalid;
-	parser_error(a0, a1, "Invalid while statement syntax");
+  parser_error(a0, a1, "Invalid while statement syntax");
 };
 
 ## Parse allocate statement
@@ -2103,25 +2103,25 @@ label while_statement_invalid;
 # a1 - token location
 # @return statement
 allocate_statement : (a0, a1) {
-	# x0 - next token
-	# x1 - expression
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != '(') { goto &allocate_statement_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching size expression
-	x1 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ')') { goto &allocate_statement_invalid; };
-	# Return statement
-	return(tuple3(STMT_ALLOCATE, a1, x1));
+  # x0 - next token
+  # x1 - expression
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != '(') { goto &allocate_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching size expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ')') { goto &allocate_statement_invalid; };
+  # Return statement
+  return(tuple3(STMT_ALLOCATE, a1, x1));
 label allocate_statement_invalid;
-	parser_error(a0, a1, "Invalid allocate statement syntax");
+  parser_error(a0, a1, "Invalid allocate statement syntax");
 };
 
 ## Parse return statement
@@ -2129,22 +2129,22 @@ label allocate_statement_invalid;
 # a1 - token location
 # @return statement
 return_statement : (a0, a1) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if we are returning with no result
-	if (x1 == ';') { parser_lexer_hold(a0); goto &return_statement_end; };
-	# Fetching return expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - expression
+  allocate(3);
+  # Allocating operand vector
+  x0 = vector(0, 1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if we are returning with no result
+  if (x1 == ';') { parser_lexer_hold(a0); goto &return_statement_end; };
+  # Fetching return expression
+  x2 = expression(a0, x1);
+  # Pushing expression to operand vector
+  vector_push(x0, x2);
 label return_statement_end;
-	return(tuple3(STMT_RETURN, a1, x0));
+  return(tuple3(STMT_RETURN, a1, x0));
 };
 
 ## Parse syscall statement
@@ -2152,8 +2152,8 @@ label return_statement_end;
 # a1 - token location
 # @return statement
 syscall_statement : (a0, a1) {
-	# Just using already implemented `simple_syscall_expression`
-	return(simple_syscall_expression(a0, TRUE, a1));
+  # Just using already implemented `simple_syscall_expression`
+  return(simple_syscall_expression(a0, TRUE, a1));
 };
 
 ## Parse writechar statement
@@ -2161,63 +2161,63 @@ syscall_statement : (a0, a1) {
 # a1 - token location
 # @return statement
 writechar_statement : (a0, a1) {
-	# x0 - next token
-	# x1 - array expression
-	# x2 - index expression
-	# x3 - value expression
-	allocate(4);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != '(') { goto &writechar_statement_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching array expression
-	x1 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ',') { goto &writechar_statement_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching index expression
-	x2 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ',') { goto &writechar_statement_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching value expression
-	x3 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ')') { goto &writechar_statement_invalid; };
-	# Returning statement
-	return(tuple5(STMT_WRITECHAR, a1, x1, x2, x3));
+  # x0 - next token
+  # x1 - array expression
+  # x2 - index expression
+  # x3 - value expression
+  allocate(4);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != '(') { goto &writechar_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching array expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ',') { goto &writechar_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching index expression
+  x2 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ',') { goto &writechar_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching value expression
+  x3 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ')') { goto &writechar_statement_invalid; };
+  # Returning statement
+  return(tuple5(STMT_WRITECHAR, a1, x1, x2, x3));
 label writechar_statement_invalid;
-	parser_error(a0, a1, "Invalid writechar statement");
+  parser_error(a0, a1, "Invalid writechar statement");
 };
 
-## Parse label statement
+## Parselabel statement
 # a0 - parser
 # a1 - token location
 # @return statement
 label_statement : (a0, a1) {
-	# x0 - next token
-	# x1 - duplicated identifier
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
-	# Duplicating identifier
-	x1 = strdup(lexer_token_text(parser_lexer(a0)));
-	# Returning statement
-	return(tuple3(STMT_LABEL, a1, x1));
+  # x0 - next token
+  # x1 - duplicated identifier
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
+  # Duplicating identifier
+  x1 = strdup(lexer_token_text(parser_lexer(a0)));
+  # Returning statement
+  return(tuple3(STMT_LABEL, a1, x1));
 label label_statement_invalid;
-	parser_error(a0, a1, "Invalid label statement syntax");
+  parser_error(a0, a1, "Invalidlabel statement syntax");
 };
 
 ## Parse goto statement
@@ -2225,15 +2225,15 @@ label label_statement_invalid;
 # a1 - token location
 # @return statement
 goto_statement : (a0, a1) {
-	# x0 - next token
-	# x1 - expression
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching goto expression
-	x1 = expression(a0, x0);
-	# Returning statement
-	return(tuple3(STMT_GOTO, a1, x1));
+  # x0 - next token
+  # x1 - expression
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching goto expression
+  x1 = expression(a0, x0);
+  # Returning statement
+  return(tuple3(STMT_GOTO, a1, x1));
 };
 
 ## Parse expression
@@ -2241,11 +2241,11 @@ goto_statement : (a0, a1) {
 # a1 - current token
 # @return statement
 expression : (a0, a1) {
-	# x0 - token location
-	allocate(1);
-	# Fetching token location
-	x0 = parser_token_location(a0);
-	return(assignment_expression(a0, a1, x0));
+  # x0 - token location
+  allocate(1);
+  # Fetching token location
+  x0 = parser_token_location(a0);
+  return(assignment_expression(a0, a1, x0));
 };
 
 ## Try to parse assignment expression
@@ -2254,29 +2254,29 @@ expression : (a0, a1) {
 # a2 - token location
 # @return statement
 assignment_expression : (a0, a1, a2) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
-	# Fetching first operand
-	x0 = ternary_expression(a0, a1, a2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Parsing assignment
-	if (x1 == '=')        { return(assignment_expr(a0, x0, STMT_EXPR_ASSIGN,     a2)); };
-	if (x1 == TOKEN_AADD) { return(assignment_expr(a0, x0, STMT_EXPR_ADD_ASSIGN, a2)); };
-	if (x1 == TOKEN_ASUB) { return(assignment_expr(a0, x0, STMT_EXPR_SUB_ASSIGN, a2)); };
-	if (x1 == TOKEN_AMUL) { return(assignment_expr(a0, x0, STMT_EXPR_MUL_ASSIGN, a2)); };
-	if (x1 == TOKEN_ADIV) { return(assignment_expr(a0, x0, STMT_EXPR_DIV_ASSIGN, a2)); };
-	if (x1 == TOKEN_AMOD) { return(assignment_expr(a0, x0, STMT_EXPR_MOD_ASSIGN, a2)); };
-	if (x1 == TOKEN_AAND) { return(assignment_expr(a0, x0, STMT_EXPR_AND_ASSIGN, a2)); };
-	if (x1 == TOKEN_AXOR) { return(assignment_expr(a0, x0, STMT_EXPR_XOR_ASSIGN, a2)); };
-	if (x1 == TOKEN_AOR)  { return(assignment_expr(a0, x0, STMT_EXPR_OR_ASSIGN,  a2)); };
-	if (x1 == TOKEN_ASHL) { return(assignment_expr(a0, x0, STMT_EXPR_SHL_ASSIGN, a2)); };
-	if (x1 == TOKEN_ASHR) { return(assignment_expr(a0, x0, STMT_EXPR_SHR_ASSIGN, a2)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(x0);
+  # x0 - op1
+  # x1 - next token
+  allocate(2);
+  # Fetching first operand
+  x0 = ternary_expression(a0, a1, a2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Parsing assignment
+  if (x1 == '=')        { return(assignment_expr(a0, x0, STMT_EXPR_ASSIGN,     a2)); };
+  if (x1 == TOKEN_AADD) { return(assignment_expr(a0, x0, STMT_EXPR_ADD_ASSIGN, a2)); };
+  if (x1 == TOKEN_ASUB) { return(assignment_expr(a0, x0, STMT_EXPR_SUB_ASSIGN, a2)); };
+  if (x1 == TOKEN_AMUL) { return(assignment_expr(a0, x0, STMT_EXPR_MUL_ASSIGN, a2)); };
+  if (x1 == TOKEN_ADIV) { return(assignment_expr(a0, x0, STMT_EXPR_DIV_ASSIGN, a2)); };
+  if (x1 == TOKEN_AMOD) { return(assignment_expr(a0, x0, STMT_EXPR_MOD_ASSIGN, a2)); };
+  if (x1 == TOKEN_AAND) { return(assignment_expr(a0, x0, STMT_EXPR_AND_ASSIGN, a2)); };
+  if (x1 == TOKEN_AXOR) { return(assignment_expr(a0, x0, STMT_EXPR_XOR_ASSIGN, a2)); };
+  if (x1 == TOKEN_AOR)  { return(assignment_expr(a0, x0, STMT_EXPR_OR_ASSIGN,  a2)); };
+  if (x1 == TOKEN_ASHL) { return(assignment_expr(a0, x0, STMT_EXPR_SHL_ASSIGN, a2)); };
+  if (x1 == TOKEN_ASHR) { return(assignment_expr(a0, x0, STMT_EXPR_SHR_ASSIGN, a2)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(x0);
 };
 
 ## Parse assignment expression
@@ -2286,18 +2286,18 @@ assignment_expression : (a0, a1, a2) {
 # a3 - token location
 # @return statement
 assignment_expr : (a0, a1, a2, a3) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = ternary_expression(a0, x0, x2);
-	# Returning expression
-	return(tuple4(a2, a3, a1, x1));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = ternary_expression(a0, x0, x2);
+  # Returning expression
+  return(tuple4(a2, a3, a1, x1));
 };
 
 ## Try to parse ternary expression
@@ -2306,19 +2306,19 @@ assignment_expr : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 ternary_expression : (a0, a1, a2) {
-	# x0 - op1
-	# x1 - next token
-	allocate(2);
-	# Fetching first operand
-	x0 = logical_or_expression(a0, a1, NULL, a2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Parsing ternary
-	if (x1 == '?') { return(ternary_expr(a0, x0, a2, x2)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(x0);
+  # x0 - op1
+  # x1 - next token
+  allocate(2);
+  # Fetching first operand
+  x0 = logical_or_expression(a0, a1, NULL, a2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Parsing ternary
+  if (x1 == '?') { return(ternary_expr(a0, x0, a2, x2)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(x0);
 };
 
 ## Parse ternary expression
@@ -2327,31 +2327,31 @@ ternary_expression : (a0, a1, a2) {
 # a2 - token location
 # @return statement
 ternary_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - op3
-	# x3 - token location
-	allocate(4);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x3 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = ternary_expression(a0, x0, x3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ':') { goto &ternary_expr_error; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x3 = parser_token_location(a0);
-	# Fetching third operand
-	x2 = ternary_expression(a0, x0, x3);
-	# Returning expression
-	return(tuple5(STMT_EXPR_TERNARY, a2, a1, x1, x2));
+  # x0 - next token
+  # x1 - op2
+  # x2 - op3
+  # x3 - token location
+  allocate(4);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x3 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = ternary_expression(a0, x0, x3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ':') { goto &ternary_expr_error; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x3 = parser_token_location(a0);
+  # Fetching third operand
+  x2 = ternary_expression(a0, x0, x3);
+  # Returning expression
+  return(tuple5(STMT_EXPR_TERNARY, a2, a1, x1, x2));
 label ternary_expr_error;
-	parser_error(a0, a2, "Incorrect ternary expression syntax");
+  parser_error(a0, a2, "Incorrect ternary expression syntax");
 };
 
 ## Try to parse logical or expression
@@ -2361,18 +2361,18 @@ label ternary_expr_error;
 # a3 - token location
 # @return statement
 logical_or_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = logical_and_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing logical or
-	if (x0 == TOKEN_LOR) { return(logical_or_expr(a0, a2, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = logical_and_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing logical or
+  if (x0 == TOKEN_LOR) { return(logical_or_expr(a0, a2, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse logical or expression
@@ -2381,18 +2381,18 @@ logical_or_expression : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 logical_or_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = logical_and_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(logical_or_expression(a0, NULL, tuple4(STMT_EXPR_LOGICAL_OR, a2, a1, x1), a2));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = logical_and_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(logical_or_expression(a0, NULL, tuple4(STMT_EXPR_LOGICAL_OR, a2, a1, x1), a2));
 };
 
 ## Try to parse logical and expression
@@ -2402,18 +2402,18 @@ logical_or_expr : (a0, a1, a2) {
 # a3 - token location
 # @return statement
 logical_and_expression : (a0, a1, a2) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing logical and
-	if (x0 == TOKEN_LAND) { return(logical_and_expr(a0, a2, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing logical and
+  if (x0 == TOKEN_LAND) { return(logical_and_expr(a0, a2, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse logical and expression
@@ -2422,18 +2422,18 @@ logical_and_expression : (a0, a1, a2) {
 # a2 - token location
 # @return statement
 logical_and_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = equality_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(logical_and_expression(a0, NULL, tuple4(STMT_EXPR_LOGICAL_AND, a2, a1, x1), a2));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = equality_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(logical_and_expression(a0, NULL, tuple4(STMT_EXPR_LOGICAL_AND, a2, a1, x1), a2));
 };
 
 ## Try to parse equality expression
@@ -2443,20 +2443,20 @@ logical_and_expr : (a0, a1, a2) {
 # a3 - token location
 # @return statement
 equality_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = relational_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing equal
-	if (x0 == TOKEN_EQ) { return(equality_expr(a0, a2, STMT_EXPR_EQ, a3)); };
-	# Parsing not equal
-	if (x0 == TOKEN_NE) { return(equality_expr(a0, a2, STMT_EXPR_NE, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = relational_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing equal
+  if (x0 == TOKEN_EQ) { return(equality_expr(a0, a2, STMT_EXPR_EQ, a3)); };
+  # Parsing not equal
+  if (x0 == TOKEN_NE) { return(equality_expr(a0, a2, STMT_EXPR_NE, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse equality expression
@@ -2466,18 +2466,18 @@ equality_expression : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 equality_expr : (a0, a1, a2, a3) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = relational_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(equality_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = relational_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(equality_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
 };
 
 ## Try to parse relational expression
@@ -2487,24 +2487,24 @@ equality_expr : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 relational_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing less
-	if (x0 == '<') { return(relational_expr(a0, a2, STMT_EXPR_LESS, a3)); };
-	# Parsing greater
-	if (x0 == '>') { return(relational_expr(a0, a2, STMT_EXPR_GREATER, a3)); };
-	# Parsing less or equal
-	if (x0 == TOKEN_LE) { return(relational_expr(a0, a2, STMT_EXPR_LE, a3)); };
-	# Parsing greater or equal
-	if (x0 == TOKEN_GE) { return(relational_expr(a0, a2, STMT_EXPR_GE, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing less
+  if (x0 == '<') { return(relational_expr(a0, a2, STMT_EXPR_LESS, a3)); };
+  # Parsing greater
+  if (x0 == '>') { return(relational_expr(a0, a2, STMT_EXPR_GREATER, a3)); };
+  # Parsing less or equal
+  if (x0 == TOKEN_LE) { return(relational_expr(a0, a2, STMT_EXPR_LE, a3)); };
+  # Parsing greater or equal
+  if (x0 == TOKEN_GE) { return(relational_expr(a0, a2, STMT_EXPR_GE, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse relational expression
@@ -2514,18 +2514,18 @@ relational_expression : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 relational_expr : (a0, a1, a2, a3) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = bitwise_or_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(relational_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = bitwise_or_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(relational_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
 };
 
 ## Try to parse bitwise or expression
@@ -2535,18 +2535,18 @@ relational_expr : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 bitwise_or_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = bitwise_xor_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing bitwise or
-	if (x0 == '|') { return(bitwise_or_expr(a0, a2, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = bitwise_xor_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing bitwise or
+  if (x0 == '|') { return(bitwise_or_expr(a0, a2, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse bitwise or expression
@@ -2555,18 +2555,18 @@ bitwise_or_expression : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 bitwise_or_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = bitwise_xor_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(bitwise_or_expression(a0, NULL, tuple4(STMT_EXPR_OR, a2, a1, x1), a2));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = bitwise_xor_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(bitwise_or_expression(a0, NULL, tuple4(STMT_EXPR_OR, a2, a1, x1), a2));
 };
 
 ## Try to parse bitwise xor expression
@@ -2576,18 +2576,18 @@ bitwise_or_expr : (a0, a1, a2) {
 # a3 - token location
 # @return statement
 bitwise_xor_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = bitwise_and_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing bitwise xor
-	if (x0 == '^') { return(bitwise_xor_expr(a0, a2, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = bitwise_and_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing bitwise xor
+  if (x0 == '^') { return(bitwise_xor_expr(a0, a2, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse bitwise xor expression
@@ -2596,18 +2596,18 @@ bitwise_xor_expression : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 bitwise_xor_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = bitwise_and_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(bitwise_xor_expression(a0, NULL, tuple4(STMT_EXPR_XOR, a2, a1, x1), a2));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = bitwise_and_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(bitwise_xor_expression(a0, NULL, tuple4(STMT_EXPR_XOR, a2, a1, x1), a2));
 };
 
 ## Try to parse bitwise and expression
@@ -2617,18 +2617,18 @@ bitwise_xor_expr : (a0, a1, a2) {
 # a3 - token location
 # @return statement
 bitwise_and_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = bitwise_shift_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing bitwise and
-	if (x0 == '&') { return(bitwise_and_expr(a0, a2, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = bitwise_shift_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing bitwise and
+  if (x0 == '&') { return(bitwise_and_expr(a0, a2, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse bitwise and expression
@@ -2637,18 +2637,18 @@ bitwise_and_expression : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 bitwise_and_expr : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = bitwise_shift_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(bitwise_and_expression(a0, NULL, tuple4(STMT_EXPR_AND, a2, a1, x1), a2));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = bitwise_shift_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(bitwise_and_expression(a0, NULL, tuple4(STMT_EXPR_AND, a2, a1, x1), a2));
 };
 
 ## Try to parse bitwise shift expression
@@ -2658,20 +2658,20 @@ bitwise_and_expr : (a0, a1, a2) {
 # a3 - token location
 # @return statement
 bitwise_shift_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = additive_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing left shift
-	if (x0 == TOKEN_SHL) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHL, a3)); };
-	# Parsing right shift
-	if (x0 == TOKEN_SHR) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHR, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = additive_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing left shift
+  if (x0 == TOKEN_SHL) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHL, a3)); };
+  # Parsing right shift
+  if (x0 == TOKEN_SHR) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHR, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse bitwise shift expression
@@ -2681,18 +2681,18 @@ bitwise_shift_expression : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 bitwise_shift_expr : (a0, a1, a2, a3) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = additive_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(bitwise_shift_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = additive_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(bitwise_shift_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
 };
 
 ## Try to parse additive expression
@@ -2702,20 +2702,20 @@ bitwise_shift_expr : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 additive_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = multiplicative_expression(a0, a1, NULL, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing addition
-	if (x0 == '+') { return(additive_expr(a0, a2, STMT_EXPR_ADD, a3)); };
-	# Parsing subtraction
-	if (x0 == '-') { return(additive_expr(a0, a2, STMT_EXPR_SUB, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = multiplicative_expression(a0, a1, NULL, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing addition
+  if (x0 == '+') { return(additive_expr(a0, a2, STMT_EXPR_ADD, a3)); };
+  # Parsing subtraction
+  if (x0 == '-') { return(additive_expr(a0, a2, STMT_EXPR_SUB, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse additive expression
@@ -2725,18 +2725,18 @@ additive_expression : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 additive_expr : (a0, a1, a2, a3) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = multiplicative_expression(a0, x0, NULL, x2);
-	# Returning expression
-	return(additive_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = multiplicative_expression(a0, x0, NULL, x2);
+  # Returning expression
+  return(additive_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
 };
 
 ## Try to parse multiplicative expression
@@ -2746,22 +2746,22 @@ additive_expr : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 multiplicative_expression : (a0, a1, a2, a3) {
-	# x0 - next token
-	allocate(1);
-	# Fetching first operand
-	if (a2 == NULL) { a2 = prefix_expression(a0, a1, a3); };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Parsing multiplication
-	if (x0 == '*') { return(multiplicative_expr(a0, a2, STMT_EXPR_MUL, a3)); };
-	# Parsing integer division
-	if (x0 == '/') { return(multiplicative_expr(a0, a2, STMT_EXPR_DIV, a3)); };
-	# Parsing modulus division
-	if (x0 == '%') { return(multiplicative_expr(a0, a2, STMT_EXPR_MOD, a3)); };
-	# Holding token
-	parser_lexer_hold(a0);
-	# Returning operand
-	return(a2);
+  # x0 - next token
+  allocate(1);
+  # Fetching first operand
+  if (a2 == NULL) { a2 = prefix_expression(a0, a1, a3); };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Parsing multiplication
+  if (x0 == '*') { return(multiplicative_expr(a0, a2, STMT_EXPR_MUL, a3)); };
+  # Parsing integer division
+  if (x0 == '/') { return(multiplicative_expr(a0, a2, STMT_EXPR_DIV, a3)); };
+  # Parsing modulus division
+  if (x0 == '%') { return(multiplicative_expr(a0, a2, STMT_EXPR_MOD, a3)); };
+  # Holding token
+  parser_lexer_hold(a0);
+  # Returning operand
+  return(a2);
 };
 
 ## Parse multiplicative expression
@@ -2771,18 +2771,18 @@ multiplicative_expression : (a0, a1, a2, a3) {
 # a3 - token location
 # @return statement
 multiplicative_expr : (a0, a1, a2, a3) {
-	# x0 - next token
-	# x1 - op2
-	# x2 - token location
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x2 = parser_token_location(a0);
-	# Fetching second operand
-	x1 = prefix_expression(a0, x0, x2);
-	# Returning expression
-	return(multiplicative_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
+  # x0 - next token
+  # x1 - op2
+  # x2 - token location
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x2 = parser_token_location(a0);
+  # Fetching second operand
+  x1 = prefix_expression(a0, x0, x2);
+  # Returning expression
+  return(multiplicative_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
 };
 
 ## Try to parse prefix expression
@@ -2791,20 +2791,20 @@ multiplicative_expr : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 prefix_expression : (a0, a1, a2) {
-	# Parsing unary plus
-	if (a1 == '+') { return(prefix_expr(a0, STMT_EXPR_PLUS, a2)); };
-	# Parsing unary minus
-	if (a1 == '-') { return(prefix_expr(a0, STMT_EXPR_MINUS, a2)); };
-	# Parsing logical not
-	if (a1 == '!') { return(prefix_expr(a0, STMT_EXPR_LOGICAL_NOT, a2)); };
-	# Parsing bitwise not
-	if (a1 == '~') { return(prefix_expr(a0, STMT_EXPR_NOT, a2)); };
-	# Parsing dereference
-	if (a1 == '*') { return(prefix_expr(a0, STMT_EXPR_DEREF, a2)); };
-	# Parsing addressof
-	if (a1 == '&') { return(prefix_expr(a0, STMT_EXPR_ADDROF, a2)); };
-	# Parsing simple expression
-	return(simple_expression(a0, a1, a2));
+  # Parsing unary plus
+  if (a1 == '+') { return(prefix_expr(a0, STMT_EXPR_PLUS, a2)); };
+  # Parsing unary minus
+  if (a1 == '-') { return(prefix_expr(a0, STMT_EXPR_MINUS, a2)); };
+  # Parsing logical not
+  if (a1 == '!') { return(prefix_expr(a0, STMT_EXPR_LOGICAL_NOT, a2)); };
+  # Parsing bitwise not
+  if (a1 == '~') { return(prefix_expr(a0, STMT_EXPR_NOT, a2)); };
+  # Parsing dereference
+  if (a1 == '*') { return(prefix_expr(a0, STMT_EXPR_DEREF, a2)); };
+  # Parsing addressof
+  if (a1 == '&') { return(prefix_expr(a0, STMT_EXPR_ADDROF, a2)); };
+  # Parsing simple expression
+  return(simple_expression(a0, a1, a2));
 };
 
 ## Parse prefix expression
@@ -2813,18 +2813,18 @@ prefix_expression : (a0, a1, a2) {
 # a2 - token location
 # @return statement
 prefix_expr : (a0, a1, a2) {
-	# x0 - token
-	# x1 - token location
-	# x2 - op1
-	allocate(2);
-	# Fetching token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x1 = parser_token_location(a0);
-	# Fetching operand
-	x2 = prefix_expression(a0, x0, x1);
-	# Returning expression
-	return(tuple3(a1, a2, x0));
+  # x0 - token
+  # x1 - token location
+  # x2 - op1
+  allocate(2);
+  # Fetching token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x1 = parser_token_location(a0);
+  # Fetching operand
+  x2 = prefix_expression(a0, x0, x1);
+  # Returning expression
+  return(tuple3(a1, a2, x0));
 };
 
 ## Try to parse simple expression
@@ -2833,20 +2833,20 @@ prefix_expr : (a0, a1, a2) {
 # a2 - token location
 # @return statement
 simple_expression : (a0, a1, a2) {
-	# Parsing identifier
-	if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0, a2)); };
-	# Parsing argument
-	if (a1 == TOKEN_ARGUMENT) { return(simple_argvar_expression(a0, TRUE, a2)); };
-	# Parsing variable
-	if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE, a2)); };
-	# Parsing syscall
-	if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, FALSE, a2)); };
-	# Parsing readchar
-	if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a2)); };
-	# Parsing parantheses grouping
-	if (a1 == '(') { return(simple_parantheses_expression(a0, a2)); };
-	# Parsing constant expression
-	return(simple_postfix_expression(a0, constant_expression(a0, a1, a2)));
+  # Parsing identifier
+  if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0, a2)); };
+  # Parsing argument
+  if (a1 == TOKEN_ARGUMENT) { return(simple_argvar_expression(a0, TRUE, a2)); };
+  # Parsing variable
+  if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE, a2)); };
+  # Parsing syscall
+  if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, FALSE, a2)); };
+  # Parsing readchar
+  if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a2)); };
+  # Parsing parantheses grouping
+  if (a1 == '(') { return(simple_parantheses_expression(a0, a2)); };
+  # Parsing constant expression
+  return(simple_postfix_expression(a0, constant_expression(a0, a1, a2)));
 };
 
 ## Parse simple identifier expression
@@ -2854,12 +2854,12 @@ simple_expression : (a0, a1, a2) {
 # a1 - token location
 # @return statement
 simple_identifier_expression : (a0, a1) {
-	# x0 - duplicated identifier string
-	allocate(1);
-	# Duplicating the identifier
-	x0 = strdup(lexer_token_text(parser_lexer(a0)));
-	# Returning expression
-	return(simple_postfix_expression(a0, tuple3(STMT_EXPR_IDENTIFIER, a1, x0)));
+  # x0 - duplicated identifier string
+  allocate(1);
+  # Duplicating the identifier
+  x0 = strdup(lexer_token_text(parser_lexer(a0)));
+  # Returning expression
+  return(simple_postfix_expression(a0, tuple3(STMT_EXPR_IDENTIFIER, a1, x0)));
 };
 
 ## Parse simple argument/variable expression
@@ -2868,13 +2868,13 @@ simple_identifier_expression : (a0, a1) {
 # a2 - token location
 # @return statement
 simple_argvar_expression : (a0, a1, a2) {
-	# x0 - expression type
-	allocate(1);
-	# Getting expression type
-	x0 = STMT_EXPR_VARIABLE;
-	if (a1) { x0 = STMT_EXPR_ARGUMENT; };
-	# Returning expression
-	return(simple_postfix_expression(a0, tuple3(x0, a2, lexer_token_value(parser_lexer(a0)))));
+  # x0 - expression type
+  allocate(1);
+  # Getting expression type
+  x0 = STMT_EXPR_VARIABLE;
+  if (a1) { x0 = STMT_EXPR_ARGUMENT; };
+  # Returning expression
+  return(simple_postfix_expression(a0, tuple3(x0, a2, lexer_token_value(parser_lexer(a0)))));
 };
 
 ## Parse simple syscall expression
@@ -2883,41 +2883,41 @@ simple_argvar_expression : (a0, a1, a2) {
 # a2 - token location
 # @return statement
 simple_syscall_expression : (a0, a1, a2) {
-	# x0 - ops vector
-	# x1 - token
-	# x2 - expression
-	# x3 - node type
-	allocate(4);
-	# Allocating operand vector
-	x0 = vector(0, 1);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x1 != '(') { goto &simple_syscall_expression_invalid; };
+  # x0 - ops vector
+  # x1 - token
+  # x2 - expression
+  # x3 - node type
+  allocate(4);
+  # Allocating operand vector
+  x0 = vector(0, 1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != '(') { goto &simple_syscall_expression_invalid; };
 label simple_syscall_expression_loop;
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Fetching expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if there is next expression as argument
-	if (x1 == ',') { goto &simple_syscall_expression_loop; };
-	# Checking for correct syntax
-	if (x1 != ')') { goto &simple_syscall_expression_invalid; };
-	# Checking for argument count
-	if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; };
-	# Getting node type
-	x3 = STMT_EXPR_SYSCALL;
-	if (a1) { x3 = STMT_SYSCALL; };
-	# Returning expression
-	return(simple_postfix_expression(a0, tuple3(x3, a2, x0)));
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Fetching expression
+  x2 = expression(a0, x1);
+  # Pushing expression to operand vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if there is next expression as argument
+  if (x1 == ',') { goto &simple_syscall_expression_loop; };
+  # Checking for correct syntax
+  if (x1 != ')') { goto &simple_syscall_expression_invalid; };
+  # Checking for argument count
+  if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; };
+  # Getting node type
+  x3 = STMT_EXPR_SYSCALL;
+  if (a1) { x3 = STMT_SYSCALL; };
+  # Returning expression
+  return(simple_postfix_expression(a0, tuple3(x3, a2, x0)));
 label simple_syscall_expression_invalid;
-	parser_error(a0, a2, "Invalid syscall expression");
+  parser_error(a0, a2, "Invalid syscall expression");
 label simple_syscall_expression_too_many;
-	parser_error(a0, a2, "Too many arguments in syscall expression");
+  parser_error(a0, a2, "Too many arguments in syscall expression");
 };
 
 ## Parse simple readchar expression
@@ -2925,34 +2925,34 @@ label simple_syscall_expression_too_many;
 # a1 - token location
 # @return statement
 simple_readchar_expression : (a0, a1) {
-	# x0 - next token
-	# x1 - array expression
-	# x2 - index expression
-	allocate(3);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != '(') { goto &simple_readchar_expression_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching array expression
-	x1 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ',') { goto &simple_readchar_expression_invalid; };
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching index expression
-	x2 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ')') { goto &simple_readchar_expression_invalid; };
-	# Returning expression
-	return(simple_postfix_expression(a0, tuple4(STMT_EXPR_READCHAR, a1, x1, x2)));
+  # x0 - next token
+  # x1 - array expression
+  # x2 - index expression
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != '(') { goto &simple_readchar_expression_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching array expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ',') { goto &simple_readchar_expression_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching index expression
+  x2 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ')') { goto &simple_readchar_expression_invalid; };
+  # Returning expression
+  return(simple_postfix_expression(a0, tuple4(STMT_EXPR_READCHAR, a1, x1, x2)));
 label simple_readchar_expression_invalid;
-	parser_error(a0, a1, "Invalid readchar expression");
+  parser_error(a0, a1, "Invalid readchar expression");
 };
 
 ## Parse simple parantheses expression
@@ -2960,21 +2960,21 @@ label simple_readchar_expression_invalid;
 # a1 - token location
 # @return statement
 simple_parantheses_expression : (a0, a1) {
-	# x0 - next token
-	# x1 - expression
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching expression in parantheses
-	x1 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking parantheses are closed
-	if (x0 != ')') { goto &simple_parantheses_expression_invalid; };
-	# Returning expression
-	return(simple_postfix_expression(a0, x1));
+  # x0 - next token
+  # x1 - expression
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching expression in parantheses
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking parantheses are closed
+  if (x0 != ')') { goto &simple_parantheses_expression_invalid; };
+  # Returning expression
+  return(simple_postfix_expression(a0, x1));
 label simple_parantheses_expression_invalid;
-	parser_error(a0, a1, "Parantheses expression is not closed");
+  parser_error(a0, a1, "Parantheses expression is not closed");
 };
 
 ## Parse simple expression postfixes
@@ -2982,23 +2982,23 @@ label simple_parantheses_expression_invalid;
 # a1 - expression
 # @return statement
 simple_postfix_expression : (a0, a1) {
-	# x0 - next token
-	# x1 - token location
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching token location
-	x1 = parser_token_location(a0);
-	# Parsing address call
-	if (x0 == '(') { return(simple_address_call_expression(a0, a1, x1)); };
-	# Parsing address indexing
-	if (x0 == '[') { return(simple_address_index_expression(a0, a1, x1)); };
-	# Holding the token
-	parser_lexer_hold(a0);
-	# Freeing unused token location
-	free(x1);
-	# Returning expression
-	return(a1);
+  # x0 - next token
+  # x1 - token location
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching token location
+  x1 = parser_token_location(a0);
+  # Parsing address call
+  if (x0 == '(') { return(simple_address_call_expression(a0, a1, x1)); };
+  # Parsing address indexing
+  if (x0 == '[') { return(simple_address_index_expression(a0, a1, x1)); };
+  # Holding the token
+  parser_lexer_hold(a0);
+  # Freeing unused token location
+  free(x1);
+  # Returning expression
+  return(a1);
 };
 
 ## Parse simple address call expression
@@ -3007,34 +3007,34 @@ simple_postfix_expression : (a0, a1) {
 # a2 - token location
 # @return statement
 simple_address_call_expression : (a0, a1, a2) {
-	# x0 - ops vector
-	# x1 - next token
-	# x2 - expression
-	allocate(3);
-	# Allocating operand vector
-	x0 = vector(0, 1);
-	# Pushing expression to operand vector
-	vector_push(x0, a1);
+  # x0 - ops vector
+  # x1 - next token
+  # x2 - expression
+  allocate(3);
+  # Allocating operand vector
+  x0 = vector(0, 1);
+  # Pushing expression to operand vector
+  vector_push(x0, a1);
 label simple_address_call_expression_loop;
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking if arguments ended
-	if (x1 == ')') { goto &simple_address_call_expression_end; };
-	# Fetching expression
-	x2 = expression(a0, x1);
-	# Pushing expression to operand vector
-	vector_push(x0, x2);
-	# Fetching next token
-	x1 = parser_lex(a0);
-	# Checking for next argument
-	if (x1 == ',') { goto &simple_address_call_expression_loop; };
-	# Checking for correct syntax
-	if (x1 != ')') { goto &simple_address_call_expression_invalid; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if arguments ended
+  if (x1 == ')') { goto &simple_address_call_expression_end; };
+  # Fetching expression
+  x2 = expression(a0, x1);
+  # Pushing expression to operand vector
+  vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for next argument
+  if (x1 == ',') { goto &simple_address_call_expression_loop; };
+  # Checking for correct syntax
+  if (x1 != ')') { goto &simple_address_call_expression_invalid; };
 label simple_address_call_expression_end;
-	# Returning expression
-	return(simple_postfix_expression(a0, tuple3(STMT_EXPR_CALL, a2, x0)));
+  # Returning expression
+  return(simple_postfix_expression(a0, tuple3(STMT_EXPR_CALL, a2, x0)));
 label simple_address_call_expression_invalid;
-	parser_error(a0, a2, "Call expression is not closed");
+  parser_error(a0, a2, "Call expression is not closed");
 };
 
 ## Parse simple address indexing expression
@@ -3043,21 +3043,21 @@ label simple_address_call_expression_invalid;
 # a2 - token location
 # @return statement
 simple_address_index_expression : (a0, a1, a2) {
-	# x0 - next token
-	# x1 - expression
-	allocate(2);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Fetching expression
-	x1 = expression(a0, x0);
-	# Fetching next token
-	x0 = parser_lex(a0);
-	# Checking for correct syntax
-	if (x0 != ']') { goto &simple_address_index_expression_invalid; };
-	# Returning expression
-	return(simple_postfix_expression(a0, tuple4(STMT_EXPR_INDEX, a2, a1, x1)));
+  # x0 - next token
+  # x1 - expression
+  allocate(2);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ']') { goto &simple_address_index_expression_invalid; };
+  # Returning expression
+  return(simple_postfix_expression(a0, tuple4(STMT_EXPR_INDEX, a2, a1, x1)));
 label simple_address_index_expression_invalid;
-	parser_error(a0, a2, "Index expression is not closed");
+  parser_error(a0, a2, "Index expression is not closed");
 };
 
 ## Try to parse constant expression
@@ -3066,11 +3066,11 @@ label simple_address_index_expression_invalid;
 # a2 - token location
 # @return statement
 constant_expression : (a0, a1, a2) {
-	# Parsing integer
-	if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0, a2)); };
-	# Parsing string
-	if (a1 == TOKEN_STRING) { return(constant_string_expression(a0, a2)); };
-	parser_error(a0, a2, "Syntax error - none of available expressions matched");
+  # Parsing integer
+  if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0, a2)); };
+  # Parsing string
+  if (a1 == TOKEN_STRING) { return(constant_string_expression(a0, a2)); };
+  parser_error(a0, a2, "Syntax error - none of available expressions matched");
 };
 
 ## Parse constant integer expression
@@ -3078,8 +3078,8 @@ constant_expression : (a0, a1, a2) {
 # a1 - token location
 # @return statement
 constant_integer_expression : (a0, a1) {
-	# Returning basic integer expression
-	return(tuple3(STMT_EXPR_INTEGER, a1, lexer_token_value(parser_lexer(a0))));
+  # Returning basic integer expression
+  return(tuple3(STMT_EXPR_INTEGER, a1, lexer_token_value(parser_lexer(a0))));
 };
 
 ## Parse constant string expression
@@ -3087,12 +3087,12 @@ constant_integer_expression : (a0, a1) {
 # a1 - token location
 # @return statement
 constant_string_expression : (a0, a1) {
-	# x0 - duplicated string
-	allocate(1);
-	# Duplicating the string
-	x0 = strdup(lexer_token_text(parser_lexer(a0)));
-	# Returning expression
-	return(tuple3(STMT_EXPR_STRING, a1, x0));
+  # x0 - duplicated string
+  allocate(1);
+  # Duplicating the string
+  x0 = strdup(lexer_token_text(parser_lexer(a0)));
+  # Returning expression
+  return(tuple3(STMT_EXPR_STRING, a1, x0));
 };
 
 ### Compiler
@@ -3113,51 +3113,51 @@ compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
 # a0 - compiler
 # a1 - error message
 compiler_error : (a0, a1) {
-	eputs("ERROR: ");
-	eputs(a1);
-	eputc('\n');
-	exit(1);
+  eputs("ERROR: ");
+  eputs(a1);
+  eputc('\n');
+  exit(1);
 };
 
 ## Compile AST
 # a0 - compiler
 # a1 - AST
 compiler_compile : (a0, a1) {
-	# x0 - i
-	allocate(1);
-	# Using macros in AST instead of matching identifiers
-	compiler_use_macros(a0, a1);
-	# Resetting index
-	x0 = 0;
-	# Iterating through statements
-	while (x0 < vector_size(a1)) {
-		compile_top_level_statement(a0, vector_get(a1, x0));
-		x0 = x0 + 1;
-	};
+  # x0 - i
+  allocate(1);
+  # Using macros in AST instead of matching identifiers
+  compiler_use_macros(a0, a1);
+  # Resetting index
+  x0 = 0;
+  # Iterating through statements
+  while (x0 < vector_size(a1)) {
+    compile_top_level_statement(a0, vector_get(a1, x0));
+    x0 = x0 + 1;
+  };
 };
 
 ## Use macros instead of identifiers matching their name
 # a0 - compiler
 # a1 - AST
 compiler_use_macros : (a0, a1) {
-	# x0 - i
-	# x1 - statement
-	allocate(2);
-	# Resetting index
-	x0 = 0;
-	# Iterating through statements
-	while (x0 < vector_size(a1)) {
-		# Getting current statement
-		x1 = vector_get(a1, x0);
-		# Checking if current statement is a macro
-		if (x1[NODE_TYPE] == STMT_MACRO) {
-			# Using macro in AST
-			compiler_use_macro(a0, a1, x0 + 1, x1);
-		};
-		# Moving to next statement
-		x0 = x0 + 1;
-	};
-	compiler_error(a0, "Using macros is not implemented yet.");
+  # x0 - i
+  # x1 - statement
+  allocate(2);
+  # Resetting index
+  x0 = 0;
+  # Iterating through statements
+  while (x0 < vector_size(a1)) {
+    # Getting current statement
+    x1 = vector_get(a1, x0);
+    # Checking if current statement is a macro
+    if (x1[NODE_TYPE] == STMT_MACRO) {
+      # Using macro in AST
+      compiler_use_macro(a0, a1, x0 + 1, x1);
+    };
+    # Moving to next statement
+    x0 = x0 + 1;
+  };
+  compiler_error(a0, "Using macros is not implemented yet.");
 };
 
 ## Use macro in the rest of AST
@@ -3166,82 +3166,82 @@ compiler_use_macros : (a0, a1) {
 # a2 - statement index
 # a3 - macro statement
 compiler_use_macro : (a0, a1, a2, a3) {
-	fputloc(a3[1], stderr);
-	eputs(": ");
-	eputs(a3[2]);
-	eputc('\n');
+  fputloc(a3[1], stderr);
+  eputs(": ");
+  eputs(a3[2]);
+  eputc('\n');
 };
 
 ## Compile top level statement
 # a0 - compiler
 # a1 - top level statement
 compile_top_level_statement : (a0, a1) {
-	# x0 - statement ID
-	allocate(1);
-	# Getting statement ID
-	x0 = a1[NODE_TYPE];
-	# Compiling global statement
-	if (x0 == STMT_GLOBAL)          { compile_global_statement(a0, a1); };
-	# Compiling function declaration
-	if (x0 == STMT_FUN_DECL)        { compile_function_declaration(a0, a1); };
-	# Compiling array declaration
-	if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); };
-	# Compiling char array declaration
-	if (x0 == STMT_CHAR_ARRAY_DECL) { compile_char_array_declaration(a0, a1); };
-	# Compiling int array declaration
-	if (x0 == STMT_INT_ARRAY_DECL)  { compile_int_array_declaration(a0, a1); };
-	# Compiling variable declaration
-	if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
+  # x0 - statement ID
+  allocate(1);
+  # Getting statement ID
+  x0 = a1[NODE_TYPE];
+  # Compiling global statement
+  if (x0 == STMT_GLOBAL)          { compile_global_statement(a0, a1); };
+  # Compiling function declaration
+  if (x0 == STMT_FUN_DECL)        { compile_function_declaration(a0, a1); };
+  # Compiling array declaration
+  if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); };
+  # Compiling char array declaration
+  if (x0 == STMT_CHAR_ARRAY_DECL) { compile_char_array_declaration(a0, a1); };
+  # Compiling int array declaration
+  if (x0 == STMT_INT_ARRAY_DECL)  { compile_int_array_declaration(a0, a1); };
+  # Compiling variable declaration
+  if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
 };
 
 ## Compile global statement
 # a0 - compiler
 # a1 - statement
 compile_global_statement : (a0, a1) {
-	compiler_error(a0, "Compilation of global statements is not implemented yet.");
+  compiler_error(a0, "Compilation of global statements is not implemented yet.");
 };
 
 ## Compile function declaration
 # a0 - compiler
 # a1 - statement
 compile_function_declaration : (a0, a1) {
-	compiler_error(a0, "Compilation of function declarations is not implemented yet.");
+  compiler_error(a0, "Compilation of function declarations is not implemented yet.");
 };
 
 ## Compile array declaration
 # a0 - compiler
 # a1 - statement
 compile_array_declaration : (a0, a1) {
-	compiler_error(a0, "Compilation of array declarations is not implemented yet.");
+  compiler_error(a0, "Compilation of array declarations is not implemented yet.");
 };
 
 ## Compile char array declaration
 # a0 - compiler
 # a1 - statement
 compile_char_array_declaration : (a0, a1) {
-	compiler_error(a0, "Compilation of char array declarations is not implemented yet.");
+  compiler_error(a0, "Compilation of char array declarations is not implemented yet.");
 };
 
 ## Compile int array declaration
 # a0 - compiler
 # a1 - statement
 compile_int_array_declaration : (a0, a1) {
-	compiler_error(a0, "Compilation of int array declarations is not implemented yet.");
+  compiler_error(a0, "Compilation of int array declarations is not implemented yet.");
 };
 
 ## Compile variable declaration
 # a0 - compiler
 # a1 - statement
 compile_variable_declaration : (a0, a1) {
-	compiler_error(a0, "Compilation of variable declarations is not implemented yet.");
+  compiler_error(a0, "Compilation of variable declarations is not implemented yet.");
 };
 
 ## Print usage
 # a0 - program name
 usage : (a0) {
-	eputs("usage: ");
-	eputs(a0);
-	eputs(" [option]... <file>\n");
+  eputs("usage: ");
+  eputs(a0);
+  eputs(" [option]... <file>\n");
 };
 
 ## Main function
@@ -3249,38 +3249,38 @@ usage : (a0) {
 # a1 - argv
 # @return exit code
 main : (a0, a1) {
-	# x0 - input channel
-	# x1 - output channel
-	# x2 - lexer
-	# x3 - parser
-	# x4 - AST
-	# x5 - compiler
-	allocate(6);
-	# If no additional args - printing usage
-	if (a0 < 2) { usage(a1[0]); return(1); };
-	# TODO: implement option parser
-	# Creating input channel
-	x0 = input_chan_file(a1[1]);
-	# Creating output channel
-	x1 = output_chan_file("output.asm");
-	# Creating lexer
-	x2 = lexer(x0, a1[1]);
-	# Creating parser
-	x3 = parser(x2);
-	# Parsing code to AST
-	x4 = parser_parse(x3);
-	# Creating compiler
-	x5 = compiler(x1);
-	# Compiling AST
-	compiler_compile(x5, x4);
-	return(0);
+  # x0 - input channel
+  # x1 - output channel
+  # x2 - lexer
+  # x3 - parser
+  # x4 - AST
+  # x5 - compiler
+  allocate(6);
+  # If no additional args - printing usage
+  if (a0 < 2) { usage(a1[0]); return(1); };
+  # TODO: implement option parser
+  # Creating input channel
+  x0 = input_chan_file(a1[1]);
+  # Creating output channel
+  x1 = output_chan_file("output.asm");
+  # Creating lexer
+  x2 = lexer(x0, a1[1]);
+  # Creating parser
+  x3 = parser(x2);
+  # Parsing code to AST
+  x4 = parser_parse(x3);
+  # Creating compiler
+  x5 = compiler(x1);
+  # Compiling AST
+  compiler_compile(x5, x4);
+  return(0);
 };
 
 # Entry point of the entire program
 global _start;
 _start : () {
-	# Initializing I/O at the start
-	initialize_io();
-	# argc is located in 4(%esp), argv is located in 8(%esp)
-	exit(main(*(&a0 - 4), &a0));
+  # Initializing I/O at the start
+  initialize_io();
+  # argc is located in 4(%esp), argv is located in 8(%esp)
+  exit(main(*(&a0 - 4), &a0));
 };
