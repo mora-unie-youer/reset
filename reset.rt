@@ -3125,15 +3125,21 @@ STRBUF_SIZE => 4096;
 ## String buffer parts
 STRBUF_BUFFER => 0;
 STRBUF_OFFSET => 1;
+STRBUF_LENGTH => 2;
 
 ## Create new string buffer
 # @return buffer
-string_buffer : () { return(tuple2(calloc(STRBUF_SIZE), 0)); };
+string_buffer : () { return(tuple3(calloc(STRBUF_SIZE), 0, 0)); };
 
 ## Get string buffer offset
 # a0 - string buffer
 # @return offset
 string_buffer_offset : (a0) { return(a0[STRBUF_OFFSET]); };
+
+## Get string buffer length
+# a0 - string buffer
+# @return offset
+string_buffer_length : (a0) { return(a0[STRBUF_LENGTH]); };
 
 ### Compiler
 ## Compiler parts
