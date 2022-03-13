@@ -877,12 +877,20 @@ fputn : (a0, a1, a2) {
   if (fputn_buffer == NULL) { fputn_buffer = malloc(33); };
   # Clearing buffer
   memset(0, fputn_buffer, 33);
-  # Convering number to string
+  # Converting number to string
   itoa(a1, fputn_buffer, a2);
   # Putting string
   fputs(a0, fputn_buffer);
 };
 
+## Put decimal number in channel
+# a0 - channel
+# a1 - number
+fputd : (a0, a1) { fputn(a0, a1, 10); };
+## Put hexadecimal number in channel
+# a0 - channel
+# a1 - number
+fputx : (a0, a1) { fputn(a0, a1, 16); };
 ## Put decimal number in stdout
 # a0 - number
 putd  : (a0) { fputn(stdout, a0, 10); };
