@@ -3380,7 +3380,17 @@ compile_type_array_declaration : (a0, a1, a2) {
 # a0 - compiler
 # a1 - statement
 compile_variable_declaration : (a0, a1) {
-  compiler_error(a0, "Compilation of variable declarations is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Creating variable label
+  fputs(x0, a1[2]);
+  fputs(x0, ":.long ");
+  # Compile variable value
+  compile_simple_value(a0, a1[3]);
+  # Writing newline to end .long macro
+  fputc(x0, '\n');
 };
 
 ## Compile simple value
