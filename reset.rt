@@ -3198,7 +3198,22 @@ compile_top_level_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_global_statement : (a0, a1) {
-  compiler_error(a0, "Compilation of global statements is not implemented yet.");
+  # x0 - compiler output channel
+  # x1 - counter
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Writing .global macro
+  fputs(x0, ".global ");
+  # Iterating through identifiers
+  x1 = 0;
+  while (x1 < vector_size(a1[2])) {
+    if (x1 != 0) { fputc(x0, ','); };
+    fputs(x0, vector_get(a1[2], x1));
+    x1 = x1 + 1;
+  };
+  # Writing new line to finish macro
+  fputc(x0, '\n');
 };
 
 ## Compile function declaration
