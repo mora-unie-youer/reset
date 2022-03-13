@@ -3194,10 +3194,10 @@ string_buffer_export : (a0, a1) {
   x2 = 0;
   while (x2 < x1) {
     # Writing .string macro
-    fputs(a1, ".string \"");
+    fputs(a1, ".string ");
     # Writing string
     fputs(a1, x0 + x2);
-    fputs(a1, "\"\n");
+    fputc(a1, '\n');
     # Moving to new offset
     x2 = x2 + strlen(x0 + x2) + 1;
   };
