@@ -3190,9 +3190,9 @@ compile_top_level_statement : (a0, a1) {
   # Compiling array declaration
   if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); };
   # Compiling char array declaration
-  if (x0 == STMT_CHAR_ARRAY_DECL) { compile_char_array_declaration(a0, a1); };
+  if (x0 == STMT_CHAR_ARRAY_DECL) { compile_type_array_declaration(a0, a1, 1); };
   # Compiling int array declaration
-  if (x0 == STMT_INT_ARRAY_DECL)  { compile_int_array_declaration(a0, a1); };
+  if (x0 == STMT_INT_ARRAY_DECL)  { compile_type_array_declaration(a0, a1, 4); };
   # Compiling variable declaration
   if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
 };
@@ -3233,18 +3233,34 @@ compile_array_declaration : (a0, a1) {
   compiler_error(a0, "Compilation of array declarations is not implemented yet.");
 };
 
-## Compile char array declaration
+## Compile type array declaration
 # a0 - compiler
 # a1 - statement
-compile_char_array_declaration : (a0, a1) {
-  compiler_error(a0, "Compilation of char array declarations is not implemented yet.");
-};
-
-## Compile int array declaration
-# a0 - compiler
-# a1 - statement
-compile_int_array_declaration : (a0, a1) {
-  compiler_error(a0, "Compilation of int array declarations is not implemented yet.");
+# a2 - type size
+compile_type_array_declaration : (a0, a1, a2) {
+  # x0 - compiler output channel
+  # x1 - size expression
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching size expression
+  x1 = a1[3];
+  # Checking we have integer in size expression
+  if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
+    compiler_error(a0, "Only integers can be used for size of array");
+  };
+  # Writing .comm macro
+  fputs(x0, ".comm ");
+  # Writing array name
+  fputs(x0, a1[2]);
+  # Writing type size
+  fputc(x0, ',');
+  fputd(x0, a2);
+  fputc(x0, ',');
+  # Writing array size
+  fputd(x0, x1[2]);
+  # Writing new line to finish macro
+  fputc(x0, '\n');
 };
 
 ## Compile variable declaration
