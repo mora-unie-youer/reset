@@ -3104,7 +3104,7 @@ COM_OCHAN => 0;
 
 ## Create new compiler
 # a0 - output chan
-# @return parser
+# @return compiler
 compiler : (a0) { return(tuple1(a0)); };
 
 ## Compiler's output channel
