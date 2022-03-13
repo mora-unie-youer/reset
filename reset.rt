@@ -3336,7 +3336,23 @@ compile_global_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_function_declaration : (a0, a1) {
-  compiler_error(a0, "Compilation of function declarations is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Writing function label
+  fputs(x0, a1[2]);
+  fputs(x0, ":\n");
+  # Backing up stack pointer
+  fputs(x0, "\tpushl %ebp\n");
+  fputs(x0, "\tmovl %esp, %ebp\n");
+  # Compiling our function block
+  compile_block_statement(a0, a1[4]);
+  # TODO: check if we return at the end, so we do not generate useless ASM
+  # Restoring stack pointer
+  fputs(x0, "\tleave\n");
+  # Exitting
+  fputs(x0, "\tret\n");
 };
 
 ## Compile array declaration
@@ -3404,6 +3420,13 @@ compile_variable_declaration : (a0, a1) {
   compile_simple_value(a0, a1[3]);
   # Writing newline to end .long macro
   fputc(x0, '\n');
+};
+
+## Compile block statement
+# a0 - compiler
+# a1 - statement
+compile_block_statement : (a0, a1) {
+  compiler_error(a0, "Compilation of block statements is not implemented yet.");
 };
 
 ## Compile simple value
