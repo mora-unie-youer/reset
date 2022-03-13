@@ -159,7 +159,7 @@ _put_strings:
 	addl $1, %esp
 	popl %eax
 	call newline
-	/* Making next iteration */
+	/* " Making next iteration */
 	incl 4(%esp)
 	jmp 1b
 2:
@@ -680,21 +680,6 @@ _toplevel_expr:
 	call comma
 	call ebx
 	call newline
-	/* Storing address in %ebx */
-	call leal
-	movb $'(, (%esp)
-	call putc
-	call ebx
-	call comma
-	call ecx
-	call comma
-	movl $4, (%esp)
-	call putd
-	movb $'), (%esp)
-	call putc
-	call comma
-	call ebx
-	call newline
 	/* Loading from %eax to identifier address + offset */
 	call movl
 	call eax
@@ -702,6 +687,13 @@ _toplevel_expr:
 	movb $'(, (%esp)
 	call putc
 	call ebx
+	movb $',, (%esp)
+	call putc
+	call ecx
+	movb $',, (%esp)
+	call putc
+	movl $4, (%esp)
+	call putd
 	movb $'), (%esp)
 	call putc
 	call newline
@@ -909,34 +901,19 @@ _address_index:
 	call popl_ecx
 	call popl_ebx
 	/* Compiling */
-	call leal
-	movl $0, (%esp)
-	call putd
-	movb $'(, (%esp)
-	call putc
-	call comma
-	call ecx
-	call comma
-	movl $4, (%esp)
-	call putd
-	movb $'), (%esp)
-	call putc
-	call comma
-	call ecx
-	call newline
-
-	call addl
-	call ecx
-	call comma
-	call ebx
-	call newline
-
 	call movl
 	call eax
 	call comma
 	movb $'(, (%esp)
 	call putc
 	call ebx
+	movb $',, (%esp)
+	call putc
+	call ecx
+	movb $',, (%esp)
+	call putc
+	movl $4, (%esp)
+	call putd
 	movb $'), (%esp)
 	call putc
 	call newline
@@ -1899,26 +1876,18 @@ _return_label_index_value:
 	call comma
 	call ebx
 	call newline
-	/* Storing address in %ebx */
-	call leal
-	movb $'(, (%esp)
-	call putc
-	call ebx
-	call comma
-	call ecx
-	call comma
-	movl $4, (%esp)
-	call putd
-	movb $'), (%esp)
-	call putc
-	call comma
-	call ebx
-	call newline
 	/* Loading from identifier address + offset to %eax */
 	call movl
 	movb $'(, (%esp)
 	call putc
 	call ebx
+	movb $',, (%esp)
+	call putc
+	call ecx
+	movb $',, (%esp)
+	call putc
+	movl $4, (%esp)
+	call putd
 	movb $'), (%esp)
 	call putc
 	call comma
