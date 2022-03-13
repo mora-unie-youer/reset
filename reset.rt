@@ -261,7 +261,11 @@ stresclen : (a0) {
   allocate(1);
   x0 = 0;
   # While char is not NULL, incrementing length
-  while (readchar(a0, x0) != '\0') { x0 = x0 + 1 + readchar(a0, x0) == '\\'; };
+  while (readchar(a0, 0) != '\0') {
+    if (readchar(a0, 0) == '\\') { a0 = a0 + 1; };
+    a0 = a0 + 1;
+    x0 = x0 + 1;
+  };
   return(x0);
 };
 
