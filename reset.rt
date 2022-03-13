@@ -253,6 +253,18 @@ strlen : (a0) {
   return(x0);
 };
 
+## Get length of string counting escaped characters as one
+# a0 -string
+# @return string length
+stresclen : (a0) {
+  # x0 - string length
+  allocate(1);
+  x0 = 0;
+  # While char is not NULL, incrementing length
+  while (readchar(a0, x0) != '\0') { x0 = x0 + 1 + readchar(a0, x0) == '\\'; };
+  return(x0);
+};
+
 ## Copy string
 # a0 - src
 # a1 - dest
