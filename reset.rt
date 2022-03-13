@@ -3172,6 +3172,33 @@ string_buffer_push : (a0, a1) {
   return(x0);
 };
 
+## Export string buffer to output channel
+# a0 - string buffer
+# a1 - output channel
+string_buffer_export : (a0, a1) {
+  # x0 - string buffer address
+  # x1 - string buffer length
+  # x2 - offset
+  allocate(3);
+  # Fetching string buffer address
+  x0 = a0[STRBUF_BUFFER];
+  # Fetching string buffer length
+  x1 = string_buffer_length(a0);
+  # Creating `strbuf` label
+  fputs(a1, "strbuf:\n");
+  # Iterating through strings
+  x2 = 0;
+  while (x2 < x1) {
+    # Writing .string macro
+    fputs(a1, ".string \"");
+    # Writing string
+    fputs(a1, x0 + x2);
+    fputs(a1, "\"\n");
+    # Moving to new offset
+    x2 = x2 + strlen(x0 + x2) + 1;
+  };
+};
+
 ### Compiler
 ## Compiler parts
 COM_OCHAN => 0;
