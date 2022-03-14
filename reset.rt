@@ -2014,7 +2014,7 @@ label block_statement_loop;
   goto &block_statement_loop;
 label block_statement_end;
   # Returning block statement
-  return(tuple2(STMT_BLOCK, x0));
+  return(tuple3(STMT_BLOCK, x3, x0));
 label block_statement_invalid;
   parser_error(a0, x3, "Invalid block statement syntax");
 label block_statement_content_invalid;
