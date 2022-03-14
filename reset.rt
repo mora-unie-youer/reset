@@ -3393,19 +3393,27 @@ compile_function_declaration : (a0, a1) {
 # a1 - statement
 compile_array_declaration : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - index
-  allocate(2);
+  # x1 - array label
+  # x2 - index
+  allocate(3);
   # Getting output channel
   x0 = compiler_output_chan(a0);
+  # Getting label ID
+  x1 = compiler_new_label(a0);
   # Creating variable label
   fputs(x0, a1[2]);
   fputs(x0, ":.long ");
-  # Compile array values
-  x1 = 0;
-  while (x1 < vector_size(a1[3])) {
-    if (x1 != 0) { fputc(x0, ','); };
-    compile_simple_value(a0, vector_get(a1[3], x1));
-    x1 = x1 + 1;
+  fputlabel(x0, x1);
+  fputc(x0, '\n');
+  # Creating array label
+  fputlabel(x0, x1);
+  fputs(x0, ":.long ");
+  # Compiling array values
+  x2 = 0;
+  while (x2 < vector_size(a1[3])) {
+    if (x2 != 0) { fputc(x0, ','); };
+    compile_simple_value(a0, vector_get(a1[3], x2));
+    x2 = x2 + 1;
   };
   # Writing newline to end .long macro
   fputc(x0, '\n');
