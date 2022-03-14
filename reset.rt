@@ -3225,10 +3225,13 @@ compiler_string_buffer : (a0) { return(a0[COM_STRBUF]); };
 
 ## Print compiler error
 # a0 - compiler
-# a1 - error message
-compiler_error : (a0, a1) {
+# a1 - statement
+# a2 - error message
+compiler_error : (a0, a1, a2) {
   eputs("ERROR: ");
-  eputs(a1);
+  fputloc(a1[1], stderr);
+  eputs(": ");
+  eputs(a2);
   eputc('\n');
   exit(1);
 };
@@ -3273,7 +3276,6 @@ compiler_use_macros : (a0, a1) {
     # Moving to next statement
     x0 = x0 + 1;
   };
-  compiler_error(a0, "Using macros is not implemented yet.");
 };
 
 ## Use macro in the rest of AST
@@ -3286,6 +3288,7 @@ compiler_use_macro : (a0, a1, a2, a3) {
   eputs(": ");
   eputs(a3[2]);
   eputc('\n');
+  compiler_error(a0, a3, "Using macros is not implemented yet.");
 };
 
 ## Compile top level statement
@@ -3392,7 +3395,7 @@ compile_type_array_declaration : (a0, a1, a2) {
   x1 = a1[3];
   # Checking we have integer in size expression
   if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
-    compiler_error(a0, "Only integers can be used for size of array");
+    compiler_error(a0, x1, "Only integers can be used for size of array");
   };
   # Writing .comm macro
   fputs(x0, ".comm ");
@@ -3426,7 +3429,7 @@ compile_variable_declaration : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_block_statement : (a0, a1) {
-  compiler_error(a0, "Compilation of block statements is not implemented yet.");
+  compiler_error(a0, a1, "Compilation of block statements is not implemented yet.");
 };
 
 ## Compile simple value
@@ -3470,7 +3473,7 @@ compile_simple_value : (a0, a1) {
     return;
   };
 
-  compiler_error(a0, "Expression can't be compiled as simple.");
+  compiler_error(a0, a1, "Expression can't be compiled as simple.");
 };
 
 ## Print usage
