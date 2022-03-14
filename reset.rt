@@ -3425,23 +3425,31 @@ compile_array_declaration : (a0, a1) {
 # a2 - type size
 compile_type_array_declaration : (a0, a1, a2) {
   # x0 - compiler output channel
-  # x1 - size expression
-  allocate(2);
+  # x1 - array label
+  # x2 - size expression
+  allocate(3);
   # Getting output channel
   x0 = compiler_output_chan(a0);
+  # Getting label ID
+  x1 = compiler_new_label(a0);
   # Fetching size expression
-  x1 = a1[3];
+  x2 = a1[3];
   # Checking we have integer in size expression
-  if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
-    compiler_error(a0, x1, "Only integers can be used for size of array");
+  if (x2[NODE_TYPE] != STMT_EXPR_INTEGER) {
+    compiler_error(a0, x2, "Only integers can be used for size of array");
   };
+  # Creating variable label
+  fputs(x0, a1[2]);
+  fputs(x0, ":.long ");
+  fputlabel(x0, x1);
+  fputc(x0, '\n');
   # Writing .comm macro
   fputs(x0, ".comm ");
   # Writing array name
-  fputs(x0, a1[2]);
+  fputlabel(x0, x1);
   # Writing array size
   fputc(x0, ',');
-  fputd(x0, x1[2] * a2);
+  fputd(x0, x2[2] * a2);
   # Writing new line to finish macro
   fputc(x0, '\n');
 };
