@@ -3207,11 +3207,12 @@ string_buffer_export : (a0, a1) {
 ## Compiler parts
 COM_OCHAN  => 0;
 COM_STRBUF => 1;
+COM_LABEL  => 2;
 
 ## Create new compiler
 # a0 - output chan
 # @return compiler
-compiler : (a0) { return(tuple2(a0, string_buffer())); };
+compiler : (a0) { return(tuple3(a0, string_buffer(), 0)); };
 
 ## Get compiler's output channel
 # a0 - compiler
@@ -3222,6 +3223,35 @@ compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
 # a0 - compiler
 # @return string buffer
 compiler_string_buffer : (a0) { return(a0[COM_STRBUF]); };
+
+## Get compiler's current label ID
+# a0 - compiler
+# @return label ID
+compiler_label_id : (a0) { return(a0[COM_LABEL]); };
+
+## Set new label ID
+# a0 - compiler
+# @return old label ID
+compiler_new_label : (a0) {
+  # x0 - old label ID
+  allocate(1);
+  # Fetching label ID
+  x0 = compiler_label_id(a0);
+  # Incrementing label ID
+  a0[COM_LABEL] = x0 + 1;
+  # Returning old label ID
+  return(x0);
+};
+
+## Print label
+# a0 - output chan
+# a1 - label ID
+fputlabel : (a0, a1) {
+  # Printing the `_label` heading
+  fputs(a0, "_label");
+  # Printing the ID of label
+  fputd(a0, a1);
+};
 
 ## Print compiler error
 # a0 - compiler
