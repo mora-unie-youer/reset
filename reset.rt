@@ -3509,14 +3509,14 @@ compile_statement : (a0, a1) {
   # Fetching statement ID
   x0 = a1[0];
   # Searching for statement
-  if (x0 == STMT_IF)        { compile_if_statement(a0, a1); };
-  if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1); };
-  if (x0 == STMT_ALLOCATE)  { compile_allocate_statement(a0, a1); };
-  if (x0 == STMT_RETURN)    { compile_return_statement(a0, a1); };
-  if (x0 == STMT_SYSCALL)   { compile_syscall_statement(a0, a1); };
-  if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); };
-  if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1); };
-  if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1); };
+  if (x0 == STMT_IF)        { compile_if_statement(a0, a1);        return; };
+  if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1);     return; };
+  if (x0 == STMT_ALLOCATE)  { compile_allocate_statement(a0, a1);  return; };
+  if (x0 == STMT_RETURN)    { compile_return_statement(a0, a1);    return; };
+  if (x0 == STMT_SYSCALL)   { compile_syscall_statement(a0, a1);   return; };
+  if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); return; };
+  if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1);     return; };
+  if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1);      return; };
   # If none of statements wasn't found, trying to compile expression
   compile_expression(a0, a1);
 };
