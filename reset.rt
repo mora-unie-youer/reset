@@ -3697,7 +3697,24 @@ compile_return_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_writechar_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of writechar statements is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling base address expression
+  compile_expression(a0, a1[2]);
+  # Storing base address in %edx and reserving it
+  fputs(x0, "\tmovl %eax, %edx\n");
+  compiler_alloc_register(a0, REG_EDX);
+  # Compiling index expression
+  compile_expression(a0, a1[3]);
+  # Adding index to base address
+  fputs(x0, "\taddl %eax, %edx\n");
+  # Compiling value expression
+  compile_expression(a0, a1[4]);
+  # Storing byte to address and freeing %edx
+  fputs(x0, "\tmovb %al, (%edx)\n");
+  compiler_free_register(a0, REG_EDX);
 };
 
 ## Compile label statement
