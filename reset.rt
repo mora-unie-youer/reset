@@ -3256,6 +3256,16 @@ fputlabel : (a0, a1) {
   fputd(a0, a1);
 };
 
+## Print label definition
+# a0 - output chan
+# a1 - label ID
+fputlabeldef : (a0, a1) {
+  # Printing label
+  fputlabel(a0, a1);
+  # Printing definition
+  fputs(a0, ":\n");
+};
+
 ## Print compiler error
 # a0 - compiler
 # a1 - statement
