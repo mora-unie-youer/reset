@@ -3507,7 +3507,7 @@ compile_statement : (a0, a1) {
   # x0 - statement ID
   allocate(1);
   # Fetching statement ID
-  x0 = a1[0];
+  x0 = a1[NODE_TYPE];
   # Searching for statement
   if (x0 == STMT_IF)        { compile_if_statement(a0, a1);        return; };
   if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1);     return; };
@@ -3536,7 +3536,7 @@ compile_if_statement : (a0, a1) {
   compile_expression(a0, vector_get(a1[2], 0));
   # Comparing condition with zero
   fputs(x0, "\tcmpl $0, %eax\n");
-  # If equal to zero, skipping
+  # If equal to zero, else or exit branch
   fputs(x0, "\tje ");
   fputlabel(x0, x2);
   fputc(x0, '\n');
