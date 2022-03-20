@@ -3751,7 +3751,38 @@ compile_goto_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of statements and expressions is not implemented yet.");
+  # x0 - statement ID
+  allocate(1);
+  # Fetching statement ID
+  x0 = a1[0];
+  # Looking for expressions
+  ## Constant
+  if (x0 == STMT_EXPR_INTEGER) { compile_integer_expression(a0, a1); };
+  ## Simple
+  ## Postfix
+  ## Prefix
+  ## Multiplicative
+  ## Additive
+  ## Bitwise operations
+  ## Relational
+  ## Equality
+  ## Logical operations
+  ## Ternary
+  ## Assignment
+};
+
+## Compile integer expression
+# a0 - compiler
+# a1 - statement
+compile_integer_expression : (a0, a1) {
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Just setting value to %eax
+  fputs(x0, "\tmovl $");
+  fputd(x0, a1[2]);
+  fputs(x0, ", %eax\n");
 };
 
 ## Compile simple value
