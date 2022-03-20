@@ -3531,34 +3531,34 @@ compile_if_statement : (a0, a1) {
   # Getting output channel
   x0 = compiler_output_chan(a0);
   # Getting label ID
-  x1 = compiler_new_label(a0);
+  x2 = compiler_new_label(a0);
   # Compiling condition
   compile_expression(a0, vector_get(a1[2], 0));
   # Comparing condition with zero
   fputs(x0, "\tcmpl $0, %eax\n");
   # If equal to zero, skipping
   fputs(x0, "\tje ");
-  fputlabel(x0, x1);
+  fputlabel(x0, x2);
   fputc(x0, '\n');
   # Compiling if block
   compile_block_statement(a0, vector_get(a1[2], 1));
   # Compiling else block, if it is there
   if (vector_size(a1[2]) == 3) {
     # Exit label
-    x2 = compiler_new_label(a0);
+    x1 = compiler_new_label(a0);
     # Printing jump to exit label for true condition
     fputs(x0, "\tjmp ");
-    fputlabeldef(x0, x2);
+    fputlabel(x0, x1);
+    fputc(x0, '\n');
     # Printing else label
-    fputlabeldef(x0, x1);
+    fputlabeldef(x0, x2);
     # Compiling else block
     compile_block_statement(a0, vector_get(a1[2], 2));
-    # Printing exit label
-    fputlabeldef(x0, x2);
-  } else {
-    # If there's not else block, just printing exit label
-    fputlabeldef(x0, x1);
+    # Setting exit label
+    x2 = x1;
   };
+  # Printing exit label definition
+  fputlabeldef(x0, x2);
 };
 
 ## Compile while statement
