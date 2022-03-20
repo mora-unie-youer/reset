@@ -3597,7 +3597,28 @@ compile_while_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_allocate_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of allocate statements is not implemented yet.");
+  # x0 - compiler output channel
+  # x1 - size expression
+  # x2 - allocate size
+  allocate(3);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching size expression
+  x1 = a1[2];
+  # Expression must be integer
+  if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
+    compiler_error(a0, x1, "Size must be integer in allocate statement.");
+  };
+  # Calculating allocation size (expr value * 4)
+  x2 = x1[2] * 4;
+  # Allocation size must be bigger than zero
+  if (x2 <= 0) {
+    compiler_error(a0, x1, "Size must be positive integer.");
+  };
+  # Compiling allocation
+  fputs(x0, "\tsubl $");
+  fputd(x0, x2);
+  fputs(x0, ", %esp\n");
 };
 
 ## Compile return statement
