@@ -1585,20 +1585,19 @@ STMT_IF               => 45;
 STMT_WHILE            => 46;
 STMT_ALLOCATE         => 47;
 STMT_RETURN           => 48;
-STMT_SYSCALL          => 49;
-STMT_WRITECHAR        => 50;
-STMT_LABEL            => 51;
-STMT_GOTO             => 52;
+STMT_WRITECHAR        => 49;
+STMT_LABEL            => 50;
+STMT_GOTO             => 51;
 # Block statement
-STMT_BLOCK            => 53;
+STMT_BLOCK            => 52;
 # Top level statements
-STMT_GLOBAL           => 54;
-STMT_MACRO            => 55;
-STMT_FUN_DECL         => 56;
-STMT_ARRAY_DECL       => 57;
-STMT_CHAR_ARRAY_DECL  => 58;
-STMT_INT_ARRAY_DECL   => 59;
-STMT_VAR_DECL         => 60;
+STMT_GLOBAL           => 53;
+STMT_MACRO            => 54;
+STMT_FUN_DECL         => 55;
+STMT_ARRAY_DECL       => 56;
+STMT_CHAR_ARRAY_DECL  => 57;
+STMT_INT_ARRAY_DECL   => 58;
+STMT_VAR_DECL         => 59;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2035,8 +2034,6 @@ statement : (a0, a1, a2) {
   if (a1 == TOKEN_ALLOCATE) { return(allocate_statement(a0, a2)); };
   # Parsing return statement
   if (a1 == TOKEN_RETURN) { return(return_statement(a0, a2)); };
-  # Parsing syscall statement
-  if (a1 == TOKEN_SYSCALL) { return(syscall_statement(a0, a2)); };
   # Parsing writechar statement
   if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0, a2)); };
   # Parsinglabel statement
@@ -2173,15 +2170,6 @@ return_statement : (a0, a1) {
   vector_push(x0, x2);
 label return_statement_end;
   return(tuple3(STMT_RETURN, a1, x0));
-};
-
-## Parse syscall statement
-# a0 - parser
-# a1 - token location
-# @return statement
-syscall_statement : (a0, a1) {
-  # Just using already implemented `simple_syscall_expression`
-  return(simple_syscall_expression(a0, TRUE, a1));
 };
 
 ## Parse writechar statement
@@ -2907,15 +2895,13 @@ simple_argvar_expression : (a0, a1, a2) {
 
 ## Parse simple syscall expression
 # a0 - parser
-# a1 - is statement
-# a2 - token location
+# a1 - token location
 # @return statement
-simple_syscall_expression : (a0, a1, a2) {
+simple_syscall_expression : (a0, a1) {
   # x0 - ops vector
   # x1 - token
   # x2 - expression
-  # x3 - node type
-  allocate(4);
+  allocate(3);
   # Allocating operand vector
   x0 = vector(0, 1);
   # Fetching next token
@@ -2937,15 +2923,12 @@ label simple_syscall_expression_loop;
   if (x1 != ')') { goto &simple_syscall_expression_invalid; };
   # Checking for argument count
   if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; };
-  # Getting node type
-  x3 = STMT_EXPR_SYSCALL;
-  if (a1) { x3 = STMT_SYSCALL; };
   # Returning expression
-  return(simple_postfix_expression(a0, tuple3(x3, a2, x0)));
+  return(simple_postfix_expression(a0, tuple3(STMT_EXPR_SYSCALL, a1, x0)));
 label simple_syscall_expression_invalid;
-  parser_error(a0, a2, "Invalid syscall expression");
+  parser_error(a0, a1, "Invalid syscall expression");
 label simple_syscall_expression_too_many;
-  parser_error(a0, a2, "Too many arguments in syscall expression");
+  parser_error(a0, a1, "Too many arguments in syscall expression");
 };
 
 ## Parse simple readchar expression
@@ -3566,7 +3549,6 @@ compile_statement : (a0, a1) {
   if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1);     return; };
   if (x0 == STMT_ALLOCATE)  { compile_allocate_statement(a0, a1);  return; };
   if (x0 == STMT_RETURN)    { compile_return_statement(a0, a1);    return; };
-  if (x0 == STMT_SYSCALL)   { compile_syscall_statement(a0, a1);   return; };
   if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); return; };
   if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1);     return; };
   if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1);      return; };
@@ -3682,13 +3664,6 @@ compile_return_statement : (a0, a1) {
   compile_expression(a0, a1[2]);
   # Printing leave and ret
   fputs(compiler_output_chan(a0), "\tleave\n\tret\n");
-};
-
-## Compile syscall statement
-# a0 - compiler
-# a1 - statement
-compile_syscall_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of syscall statements is not implemented yet.");
 };
 
 ## Compile writechar statement
