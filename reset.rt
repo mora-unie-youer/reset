@@ -3661,7 +3661,13 @@ compile_writechar_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_label_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of label statements is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Printing label definition
+  fputs(x0, a1[2]);
+  fputs(x0, ":\n");
 };
 
 ## Compile goto statement
