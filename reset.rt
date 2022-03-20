@@ -3383,7 +3383,9 @@ compile_global_statement : (a0, a1) {
 # a1 - statement
 compile_function_declaration : (a0, a1) {
   # x0 - compiler output channel
-  allocate(1);
+  # x1 - statements
+  # x2 - last statement
+  allocate(3);
   # Getting compiler output channel
   x0 = compiler_output_chan(a0);
   # Writing function label
@@ -3394,11 +3396,12 @@ compile_function_declaration : (a0, a1) {
   fputs(x0, "\tmovl %esp, %ebp\n");
   # Compiling our function block
   compile_block_statement(a0, a1[4]);
-  # TODO: check if we return at the end, so we do not generate useless ASM
-  # Restoring stack pointer
-  fputs(x0, "\tleave\n");
-  # Exitting
-  fputs(x0, "\tret\n");
+  # Fetching statements
+  x1 = a1[4][2];
+  # Fetching last statement (we can change AST now, as we compiled it)
+  x2 = vector_pop(x1);
+  # Restoring stack pointer and exitting, if last statement is not return
+  if (x2[NODE_TYPE] != STMT_RETURN) { fputs(x0, "\tleave\n\tret\n"); };
 };
 
 ## Compile array declaration
