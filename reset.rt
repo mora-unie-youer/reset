@@ -2832,7 +2832,7 @@ prefix_expr : (a0, a1, a2) {
   # x0 - token
   # x1 - token location
   # x2 - op1
-  allocate(2);
+  allocate(3);
   # Fetching token
   x0 = parser_lex(a0);
   # Fetching token location
@@ -2840,7 +2840,7 @@ prefix_expr : (a0, a1, a2) {
   # Fetching operand
   x2 = prefix_expression(a0, x0, x1);
   # Returning expression
-  return(tuple3(a1, a2, x0));
+  return(tuple3(a1, a2, x2));
 };
 
 ## Try to parse simple expression
