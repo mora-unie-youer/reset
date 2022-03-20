@@ -3682,7 +3682,10 @@ compile_label_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_goto_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of goto statements is not implemented yet.");
+  # Compile goto expression
+  compile_expression(a0, a1[2]);
+  # Printing jump to this value
+  fputs(compiler_output_chan(a0), "\tjmp *%eax\n");
 };
 
 ## Compile expression
