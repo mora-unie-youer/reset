@@ -3687,9 +3687,16 @@ compile_allocate_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_return_statement : (a0, a1) {
-  # Compile return expression
-  compile_expression(a0, a1[2]);
-  # Printing leave and ret
+  # x0 - return array
+  allocate(1);
+  # Fetching return array
+  x0 = a1[2];
+  # Compiling return value, if it is there
+  if (vector_size(x0) != 0) {
+    # Compiling return value
+    compile_expression(a0, vector_pop(x0));
+  };
+  # Compiling return expression
   fputs(compiler_output_chan(a0), "\tleave\n\tret\n");
 };
 
