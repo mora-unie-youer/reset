@@ -3625,7 +3625,10 @@ compile_allocate_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_return_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of return statements is not implemented yet.");
+  # Compile return expression
+  compile_expression(a0, a1[2]);
+  # Printing leave and ret
+  fputs(compiler_output_chan(a0), "\tleave\n\tret\n");
 };
 
 ## Compile syscall statement
