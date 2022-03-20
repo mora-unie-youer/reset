@@ -3502,7 +3502,15 @@ compile_block_statement : (a0, a1) {
     # Fetching statement
     x2 = vector_get(a1[2], x0);
     # Checking if we have returned already
-    if (x1) { compiler_error(a0, x2, "Unreachable code: already returned in this block."); };
+    if (x1) {
+      # If we are defining new label, toggle returned flag
+      if (x2[NODE_TYPE] == STMT_LABEL) {
+        x1 = FALSE;
+      } else {
+        # Otherwise, erroring
+        compiler_error(a0, x2, "Unreachable code: already returned in this block.");
+      };
+    };
     # Compiling statement
     compile_statement(a0, vector_get(a1[2], x0));
     # Checking if statement is return
