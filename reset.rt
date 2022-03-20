@@ -3492,7 +3492,7 @@ compile_variable_declaration : (a0, a1) {
 # a1 - block statement
 compile_block_statement : (a0, a1) {
   # x0 - statement index
-  # x1 - returned
+  # x1 - unreachable
   # x2 - statement
   allocate(3);
   # Iterating through statements
@@ -3501,9 +3501,9 @@ compile_block_statement : (a0, a1) {
   while (x0 < vector_size(a1[2])) {
     # Fetching statement
     x2 = vector_get(a1[2], x0);
-    # Checking if we have returned already
+    # Checking if code is unreachable
     if (x1) {
-      # If we are defining new label, toggle returned flag
+      # If we are defining new label, toggle unreachable flag
       if (x2[NODE_TYPE] == STMT_LABEL) {
         x1 = FALSE;
       } else {
@@ -3513,8 +3513,9 @@ compile_block_statement : (a0, a1) {
     };
     # Compiling statement
     compile_statement(a0, vector_get(a1[2], x0));
-    # Checking if statement is return
-    if (x2[NODE_TYPE] == STMT_RETURN) { x1 = TRUE; };
+    # Checking if statement is return or goto
+    # NOTE: using + instead of || because of not having this feature
+    if ((x2[NODE_TYPE] == STMT_RETURN) + (x2[NODE_TYPE] == STMT_GOTO)) { x1 = TRUE; };
     # Moving to next statement
     x0 = x0 + 1;
   };
