@@ -3383,11 +3383,12 @@ compile_global_statement : (a0, a1) {
 # a1 - statement
 compile_function_declaration : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - statements
-  # x2 - last statement
-  allocate(3);
+  # x1 - block statement
+  allocate(2);
   # Getting compiler output channel
   x0 = compiler_output_chan(a0);
+  # Fetching block statement
+  x1 = a1[4];
   # Writing function label
   fputs(x0, a1[2]);
   fputs(x0, ":\n");
@@ -3395,13 +3396,44 @@ compile_function_declaration : (a0, a1) {
   fputs(x0, "\tpushl %ebp\n");
   fputs(x0, "\tmovl %esp, %ebp\n");
   # Compiling our function block
-  compile_block_statement(a0, a1[4]);
-  # Fetching statements
-  x1 = a1[4][2];
-  # Fetching last statement (we can change AST now, as we compiled it)
-  x2 = vector_pop(x1);
-  # Restoring stack pointer and exitting, if last statement is not return
-  if (x2[NODE_TYPE] != STMT_RETURN) { fputs(x0, "\tleave\n\tret\n"); };
+  compile_block_statement(a0, x1);
+  # `leave` and `ret` if needed
+  compile_function_declaration_return(x0, x1);
+};
+
+## Compile return function instructions, if needed
+# a0 - compiler output channel
+# a1 - block statement
+compile_function_declaration_return : (a0, a1) {
+  # x0 - statements
+  # x1 - last statement
+  # x2 - last statement type
+  allocate(3);
+  # Fetching statements in block
+  x0 = a1[2];
+  # Checking if statements vector is empty
+  if (vector_size(x0) == 0) { goto &compile_function_declaration_return_print; };
+  # Fetching last statement in block( we can change AST now, as we compiled it)
+  x1 = vector_pop(x0);
+  x2 = x1[NODE_TYPE];
+  # If last statement is return, returning :D
+  if (x2 == STMT_RETURN) { return; };
+  # If last statement with block, run recursively
+  if (x2 == STMT_IF) {
+    # Looking at last block in if statement
+    compile_function_declaration_return(a0, vector_pop(x1[2]));
+    return;
+  };
+  if (x2 == STMT_WHILE) {
+    # Looking at while block
+    compile_function_declaration_return(a0, x1[3]);
+    return;
+  };
+
+label compile_function_declaration_return_print;
+  # If we are here, we need to print return things :3
+  fputs(a0, "\tleave\n\t\ret\n");
+  return;
 };
 
 ## Compile array declaration
