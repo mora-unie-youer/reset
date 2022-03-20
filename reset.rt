@@ -3184,22 +3184,25 @@ string_buffer_export : (a0, a1) {
   # x1 - string buffer length
   # x2 - offset
   allocate(3);
-  # Fetching string buffer address
-  x0 = a0[STRBUF_BUFFER];
-  # Fetching string buffer length
-  x1 = string_buffer_length(a0);
-  # Creating `strbuf` label
-  fputs(a1, "strbuf:\n");
-  # Iterating through strings
-  x2 = 0;
-  while (x2 < x1) {
-    # Writing .string macro
-    fputs(a1, ".string ");
-    # Writing string
-    fputs(a1, x0 + x2);
-    fputc(a1, '\n');
-    # Moving to new offset
-    x2 = x2 + strlen(x0 + x2) + 1;
+  # Exporting if string buffer is not empty
+  if (a0[STRBUF_LENGTH] != 0) {
+    # Fetching string buffer address
+    x0 = a0[STRBUF_BUFFER];
+    # Fetching string buffer length
+    x1 = string_buffer_length(a0);
+    # Creating `strbuf` label
+    fputs(a1, "strbuf:\n");
+    # Iterating through strings
+    x2 = 0;
+    while (x2 < x1) {
+      # Writing .string macro
+      fputs(a1, ".string ");
+      # Writing string
+      fputs(a1, x0 + x2);
+      fputc(a1, '\n');
+      # Moving to new offset
+      x2 = x2 + strlen(x0 + x2) + 1;
+    };
   };
 };
 
