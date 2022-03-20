@@ -3494,7 +3494,15 @@ compile_block_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of statements is not implemented yet.");
+  # If none of statements wasn't found, trying to compile expression
+  compile_expression(a0, a1);
+};
+
+## Compile expression
+# a0 - compiler
+# a1 - statement
+compile_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of statements and expressions is not implemented yet.");
 };
 
 ## Compile simple value
