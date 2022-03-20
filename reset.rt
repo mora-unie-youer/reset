@@ -3757,19 +3757,234 @@ compile_expression : (a0, a1) {
   x0 = a1[0];
   # Looking for expressions
   ## Constant
-  if (x0 == STMT_EXPR_INTEGER) { compile_integer_expression(a0, a1); };
-  if (x0 == STMT_EXPR_STRING)  { compile_string_expression(a0, a1); };
-  ## Simple
+  if (x0 == STMT_EXPR_INTEGER)     { compile_integer_expression(a0, a1); };
+  if (x0 == STMT_EXPR_STRING)      { compile_string_expression(a0, a1); };
   ## Postfix
+  if (x0 == STMT_EXPR_CALL)        { compile_address_call_expression(a0, a1); };
+  if (x0 == STMT_EXPR_INDEX)       { compile_address_index_expression(a0, a1); };
+  ## Simple
+  if (x0 == STMT_EXPR_IDENTIFIER)  { compile_simple_identifier_expression(a0, a1); };
+  if (x0 == STMT_EXPR_ARGUMENT)    { compile_simple_argument_expression(a0, a1); };
+  if (x0 == STMT_EXPR_VARIABLE)    { compile_simple_variable_expression(a0, a1); };
+  if (x0 == STMT_EXPR_SYSCALL)     { compile_simple_syscall_expression(a0, a1); };
+  if (x0 == STMT_EXPR_READCHAR)    { compile_simple_readchar_expression(a0, a1); };
   ## Prefix
+  if (x0 == STMT_EXPR_PLUS)        { compile_prefix_plus_expression(a0, a1); };
+  if (x0 == STMT_EXPR_MINUS)       { compile_prefix_minus_expression(a0, a1); };
+  if (x0 == STMT_EXPR_LOGICAL_NOT) { compile_prefix_logical_not_expression(a0, a1); };
+  if (x0 == STMT_EXPR_NOT)         { compile_prefix_not_expression(a0, a1); };
+  if (x0 == STMT_EXPR_DEREF)       { compile_prefix_deref_expression(a0, a1); };
+  if (x0 == STMT_EXPR_ADDROF)      { compile_prefix_addrof_expression(a0, a1); };
   ## Multiplicative
+  if (x0 == STMT_EXPR_MUL)         { compile_multiplication_expression(a0, a1); };
+  if (x0 == STMT_EXPR_DIV)         { compile_division_expression(a0, a1, FALSE); };
+  if (x0 == STMT_EXPR_MOD)         { compile_division_expression(a0, a1, TRUE); };
   ## Additive
+  if (x0 == STMT_EXPR_ADD)         { compile_additive_expression(a0, a1, FALSE); };
+  if (x0 == STMT_EXPR_SUB)         { compile_additive_expression(a0, a1, TRUE); };
   ## Bitwise operations
+  ### Shift
+  if (x0 == STMT_EXPR_SHL)         { compile_bitwise_shift_expression(a0, a1, FALSE); };
+  if (x0 == STMT_EXPR_SHR)         { compile_bitwise_shift_expression(a0, a1, TRUE); };
+  ### Logical (and, or, xor)
+  if (x0 == STMT_EXPR_AND)         { compile_bitwise_logical_expression(a0, a1, 0); };
+  if (x0 == STMT_EXPR_XOR)         { compile_bitwise_logical_expression(a0, a1, 1); };
+  if (x0 == STMT_EXPR_OR)          { compile_bitwise_logical_expression(a0, a1, 2); };
   ## Relational
+  if (x0 == STMT_EXPR_LESS)        { compile_relational_expression(a0, a1, FALSE, FALSE); };
+  if (x0 == STMT_EXPR_GREATER)     { compile_relational_expression(a0, a1, TRUE, FALSE); };
+  if (x0 == STMT_EXPR_LE)          { compile_relational_expression(a0, a1, FALSE, TRUE); };
+  if (x0 == STMT_EXPR_GE)          { compile_relational_expression(a0, a1, TRUE, TRUE); };
   ## Equality
+  if (x0 == STMT_EXPR_EQ)          { compile_equality_expression(a0, a1, TRUE); };
+  if (x0 == STMT_EXPR_NE)          { compile_equality_expression(a0, a1, FALSE); };
   ## Logical operations
+  if (x0 == STMT_EXPR_LOGICAL_AND) { compile_logical_expression(a0, a1, FALSE); };
+  if (x0 == STMT_EXPR_LOGICAL_OR)  { compile_logical_expression(a0, a1, TRUE); };
   ## Ternary
+  if (x0 == STMT_EXPR_TERNARY)     { compile_ternary_expression(a0, a1); };
   ## Assignment
+  if (x0 == STMT_EXPR_ASSIGN)      { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_ADD_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_SUB_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_MUL_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_DIV_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_MOD_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_AND_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_XOR_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_OR_ASSIGN)   { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_SHL_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_SHR_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+};
+
+## Compile address call expression
+# a0 - compiler
+# a1 - statement
+compile_address_call_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of address call expressions is not implemented yet.");
+};
+
+## Compile address index expression
+# a0 - compiler
+# a1 - statement
+compile_address_index_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of address index expressions is not implemented yet.");
+};
+
+## Compile identifier expression
+# a0 - compiler
+# a1 - statement
+compile_simple_identifier_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of identifier expressions is not implemented yet.");
+};
+
+## Compile argument expression
+# a0 - compiler
+# a1 - statement
+compile_simple_argument_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of argument expressions is not implemented yet.");
+};
+
+## Compile variable expression
+# a0 - compiler
+# a1 - statement
+compile_simple_variable_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of variable expressions is not implemented yet.");
+};
+
+## Compile syscall expression
+# a0 - compiler
+# a1 - statement
+compile_simple_syscall_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of syscall expressions is not implemented yet.");
+};
+
+## Compile readchar expression
+# a0 - compiler
+# a1 - statement
+compile_simple_readchar_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of readchar expressions is not implemented yet.");
+};
+
+## Compile plus prefix expression
+# a0 - compiler
+# a1 - statement
+compile_prefix_plus_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of plus prefix expressions is not implemented yet.");
+};
+
+## Compile minus prefix expression
+# a0 - compiler
+# a1 - statement
+compile_prefix_minus_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of minus prefix expressions is not implemented yet.");
+};
+
+## Compile logical not expression
+# a0 - compiler
+# a1 - statement
+compile_prefix_logical_not_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of logical not expressions is not implemented yet.");
+};
+
+## Compile not expression
+# a0 - compiler
+# a1 - statement
+compile_prefix_not_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of not expressions is not implemented yet.");
+};
+
+## Compile dereference expression
+# a0 - compiler
+# a1 - statement
+compile_prefix_deref_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of dereference expressions is not implemented yet.");
+};
+
+## Compile addressof expression
+# a0 - compiler
+# a1 - statement
+compile_prefix_addrof_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of addressof expressions is not implemented yet.");
+};
+
+## Compile multiplication expression
+# a0 - compiler
+# a1 - statement
+compile_multiplication_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of multiplication expressions is not implemented yet.");
+};
+
+## Compile division expression
+# a0 - compiler
+# a1 - statement
+# a2 - modulo division
+compile_division_expression : (a0, a1, a2) {
+  compiler_error(a0, a1, "Compilation of division expressions is not implemented yet.");
+};
+
+## Compile additive expression
+# a0 - compiler
+# a1 - statement
+# a2 - subtraction
+compile_additive_expression : (a0, a1, a2) {
+  compiler_error(a0, a1, "Compilation of additive expressions is not implemented yet.");
+};
+
+## Compile bitwise shift expression
+# a0 - compiler
+# a1 - statement
+# a2 - right-way
+compile_bitwise_shift_expression : (a0, a1, a2) {
+  compiler_error(a0, a1, "Compilation of bitwise shift expressions is not implemented yet.");
+};
+
+## Compile bitwise logical expression
+# a0 - compiler
+# a1 - statement
+# a2 - AND/OR/XOR (0/1/2)
+compile_bitwise_logical_expression : (a0, a1, a2) {
+  compiler_error(a0, a1, "Compilation of bitwise logical expressions is not implemented yet.");
+};
+
+## Compile relational expression
+# a0 - compiler
+# a1 - statement
+# a2 - less or greater
+# a3 - including or not
+compile_relational_expression : (a0, a1, a2, a3) {
+  compiler_error(a0, a1, "Compilation of relational expressions is not implemented yet.");
+};
+
+## Compile equality expression
+# a0 - compiler
+# a1 - statement
+# a2 - equal or not
+compile_equality_expression : (a0, a1, a2) {
+  compiler_error(a0, a1, "Compilation of equality expressions is not implemented yet.");
+};
+
+## Compile logical expression
+# a0 - compiler
+# a1 - statement
+# a2 - AND/OR
+compile_logical_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of logical expressions is not implemented yet.");
+};
+
+## Compile ternary expression
+# a0 - compiler
+# a1 - statement
+compile_ternary_expression : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of ternary expressions is not implemented yet.");
+};
+
+## Compile assignment expression
+# a0 - compiler
+# a1 - statement
+# a2 - type
+compile_assignment_expression : (a0, a1, a2) {
+  compiler_error(a0, a1, "Compilation of assignment expressions is not implemented yet.");
 };
 
 ## Compile integer expression
