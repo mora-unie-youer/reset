@@ -3758,6 +3758,7 @@ compile_expression : (a0, a1) {
   # Looking for expressions
   ## Constant
   if (x0 == STMT_EXPR_INTEGER) { compile_integer_expression(a0, a1); };
+  if (x0 == STMT_EXPR_STRING)  { compile_string_expression(a0, a1); };
   ## Simple
   ## Postfix
   ## Prefix
@@ -3782,6 +3783,23 @@ compile_integer_expression : (a0, a1) {
   # Just setting value to %eax
   fputs(x0, "\tmovl $");
   fputd(x0, a1[2]);
+  fputs(x0, ", %eax\n");
+};
+
+## Compile string expression
+# a0 - compiler
+# a1 - statement
+compile_string_expression : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - compiler string buffer
+  allocate(2);
+  # Getting compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Getting compiler string buffer
+  x1 = compiler_string_buffer(a0);
+  # Just setting value to %eax
+  fputs(x0, "\tmovl $strbuf+");
+  fputd(x0, string_buffer_push(x1, a1[2]));
   fputs(x0, ", %eax\n");
 };
 
