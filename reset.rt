@@ -3525,7 +3525,40 @@ compile_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_if_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of if statements is not implemented yet.");
+  # x0 - compiler output channel
+  # x1, x2 - labels
+  allocate(3);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Getting label ID
+  x1 = compiler_new_label(a0);
+  # Compiling condition
+  compile_expression(a0, vector_get(a1[2], 0));
+  # Comparing condition with zero
+  fputs(x0, "\tcmpl $0, %eax\n");
+  # If equal to zero, skipping
+  fputs(x0, "\tje ");
+  fputlabel(x0, x1);
+  fputc(x0, '\n');
+  # Compiling if block
+  compile_block_statement(a0, vector_get(a1[2], 1));
+  # Compiling else block, if it is there
+  if (vector_size(a1[2]) == 3) {
+    # Exit label
+    x2 = compiler_new_label(a0);
+    # Printing jump to exit label for true condition
+    fputs(x0, "\tjmp ");
+    fputlabeldef(x0, x2);
+    # Printing else label
+    fputlabeldef(x0, x1);
+    # Compiling else block
+    compile_block_statement(a0, vector_get(a1[2], 2));
+    # Printing exit label
+    fputlabeldef(x0, x2);
+  } else {
+    # If there's not else block, just printing exit label
+    fputlabeldef(x0, x1);
+  };
 };
 
 ## Compile while statement
