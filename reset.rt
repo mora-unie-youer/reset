@@ -3494,8 +3494,77 @@ compile_block_statement : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_statement : (a0, a1) {
+  # x0 - statement ID
+  allocate(1);
+  # Fetching statement ID
+  x0 = a1[0];
+  # Searching for statement
+  if (x0 == STMT_IF)        { compile_if_statement(a0, a1); };
+  if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1); };
+  if (x0 == STMT_ALLOCATE)  { compile_allocate_statement(a0, a1); };
+  if (x0 == STMT_RETURN)    { compile_return_statement(a0, a1); };
+  if (x0 == STMT_SYSCALL)   { compile_syscall_statement(a0, a1); };
+  if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); };
+  if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1); };
+  if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1); };
   # If none of statements wasn't found, trying to compile expression
   compile_expression(a0, a1);
+};
+
+## Compile if statement
+# a0 - compiler
+# a1 - statement
+compile_if_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of if statements is not implemented yet.");
+};
+
+## Compile while statement
+# a0 - compiler
+# a1 - statement
+compile_while_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of while statements is not implemented yet.");
+};
+
+## Compile allocate statement
+# a0 - compiler
+# a1 - statement
+compile_allocate_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of allocate statements is not implemented yet.");
+};
+
+## Compile return statement
+# a0 - compiler
+# a1 - statement
+compile_return_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of return statements is not implemented yet.");
+};
+
+## Compile syscall statement
+# a0 - compiler
+# a1 - statement
+compile_syscall_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of syscall statements is not implemented yet.");
+};
+
+## Compile writechar statement
+# a0 - compiler
+# a1 - statement
+compile_writechar_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of writechar statements is not implemented yet.");
+};
+
+## Compile label statement
+# a0 - compiler
+# a1 - statement
+compile_label_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of label statements is not implemented yet.");
+};
+
+## Compile goto statement
+# a0 - compiler
+# a1 - statement
+compile_goto_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of goto statements is not implemented yet.");
 };
 
 ## Compile expression
