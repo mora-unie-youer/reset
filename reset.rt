@@ -3492,12 +3492,21 @@ compile_variable_declaration : (a0, a1) {
 # a1 - block statement
 compile_block_statement : (a0, a1) {
   # x0 - statement index
-  allocate(1);
+  # x1 - returned
+  # x2 - statement
+  allocate(3);
   # Iterating through statements
   x0 = 0;
+  x1 = FALSE;
   while (x0 < vector_size(a1[2])) {
+    # Fetching statement
+    x2 = vector_get(a1[2], x0);
+    # Checking if we have returned already
+    if (x1) { compiler_error(a0, x2, "Unreachable code: already returned in this block."); };
     # Compiling statement
     compile_statement(a0, vector_get(a1[2], x0));
+    # Checking if statement is return
+    if (x2[NODE_TYPE] == STMT_RETURN) { x1 = TRUE; };
     # Moving to next statement
     x0 = x0 + 1;
   };
