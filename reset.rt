@@ -3432,7 +3432,7 @@ compile_function_declaration_return : (a0, a1) {
 
 label compile_function_declaration_return_print;
   # If we are here, we need to print return things :3
-  fputs(a0, "\tleave\n\t\ret\n");
+  fputs(a0, "\tleave\n\tret\n");
   return;
 };
 
