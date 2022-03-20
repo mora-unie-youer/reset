@@ -3476,9 +3476,25 @@ compile_variable_declaration : (a0, a1) {
 
 ## Compile block statement
 # a0 - compiler
-# a1 - statement
+# a1 - block statement
 compile_block_statement : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of block statements is not implemented yet.");
+  # x0 - statement index
+  allocate(1);
+  # Iterating through statements
+  x0 = 0;
+  while (x0 < vector_size(a1[2])) {
+    # Compiling statement
+    compile_statement(a0, vector_get(a1[2], x0));
+    # Moving to next statement
+    x0 = x0 + 1;
+  };
+};
+
+## Compile statement
+# a0 - compiler
+# a1 - statement
+compile_statement : (a0, a1) {
+  compiler_error(a0, a1, "Compilation of statements is not implemented yet.");
 };
 
 ## Compile simple value
