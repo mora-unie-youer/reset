@@ -2856,7 +2856,7 @@ simple_expression : (a0, a1, a2) {
   # Parsing variable
   if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE, a2)); };
   # Parsing syscall
-  if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, FALSE, a2)); };
+  if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, a2)); };
   # Parsing readchar
   if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a2)); };
   # Parsing parantheses grouping
