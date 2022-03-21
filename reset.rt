@@ -3979,12 +3979,10 @@ compile_bitwise_logical_expression : (a0, a1) {
   compile_expression(a0, a1[3]);
   # Compiling bitwise instruction
   fputc(x0, '\t');
-  if (x1 == STMT_EXPR_SHL) { fputs(x0, "movl %eax, %ecx\n\tshll %cl"); };
-  if (x1 == STMT_EXPR_SHR) { fputs(x0, "movl %eax, %ecx\n\tshrl %cl"); };
-  if (x1 == STMT_EXPR_AND) { fputs(x0, "andl %eax"); };
-  if (x1 == STMT_EXPR_XOR) { fputs(x0, "xorl %eax"); };
-  if (x1 == STMT_EXPR_OR)  { fputs(x0, "orl %eax"); };
-  fputs(x0, ", %ebx\n\tmovl %ebx, %eax\n");
+  if (x1 == STMT_EXPR_AND) { fputs(x0, "and"); };
+  if (x1 == STMT_EXPR_XOR) { fputs(x0, "xor"); };
+  if (x1 == STMT_EXPR_OR)  { fputs(x0, "or"); };
+  fputs(x0, "l %ebx, %eax\n");
   # Restoring %ebx, if it is needed
   if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpopl %ebx\n"); };
 };
