@@ -3984,13 +3984,14 @@ compile_comparison_expression : (a0, a1) {
   fputs(x0, "\tcmpl %eax, %edx\n");
   compiler_free_register(a0, REG_EDX);
   # Putting (not) equal flag in %eax
-  if (x1 == STMT_EXPR_EQ)      { fputs(x0, "\tsete %al\n"); };
-  if (x1 == STMT_EXPR_NE)      { fputs(x0, "\tsetne %al\n"); };
-  if (x1 == STMT_EXPR_LESS)    { fputs(x0, "\tsetl %al\n"); };
-  if (x1 == STMT_EXPR_GREATER) { fputs(x0, "\tsetg %al\n"); };
-  if (x1 == STMT_EXPR_LE)      { fputs(x0, "\tsetle %al\n"); };
-  if (x1 == STMT_EXPR_GE)      { fputs(x0, "\tsetge %al\n"); };
-  fputs(x0, "\tmovzbl %al, %eax\n");
+  fputc('\t');
+  if (x1 == STMT_EXPR_EQ)      { fputs(x0, "sete"); };
+  if (x1 == STMT_EXPR_NE)      { fputs(x0, "setne"); };
+  if (x1 == STMT_EXPR_LESS)    { fputs(x0, "setl"); };
+  if (x1 == STMT_EXPR_GREATER) { fputs(x0, "setg"); };
+  if (x1 == STMT_EXPR_LE)      { fputs(x0, "setle"); };
+  if (x1 == STMT_EXPR_GE)      { fputs(x0, "setge"); };
+  fputs(x0, " %al\n\tmovzbl %al, %eax\n");
 };
 
 ## Compile logical expression
