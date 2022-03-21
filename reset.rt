@@ -4099,7 +4099,7 @@ compile_bitwise_arithmetic_expression : (a0, a1) {
   if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
   #  TODO: optimize this. When arithm/bitwise operations are chained, it can be
   # omitted I guess.
-  if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tpushl %eax\n") } else { fputs(x0, "\tmovl %eax, %ebx\n"); };
+  if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tpushl %eax\n"); } else { fputs(x0, "\tmovl %eax, %ebx\n"); };
   # Compiling second operand
   compile_expression(a0, a1[3]);
   if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tmovl %eax, %ebx\n"); fputs(x0, "\tpopl %eax\n"); };
