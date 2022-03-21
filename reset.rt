@@ -4250,10 +4250,11 @@ main : (a0, a1) {
   # x0 - input channel
   # x1 - output channel
   # x2 - lexer
-  # x3 - parser
-  # x4 - AST
-  # x5 - compiler
-  allocate(6);
+  # x3 - string buffer
+  # x4 - parser
+  # x5 - AST
+  # x6 - compiler
+  allocate(7);
   # If no additional args - printing usage
   if (a0 < 2) { usage(a1[0]); return(1); };
   # TODO: implement option parser
@@ -4263,14 +4264,16 @@ main : (a0, a1) {
   x1 = output_chan_file("output.asm");
   # Creating lexer
   x2 = lexer(x0, a1[1]);
+  # Creating string buffer
+  x3 = string_buffer();
   # Creating parser
-  x3 = parser(x2);
+  x4 = parser(x2, x3);
   # Parsing code to AST
-  x4 = parser_parse(x3);
+  x5 = parser_parse(x4);
   # Creating compiler
-  x5 = compiler(x1);
+  x6 = compiler(x1, x3);
   # Compiling AST
-  compiler_compile(x5, x4);
+  compiler_compile(x6, x5);
   return(0);
 };
 
