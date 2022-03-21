@@ -3791,13 +3791,13 @@ compile_expression : (a0, a1) {
   if (x0 == STMT_EXPR_XOR)         { compile_bitwise_logical_expression(a0, a1, 1); };
   if (x0 == STMT_EXPR_OR)          { compile_bitwise_logical_expression(a0, a1, 2); };
   ## Relational
-  if (x0 == STMT_EXPR_LESS)        { compile_relational_expression(a0, a1, FALSE, FALSE); };
-  if (x0 == STMT_EXPR_GREATER)     { compile_relational_expression(a0, a1, TRUE, FALSE); };
-  if (x0 == STMT_EXPR_LE)          { compile_relational_expression(a0, a1, FALSE, TRUE); };
-  if (x0 == STMT_EXPR_GE)          { compile_relational_expression(a0, a1, TRUE, TRUE); };
+  if (x0 == STMT_EXPR_LESS)        { compile_comparison_expression(a0, a1); };
+  if (x0 == STMT_EXPR_GREATER)     { compile_comparison_expression(a0, a1); };
+  if (x0 == STMT_EXPR_LE)          { compile_comparison_expression(a0, a1); };
+  if (x0 == STMT_EXPR_GE)          { compile_comparison_expression(a0, a1); };
   ## Equality
-  if (x0 == STMT_EXPR_EQ)          { compile_equality_expression(a0, a1, TRUE); };
-  if (x0 == STMT_EXPR_NE)          { compile_equality_expression(a0, a1, FALSE); };
+  if (x0 == STMT_EXPR_EQ)          { compile_comparison_expression(a0, a1); };
+  if (x0 == STMT_EXPR_NE)          { compile_comparison_expression(a0, a1); };
   ## Logical operations
   if (x0 == STMT_EXPR_LOGICAL_AND) { compile_logical_expression(a0, a1, FALSE); };
   if (x0 == STMT_EXPR_LOGICAL_OR)  { compile_logical_expression(a0, a1, TRUE); };
@@ -3947,25 +3947,18 @@ compile_bitwise_logical_expression : (a0, a1, a2) {
   compiler_error(a0, a1, "Compilation of bitwise logical expressions is not implemented yet.");
 };
 
-## Compile relational expression
+## Compile comparison expression
 # a0 - compiler
 # a1 - statement
-# a2 - less or greater
-# a3 - including or not
-compile_relational_expression : (a0, a1, a2, a3) {
-  compiler_error(a0, a1, "Compilation of relational expressions is not implemented yet.");
-};
-
-## Compile equality expression
-# a0 - compiler
-# a1 - statement
-# a2 - equal or not
-compile_equality_expression : (a0, a1, a2) {
+compile_comparison_expression : (a0, a1) {
   # x0 - compiler output channel
-  allocate(1);
+  # x1 - statement ID
+  allocate(2);
   # Getting output channel
   x0 = compiler_output_chan(a0);
-  # TODO: make support of chained equation.
+  # Fetching statement ID
+  x1 = a1[NODE_TYPE];
+  # TODO: make support of chained equations and comparisons.
   # Compiling first operand
   compile_expression(a0, a1[2]);
   # Moving it's value to %edx
@@ -3977,7 +3970,12 @@ compile_equality_expression : (a0, a1, a2) {
   fputs(x0, "\tcmpl %eax, %edx\n");
   compiler_free_register(a0, REG_EDX);
   # Putting (not) equal flag in %eax
-  if (a2) { fputs(x0, "\tsete %al\n"); } else { fputs(x0, "\tsetne %al\n"); };
+  if (x1 == STMT_EXPR_EQ)      { fputs(x0, "\tsete %al\n"); };
+  if (x1 == STMT_EXPR_NE)      { fputs(x0, "\tsetne %al\n"); };
+  if (x1 == STMT_EXPR_LESS)    { fputs(x0, "\tsetl %al\n"); };
+  if (x1 == STMT_EXPR_GREATER) { fputs(x0, "\tsetg %al\n"); };
+  if (x1 == STMT_EXPR_LE)      { fputs(x0, "\tsetle %al\n"); };
+  if (x1 == STMT_EXPR_GE)      { fputs(x0, "\tsetge %al\n"); };
   fputs(x0, "\tmovzbl %al, %eax\n");
 };
 
