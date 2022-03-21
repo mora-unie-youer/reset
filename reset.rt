@@ -1513,7 +1513,8 @@ label le07;
 ### Parser
 ## Parser parts
 PARSER_LEX    => 0;
-PARSER_SWITCH => 1;
+PARSER_BUFFER => 1;
+PARSER_SWITCH => 2;
 ## Node parts
 NODE_TYPE => 0;
 NODE_LOC  => 1;
@@ -1601,13 +1602,19 @@ STMT_VAR_DECL         => 59;
 
 ## Create new parser
 # a0 - lexer of main file
+# a1 - string buffer
 # @return parser
-parser : (a0) { return(tuple2(list(a0), FALSE)); };
+parser : (a0, a1) { return(tuple3(list(a0), a1, FALSE)); };
 
 ## Get current lexer in parser
 # a0 - parser
 # @return lexer
 parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
+
+## Get string buffer in parser
+# a0 - parser
+# @return string buffer
+parser_buffer : (a0) { return(a0[PARSER_BUFFER]); };
 
 ## Get current token location
 # a0 - parser
@@ -3100,10 +3107,10 @@ constant_integer_expression : (a0, a1) {
 constant_string_expression : (a0, a1) {
   # x0 - duplicated string
   allocate(1);
-  # Duplicating the string
-  x0 = strdup(lexer_token_text(parser_lexer(a0)));
+  # Fetching lexer text buffer address
+  x0 = lexer_token_text(parser_lexer(a0));
   # Returning expression
-  return(tuple3(STMT_EXPR_STRING, a1, x0));
+  return(tuple3(STMT_EXPR_STRING, a1, string_buffer_push(parser_buffer(a0), x0)));
 };
 
 ### String buffer
@@ -3245,18 +3252,14 @@ REG_EDI      => 32; # 0x20
 
 ## Create new compiler
 # a0 - output chan
+# a1 - string buffer
 # @return compiler
-compiler : (a0) { return(tuple4(a0, string_buffer(), 0, 0)); };
+compiler : (a0, a1) { return(tuple4(a0, a1, 0, 0)); };
 
 ## Get compiler's output channel
 # a0 - compiler
 # @return output channel
 compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
-
-## Get compiler's string buffer
-# a0 - compiler
-# @return string buffer
-compiler_string_buffer : (a0) { return(a0[COM_STRBUF]); };
 
 ## Get compiler's current label ID
 # a0 - compiler
@@ -4184,15 +4187,12 @@ compile_integer_expression : (a0, a1) {
 # a1 - statement
 compile_string_expression : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - compiler string buffer
-  allocate(2);
+  allocate(1);
   # Getting compiler output channel
   x0 = compiler_output_chan(a0);
-  # Getting compiler string buffer
-  x1 = compiler_string_buffer(a0);
   # Just setting value to %eax
   fputs(x0, "\tmovl $strbuf+");
-  fputd(x0, string_buffer_push(x1, a1[2]));
+  fputd(x0, a1[2]);
   fputs(x0, ", %eax\n");
 };
 
@@ -4201,36 +4201,30 @@ compile_string_expression : (a0, a1) {
 # a1 - statement
 compile_simple_value : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - compiler string buffer
-  # x2 - statement ID
-  # x3 - string buffer offset
-  allocate(4);
+  # x1 - statement ID
+  allocate(2);
   # Fetching compiler output channel
   x0 = compiler_output_chan(a0);
-  # Fetching compiler string buffer
-  x1 = compiler_string_buffer(a0);
   # Fetching statement ID
-  x2 = a1[NODE_TYPE];
+  x1 = a1[NODE_TYPE];
   # Checking if we can compile this statement
   # TODO: check if statement can be precalculated, e.g. `2 + 2`
-  if (x2 == STMT_EXPR_INTEGER) {
+  if (x1 == STMT_EXPR_INTEGER) {
     # Writing integer
     fputd(x0, a1[2]);
     # Returning
     return;
   };
 
-  if (x2 == STMT_EXPR_STRING) {
-    # Pushing string to buffer and getting offset
-    x3 = string_buffer_push(x1, a1[2]);
+  if (x1 == STMT_EXPR_STRING) {
     # Writing string buffer address
     fputs(x0, "strbuf+");
-    fputd(x0, x3);
+    fputd(x0, a1[2]);
     # Returning
     return;
   };
 
-  if (x2 == STMT_EXPR_IDENTIFIER) {
+  if (x1 == STMT_EXPR_IDENTIFIER) {
     # Writing identifier
     fputs(x0, a1[2]);
     # Returning
