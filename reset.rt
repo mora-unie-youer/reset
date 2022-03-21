@@ -3864,7 +3864,60 @@ compile_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_address_call_expression : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - to be called
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching expression, that is going to be called
+  x1 = vector_get(a1[2], 0);
+  # If expression is identifier - compiling function call
+  if (x1[NODE_TYPE] == STMT_EXPR_IDENTIFIER) { compile_function_call_expression(a0, a1); return; };
   compiler_error(a0, a1, "Compilation of address call expressions is not implemented yet.");
+};
+
+## Compile function call expression
+# a0 - compiler
+# a1 - statement
+compile_function_call_expression : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - call vector
+  # x2 - call vector size
+  # x3 - argument index
+  # x4 - identifier
+  allocate(5);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching call vector
+  x1 = a1[2];
+  # Getting call vector size
+  x2 = vector_size(x1);
+  # Allocating enough stack for arguments
+  fputs(x0, "\tsubl $");
+  fputd(x0, 4 * (x2 - 1));
+  fputs(x0, ", %esp\n");
+  # Iterating through arguments
+  x3 = 1;
+  while (x3 < x2) {
+    # Compiling argument expression
+    compile_expression(a0, vector_get(x1, x3));
+    # Moving value to stack
+    fputs(x0, "\tmovl %eax, ");
+    fputd(x0, 4 * (x3 - 1));
+    fputs(x0, "(%esp)\n");
+    # Moving to next argument
+    x3 = x3 + 1;
+  };
+  # Fetching identifier expression
+  x4 = vector_get(x1, 0);
+  # Printing call instruction
+  fputs(x0, "\tcall ");
+  fputs(x0, x4[2]);
+  fputc(x0, '\n');
+  # Restoring stack
+  fputs(x0, "\taddl $");
+  fputd(x0, 4 * (x2 - 1));
+  fputs(x0, ", %esp\n");
 };
 
 ## Compile address index expression
