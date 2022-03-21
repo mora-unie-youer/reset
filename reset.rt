@@ -3784,12 +3784,12 @@ compile_expression : (a0, a1) {
   if (x0 == STMT_EXPR_SUB)         { compile_additive_expression(a0, a1, TRUE); };
   ## Bitwise operations
   ### Shift
-  if (x0 == STMT_EXPR_SHL)         { compile_bitwise_shift_expression(a0, a1, FALSE); };
-  if (x0 == STMT_EXPR_SHR)         { compile_bitwise_shift_expression(a0, a1, TRUE); };
+  if (x0 == STMT_EXPR_SHL)         { compile_bitwise_expression(a0, a1); };
+  if (x0 == STMT_EXPR_SHR)         { compile_bitwise_expression(a0, a1); };
   ### Logical (and, or, xor)
-  if (x0 == STMT_EXPR_AND)         { compile_bitwise_logical_expression(a0, a1, 0); };
-  if (x0 == STMT_EXPR_XOR)         { compile_bitwise_logical_expression(a0, a1, 1); };
-  if (x0 == STMT_EXPR_OR)          { compile_bitwise_logical_expression(a0, a1, 2); };
+  if (x0 == STMT_EXPR_AND)         { compile_bitwise_expression(a0, a1); };
+  if (x0 == STMT_EXPR_XOR)         { compile_bitwise_expression(a0, a1); };
+  if (x0 == STMT_EXPR_OR)          { compile_bitwise_expression(a0, a1); };
   ## Relational
   if (x0 == STMT_EXPR_LESS)        { compile_comparison_expression(a0, a1); };
   if (x0 == STMT_EXPR_GREATER)     { compile_comparison_expression(a0, a1); };
@@ -3931,20 +3931,34 @@ compile_additive_expression : (a0, a1, a2) {
   compiler_error(a0, a1, "Compilation of additive expressions is not implemented yet.");
 };
 
-## Compile bitwise shift expression
-# a0 - compiler
-# a1 - statement
-# a2 - right-way
-compile_bitwise_shift_expression : (a0, a1, a2) {
-  compiler_error(a0, a1, "Compilation of bitwise shift expressions is not implemented yet.");
-};
-
 ## Compile bitwise logical expression
 # a0 - compiler
 # a1 - statement
-# a2 - AND/OR/XOR (0/1/2)
-compile_bitwise_logical_expression : (a0, a1, a2) {
-  compiler_error(a0, a1, "Compilation of bitwise logical expressions is not implemented yet.");
+compile_bitwise_expression : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - statement ID
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching statement ID
+  x1 = a1[NODE_TYPE];
+  # Compiling first operand
+  compile_expression(a0, a1[2]);
+  # Moving it's value to %ebx
+  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
+  fputs(x0, "\tmovl %eax, %ebx\n");
+  # Compiling second operand
+  compile_expression(a0, a1[3]);
+  # Compiling bitwise instruction
+  fputc(x0, '\t');
+  if (x1 == STMT_EXPR_SHL) { fputs(x0, "movl %eax, %ecx\n\tshll %cl") };
+  if (x1 == STMT_EXPR_SHR) { fputs(x0, "movl %eax, %ecx\n\tshrl %cl") };
+  if (x1 == STMT_EXPR_AND) { fputs(x0, "andl %eax") };
+  if (x1 == STMT_EXPR_XOR) { fputs(x0, "xorl %eax") };
+  if (x1 == STMT_EXPR_OR)  { fputs(x0, "orl %eax") };
+  fputs(x0, ", %ebx\n\tmovl %ebx, %eax\n");
+  # Restoring %ebx, if it is needed
+  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpopl %ebx\n"); };
 };
 
 ## Compile comparison expression
