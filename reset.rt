@@ -3128,15 +3128,17 @@ string_buffer_offset : (a0) { return(a0[STRBUF_OFFSET]); };
 # @return offset
 string_buffer_length : (a0) { return(a0[STRBUF_LENGTH]); };
 
-## Find or push string to string buffer
+## Find string in string buffer
 # a0 - string buffer
 # a1 - string
 # @return string offset
-string_buffer_push : (a0, a1) {
+string_buffer_find : (a0, a1) {
   # x0 - string buffer address
   # x1 - string buffer length
-  # x2 - offset
-  allocate(3);
+  # x2 - string buffer offset
+  # x3 - string offset
+  # x4 - string address
+  allocate(5);
   # Fetching string buffer length
   x1 = string_buffer_length(a0);
   # If string buffer is empty, don't even try to search string
@@ -3145,18 +3147,33 @@ string_buffer_push : (a0, a1) {
     x0 = a0[STRBUF_BUFFER];
     # Iterating through strings
     x2 = 0;
+    x3 = 0;
     while (x2 < x1) {
-      # Comparing strings
-      if (strcmp(x0 + x2, a1) == 0) {
-        # Strings are equal, returning offset
-        return(x2);
-      };
-      # Strings are not equal, moving to new offset
-      x2 = x2 + strlen(x0 + x2) + 1;
+      # Calculating string address
+      x4 = x0 + x2;
+      # Comparing string. If matched, return offset
+      if (strcmp(x4, a1) == 0) { return(x3); };
+      # String didn't match. Moving to next string
+      x2 = x2 + strlen(x4) + 1;
+      x3 = x3 + stresclen(x4) - 1;
     };
   };
+  # We didn't find the string.
+  return(-1);
+};
 
-  # We are here, because we didn't find string. Pushing string to buffer
+## Find or push string to string buffer
+# a0 - string buffer
+# a1 - string
+# @return string offset
+string_buffer_push : (a0, a1) {
+  # x0 - string offset
+  allocate(3);
+  # Trying to find string in buffer
+  x0 = string_buffer_find(a0, a1);
+  # If not -1, return offset
+  if (x0 != -1) { return(x0); };
+  ## We are here, because we didn't find string. Pushing string to buffer
   # x0 - old offset
   # x1 - old length
   # x2 - string length
