@@ -3711,8 +3711,8 @@ compile_writechar_statement : (a0, a1) {
   # Compiling base address expression
   compile_expression(a0, a1[2]);
   # Storing base address in %edx and reserving it
-  fputs(x0, "\tmovl %eax, %edx\n");
   compiler_alloc_register(a0, REG_EDX);
+  fputs(x0, "\tmovl %eax, %edx\n");
   # Compiling index expression
   compile_expression(a0, a1[3]);
   # Adding index to base address
