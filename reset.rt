@@ -4053,7 +4053,7 @@ compile_comparison_expression : (a0, a1) {
   fputs(x0, "\tcmpl %eax, %edx\n");
   compiler_free_register(a0, REG_EDX);
   # Putting (not) equal flag in %eax
-  fputc('\t');
+  fputc(x0, '\t');
   if (x1 == STMT_EXPR_EQ)      { fputs(x0, "sete"); };
   if (x1 == STMT_EXPR_NE)      { fputs(x0, "setne"); };
   if (x1 == STMT_EXPR_LESS)    { fputs(x0, "setl"); };
