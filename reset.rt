@@ -3819,7 +3819,7 @@ compile_expression : (a0, a1) {
   if (x0 == STMT_EXPR_DEREF)       { compile_prefix_deref_expression(a0, a1); };
   if (x0 == STMT_EXPR_ADDROF)      { compile_prefix_addrof_expression(a0, a1); };
   ## Multiplicative
-  if (x0 == STMT_EXPR_MUL)         { compile_multiplication_expression(a0, a1); };
+  if (x0 == STMT_EXPR_MUL)         { compile_bitwise_arithmetic_expression(a0, a1); };
   if (x0 == STMT_EXPR_DIV)         { compile_division_expression(a0, a1, FALSE); };
   if (x0 == STMT_EXPR_MOD)         { compile_division_expression(a0, a1, TRUE); };
   ## Additive
@@ -4048,13 +4048,6 @@ compile_prefix_addrof_expression : (a0, a1) {
   compiler_error(a0, a1, "Compilation of addressof expressions is not implemented yet.");
 };
 
-## Compile multiplication expression
-# a0 - compiler
-# a1 - statement
-compile_multiplication_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of multiplication expressions is not implemented yet.");
-};
-
 ## Compile division expression
 # a0 - compiler
 # a1 - statement
@@ -4112,6 +4105,7 @@ compile_bitwise_arithmetic_expression : (a0, a1) {
   if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tmovl %eax, %ebx\n"); fputs(x0, "\tpopl %eax\n"); };
   # Compiling bitwise instruction
   fputc(x0, '\t');
+  if (x1 == STMT_EXPR_MUL) { fputs(x0, "imul"); };
   if (x1 == STMT_EXPR_ADD) { fputs(x0, "add"); };
   if (x1 == STMT_EXPR_SUB) { fputs(x0, "sub"); };
   if (x1 == STMT_EXPR_AND) { fputs(x0, "and"); };
