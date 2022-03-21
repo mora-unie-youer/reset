@@ -3878,7 +3878,14 @@ compile_address_index_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_simple_identifier_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of identifier expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Printing instruction
+  fputs(x0, "\tmovl ");
+  fputs(x0, a1[2]);
+  fputs(x0, ", %eax\n");
 };
 
 ## Compile argument expression
