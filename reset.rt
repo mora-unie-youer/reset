@@ -3946,6 +3946,8 @@ compile_bitwise_expression : (a0, a1) {
   compile_expression(a0, a1[2]);
   # Moving it's value to %ebx
   if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
+  #  TODO: optimize this. When arithm/bitwise operations are chained, it can be
+  # omitted I guess.
   fputs(x0, "\tmovl %eax, %ebx\n");
   # Compiling second operand
   compile_expression(a0, a1[3]);
