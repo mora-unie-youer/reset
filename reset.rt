@@ -3823,16 +3823,16 @@ compile_expression : (a0, a1) {
   if (x0 == STMT_EXPR_DIV)         { compile_division_expression(a0, a1, FALSE); };
   if (x0 == STMT_EXPR_MOD)         { compile_division_expression(a0, a1, TRUE); };
   ## Additive
-  if (x0 == STMT_EXPR_ADD)         { compile_additive_expression(a0, a1, FALSE); };
-  if (x0 == STMT_EXPR_SUB)         { compile_additive_expression(a0, a1, TRUE); };
+  if (x0 == STMT_EXPR_ADD)         { compile_bitwise_arithmetic_expression(a0, a1); };
+  if (x0 == STMT_EXPR_SUB)         { compile_bitwise_arithmetic_expression(a0, a1); };
   ## Bitwise operations
   ### Shift
   if (x0 == STMT_EXPR_SHL)         { compile_bitwise_shift_expression(a0, a1, FALSE); };
   if (x0 == STMT_EXPR_SHR)         { compile_bitwise_shift_expression(a0, a1, TRUE); };
   ### Logical (and, or, xor)
-  if (x0 == STMT_EXPR_AND)         { compile_bitwise_logical_expression(a0, a1); };
-  if (x0 == STMT_EXPR_XOR)         { compile_bitwise_logical_expression(a0, a1); };
-  if (x0 == STMT_EXPR_OR)          { compile_bitwise_logical_expression(a0, a1); };
+  if (x0 == STMT_EXPR_AND)         { compile_bitwise_arithmetic_expression(a0, a1); };
+  if (x0 == STMT_EXPR_XOR)         { compile_bitwise_arithmetic_expression(a0, a1); };
+  if (x0 == STMT_EXPR_OR)          { compile_bitwise_arithmetic_expression(a0, a1); };
   ## Relational
   if (x0 == STMT_EXPR_LESS)        { compile_comparison_expression(a0, a1); };
   if (x0 == STMT_EXPR_GREATER)     { compile_comparison_expression(a0, a1); };
@@ -4063,14 +4063,6 @@ compile_division_expression : (a0, a1, a2) {
   compiler_error(a0, a1, "Compilation of division expressions is not implemented yet.");
 };
 
-## Compile additive expression
-# a0 - compiler
-# a1 - statement
-# a2 - subtraction
-compile_additive_expression : (a0, a1, a2) {
-  compiler_error(a0, a1, "Compilation of additive expressions is not implemented yet.");
-};
-
 ## Compile bitwise shift expression
 # a0 - compiler
 # a1 - statement
@@ -4097,10 +4089,10 @@ compile_bitwise_shift_expression : (a0, a1, a2) {
   fputs(x0, " %cl, %ebx\n\tmovl %ebx, %eax\n");
 };
 
-## Compile bitwise logical expression
+## Compile bitwise arithmetic expression
 # a0 - compiler
 # a1 - statement
-compile_bitwise_logical_expression : (a0, a1) {
+compile_bitwise_arithmetic_expression : (a0, a1) {
   # x0 - compiler output channel
   # x1 - statement ID
   allocate(2);
@@ -4114,11 +4106,14 @@ compile_bitwise_logical_expression : (a0, a1) {
   if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
   #  TODO: optimize this. When arithm/bitwise operations are chained, it can be
   # omitted I guess.
-  fputs(x0, "\tmovl %eax, %ebx\n");
+  if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tpushl %eax\n") } else { fputs(x0, "\tmovl %eax, %ebx\n"); };
   # Compiling second operand
   compile_expression(a0, a1[3]);
+  if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tmovl %eax, %ebx\n"); fputs(x0, "\tpopl %eax\n"); };
   # Compiling bitwise instruction
   fputc(x0, '\t');
+  if (x1 == STMT_EXPR_ADD) { fputs(x0, "add"); };
+  if (x1 == STMT_EXPR_SUB) { fputs(x0, "sub"); };
   if (x1 == STMT_EXPR_AND) { fputs(x0, "and"); };
   if (x1 == STMT_EXPR_XOR) { fputs(x0, "xor"); };
   if (x1 == STMT_EXPR_OR)  { fputs(x0, "or"); };
