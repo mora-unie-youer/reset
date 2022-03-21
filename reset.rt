@@ -3978,7 +3978,6 @@ compile_logical_expression : (a0, a1, a2) {
   x1 = compiler_new_label(a0);
   x2 = compiler_new_label(a0);
   # Compiling first operand
-  # TODO: compile chained logical operations in one run
   compile_logical_expression_operand(a0, a1[2], a2, x1);
   # Compiling second operand
   compile_logical_expression_operand(a0, a1[3], a2, x1);
@@ -4008,7 +4007,16 @@ compile_logical_expression_operand : (a0, a1, a2, a3) {
   allocate(1);
   # Getting output channel
   x0 = compiler_output_chan(a0);
-  # Compiling operand
+  # If operand is another logical expression, try to compile it there too.
+  if (a1[NODE_TYPE] - STMT_EXPR_LOGICAL_AND == a2) {
+    # Compiling first operand of logical expression
+    compile_logical_expression_operand(a0, a1[2], a2, a3);
+    # Compiling second operand of logical expression
+    compile_logical_expression_operand(a0, a1[3], a2, a3);
+    return;
+  };
+
+  # We have non-logical expression. Compiling it by default way.
   compile_expression(a0, a1);
   # Comparing it with zero
   fputs(x0, "\tcmpl $0, %eax\n");
