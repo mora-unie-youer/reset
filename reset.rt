@@ -3965,7 +3965,7 @@ compile_simple_argument_expression : (a0, a1) {
 fputarg : (a0, a1) {
   # Print offset to %ebp
   fputd(a0, 4 * (a1 + 2));
-  fputs(a0, "(%esp)");
+  fputs(a0, "(%ebp)");
 };
 
 ## Compile variable expression
@@ -3978,7 +3978,7 @@ compile_simple_variable_expression : (a0, a1) {
   x0 = compiler_output_chan(a0);
   # Printing instruction
   fputs(x0, "\tmovl ");
-  fputarg(x0, a1[2]);
+  fputvar(x0, a1[2]);
   fputs(x0, ", %eax\n");
 };
 
@@ -3989,7 +3989,7 @@ fputvar : (a0, a1) {
   # Print offset to %ebp
   fputc(a0, '-');
   fputd(a0, 4 * (a1 + 1));
-  fputs(a0, "(%esp)");
+  fputs(a0, "(%ebp)");
 };
 
 ## Compile syscall expression
