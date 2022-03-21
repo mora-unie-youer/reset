@@ -3968,8 +3968,55 @@ compile_equality_expression : (a0, a1, a2) {
 # a0 - compiler
 # a1 - statement
 # a2 - AND/OR
-compile_logical_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of logical expressions is not implemented yet.");
+compile_logical_expression : (a0, a1, a2) {
+  # x0 - compiler output channel
+  # x1, x2 - labels
+  allocate(3);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Getting label IDs
+  x1 = compiler_new_label(a0);
+  x2 = compiler_new_label(a0);
+  # Compiling first operand
+  # TODO: compile chained logical operations in one run
+  compile_logical_expression_operand(a0, a1[2], a2, x1);
+  # Compiling second operand
+  compile_logical_expression_operand(a0, a1[3], a2, x1);
+  ## AND -> if we are here, we need to put 1 in %eax
+  ## OR  -> if we are here, we need to put 0 in %eax
+  if (a2) { fputs(x0, "\tmovl $0, %eax\n"); } else { fputs(x0, "\tmovl $1, %eax\n"); };
+  # Jump to second (exit) label
+  fputs(x0, "\tjmp ");
+  fputlabel(x0, x2);
+  fputc(x0, '\n');
+  # Printing first label definition
+  fputlabeldef(x0, x1);
+  ## AND -> if we are here, we need to put 0 in %eax
+  ## OR  -> if we are here, we need to put 1 in %eax
+  if (a2) { fputs(x0, "\tmovl $1, %eax\n"); } else { fputs(x0, "\tmovl $0, %eax\n"); };
+  # Printing second label definition
+  fputlabeldef(x0, x2);
+};
+
+## Compile logical expression operand
+# a0 - compiler
+# a1 - expression
+# a2 - AND/OR
+# a3 - first label
+compile_logical_expression_operand : (a0, a1, a2, a3) {
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling operand
+  compile_expression(a0, a1);
+  # Comparing it with zero
+  fputs(x0, "\tcmpl $0, %eax\n");
+  ## AND -> jump to first label if zero
+  ## OR  -> jump to first label if not zero
+  if (a2) { fputs(x0, "\tjne "); } else { fputs(x0, "\tje "); };
+  fputlabel(x0, a3);
+  fputc(x0, '\n');
 };
 
 ## Compile ternary expression
