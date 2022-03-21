@@ -3908,7 +3908,24 @@ fputarg : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_simple_variable_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of variable expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Printing instruction
+  fputs(x0, "\tmovl ");
+  fputarg(x0, a1[2]);
+  fputs(x0, ", %eax\n");
+};
+
+## Print variable to output channel
+# a0 - output channel
+# a1 - number
+fputvar : (a0, a1) {
+  # Print offset to %ebp
+  fputc(a0, '-');
+  fputd(a0, 4 * (a1 + 1));
+  fputs(a0, "(%esp)");
 };
 
 ## Compile syscall expression
