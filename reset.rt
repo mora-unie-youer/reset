@@ -3961,7 +3961,24 @@ compile_relational_expression : (a0, a1, a2, a3) {
 # a1 - statement
 # a2 - equal or not
 compile_equality_expression : (a0, a1, a2) {
-  compiler_error(a0, a1, "Compilation of equality expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # TODO: make support of chained equation.
+  # Compiling first operand
+  compile_expression(a0, a1[2]);
+  # Moving it's value to %edx
+  compiler_alloc_register(a0, REG_EDX);
+  fputs(x0, "\tmovl %eax, %edx\n");
+  # Compiling second operand
+  compile_expression(a0, a1[3]);
+  # Comparing values
+  fputs(x0, "\tcmpl %eax, %edx\n");
+  compiler_free_register(a0, REG_EDX);
+  # Putting (not) equal flag in %eax
+  if (a2) { fputs(x0, "\tsete %al\n"); } else { fputs(x0, "\tsetne %al\n"); };
+  fputs(x0, "\tmovzbl %al, %eax\n");
 };
 
 ## Compile logical expression
