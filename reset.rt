@@ -3636,29 +3636,21 @@ label compile_function_declaration_return_print;
 # a1 - statement
 compile_array_declaration : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - array label
-  # x2 - index
-  allocate(3);
+  # x1 - index
+  allocate(2);
   # Getting output channel
   x0 = compiler_output_chan(a0);
-  # Getting label ID
-  x1 = compiler_new_label(a0);
   # Changing segment to .data, if needed
   compiler_set_segment(a0, SEG_DATA);
-  # Creating variable label
+  # Creating array label
   fputs(x0, a1[2]);
   fputs(x0, ":.long ");
-  fputlabel(x0, x1);
-  fputc(x0, '\n');
-  # Creating array label
-  fputlabel(x0, x1);
-  fputs(x0, ":.long ");
   # Compiling array values
-  x2 = 0;
-  while (x2 < vector_size(a1[3])) {
-    if (x2 != 0) { fputc(x0, ','); };
-    compile_simple_value(a0, vector_get(a1[3], x2));
-    x2 = x2 + 1;
+  x1 = 0;
+  while (x1 < vector_size(a1[3])) {
+    if (x1 != 0) { fputc(x0, ','); };
+    compile_simple_value(a0, vector_get(a1[3], x1));
+    x1 = x1 + 1;
   };
   # Writing newline to end .long macro
   fputc(x0, '\n');
@@ -3670,33 +3662,25 @@ compile_array_declaration : (a0, a1) {
 # a2 - type size
 compile_type_array_declaration : (a0, a1, a2) {
   # x0 - compiler output channel
-  # x1 - array label
-  # x2 - size expression
-  allocate(3);
+  # x1 - size expression
+  allocate(2);
   # Getting output channel
   x0 = compiler_output_chan(a0);
-  # Getting label ID
-  x1 = compiler_new_label(a0);
   # Fetching size expression
-  x2 = a1[3];
+  x1 = a1[3];
   # Checking we have integer in size expression
-  if (x2[NODE_TYPE] != STMT_EXPR_INTEGER) {
+  if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
     compiler_error(a0, x2, "Only integers can be used for size of array");
   };
   # Changing segment to .data, if needed
   compiler_set_segment(a0, SEG_DATA);
-  # Creating variable label
-  fputs(x0, a1[2]);
-  fputs(x0, ":.long ");
-  fputlabel(x0, x1);
-  fputc(x0, '\n');
   # Writing .comm macro
   fputs(x0, ".comm ");
   # Writing array name
-  fputlabel(x0, x1);
+  fputs(x0, a1[2]);
   # Writing array size
   fputc(x0, ',');
-  fputd(x0, x2[2] * a2);
+  fputd(x0, x1[2] * a2);
   # Writing new line to finish macro
   fputc(x0, '\n');
 };
