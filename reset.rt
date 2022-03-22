@@ -1564,20 +1564,20 @@ STMT_EXPR_OR          => 30;
 STMT_EXPR_LOGICAL_AND => 31;
 # Logical or
 STMT_EXPR_LOGICAL_OR  => 32;
-# Ternary
-STMT_EXPR_TERNARY     => 33;
 # Assignment
-STMT_EXPR_ASSIGN      => 34;
-STMT_EXPR_ADD_ASSIGN  => 35;
-STMT_EXPR_SUB_ASSIGN  => 36;
-STMT_EXPR_MUL_ASSIGN  => 37;
-STMT_EXPR_DIV_ASSIGN  => 38;
-STMT_EXPR_MOD_ASSIGN  => 39;
-STMT_EXPR_AND_ASSIGN  => 40;
-STMT_EXPR_XOR_ASSIGN  => 41;
-STMT_EXPR_OR_ASSIGN   => 42;
-STMT_EXPR_SHL_ASSIGN  => 43;
-STMT_EXPR_SHR_ASSIGN  => 44;
+STMT_EXPR_ASSIGN      => 33;
+STMT_EXPR_ADD_ASSIGN  => 34;
+STMT_EXPR_SUB_ASSIGN  => 35;
+STMT_EXPR_MUL_ASSIGN  => 36;
+STMT_EXPR_DIV_ASSIGN  => 37;
+STMT_EXPR_MOD_ASSIGN  => 38;
+STMT_EXPR_AND_ASSIGN  => 39;
+STMT_EXPR_XOR_ASSIGN  => 40;
+STMT_EXPR_OR_ASSIGN   => 41;
+STMT_EXPR_SHL_ASSIGN  => 42;
+STMT_EXPR_SHR_ASSIGN  => 43;
+# Ternary
+STMT_EXPR_TERNARY     => 44;
 # Statements
 STMT_IF               => 45;
 STMT_WHILE            => 46;
@@ -3354,7 +3354,8 @@ compiler_compile : (a0, a1) {
 compiler_use_macros : (a0, a1) {
   # x0 - i
   # x1 - statement
-  allocate(2);
+  # x2 - j
+  allocate(3);
   # Resetting index
   x0 = 0;
   # Iterating through statements
@@ -3363,25 +3364,117 @@ compiler_use_macros : (a0, a1) {
     x1 = vector_get(a1, x0);
     # Checking if current statement is a macro
     if (x1[NODE_TYPE] == STMT_MACRO) {
-      # Using macro in AST
-      compiler_use_macro(a0, a1, x0 + 1, x1);
+      # Looping through all next statements
+      x2 = x0 + 1;
+      while (x2 < vector_size(a1)) {
+        # Using macro in statement
+        compiler_use_macro(a0, vector_get(a1, x2), x1);
+        x2 = x2 + 1;
+      };
     };
     # Moving to next statement
     x0 = x0 + 1;
   };
 };
 
-## Use macro in the rest of AST
+## Use macro in statement's children
 # a0 - compiler
-# a1 - AST
-# a2 - statement index
-# a3 - macro statement
-compiler_use_macro : (a0, a1, a2, a3) {
-  fputloc(a3[1], stderr);
-  eputs(": ");
-  eputs(a3[2]);
-  eputc('\n');
-  compiler_error(a0, a3, "Using macros is not implemented yet.");
+# a1 - statement
+# a2 - macro statement
+compiler_use_macro : (a0, a1, a2) {
+  # x0 - statement ID
+  # x1 - children pos
+  # x2 - children count
+  # x3 - child
+  allocate(4);
+  # Presetting default values
+  x1 = 2; # Children in tuples start from second element in most cases
+  # Fetching statement ID
+  x0 = a1[NODE_TYPE];
+  ### Checking if we have statement, that has children
+  # Vectored expressions
+  if (x0 == STMT_EXPR_SYSCALL) { goto &compiler_use_macro_vector; };
+  if (x0 == STMT_EXPR_CALL)    { goto &compiler_use_macro_vector; };
+  # Not vectored expressions
+  if (x0 == STMT_EXPR_READCHAR) { x2 = 2; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_EXPR_INDEX)    { x2 = 2; goto &compiler_use_macro_tuple; };
+  # Unary operators
+  ## From STMT_EXPR_PLUS to STMT_EXPR_ADDROF
+  # NOTE: Using * instead of && due feature lack
+  if ((x0 >= STMT_EXPR_PLUS) * (x0 <= STMT_EXPR_ADDROF)) {
+    x2 = 1;
+    goto &compiler_use_macro_tuple;
+  };
+  # Binary operators
+  ## From STMT_EXPR_MUL to STMT_EXPR_SHR_ASSIGN
+  # NOTE: Using * instead of && due feature lack
+  if ((x0 >= STMT_EXPR_MUL) * (x0 <= STMT_EXPR_SHR_ASSIGN)) {
+    x2 = 2;
+    goto &compiler_use_macro_tuple;
+  };
+  # Ternary operator
+  if (x0 == STMT_EXPR_TERNARY) { x2 = 3; goto &compiler_use_macro_tuple; };
+  # Statements
+  ## Vectored statements
+  if (x0 == STMT_IF)         {         goto &compiler_use_macro_vector; };
+  if (x0 == STMT_BLOCK)      {         goto &compiler_use_macro_vector; };
+  if (x0 == STMT_RETURN)     {         goto &compiler_use_macro_vector; };
+  if (x0 == STMT_ARRAY_DECL) { x1 = 3; goto &compiler_use_macro_vector; };
+  ## Not vectored statements
+  if (x0 == STMT_ALLOCATE)        { x2 = 1;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_WHILE)           { x2 = 2;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_WRITECHAR)       { x2 = 3;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_GOTO)            { x2 = 1;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_MACRO)           { x2 = 1;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_FUN_DECL)        { x1 = 4; x2 = 1; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_CHAR_ARRAY_DECL) { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_INT_ARRAY_DECL)  { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_VAR_DECL)        { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
+  # If we are here, we have expression that shouldn't apply macro. Exitting.
+label compiler_use_macro_exit;
+  return;
+label compiler_use_macro_tuple;
+  # x0 - index
+  x0 = 0; # Resetting index
+  while (x0 < x2) {
+    # Fetching child
+    x3 = a1[x1 + x0];
+    # Checking if we can apply macro
+    if (x3[NODE_TYPE] == STMT_EXPR_IDENTIFIER) {
+      # Checking if identifier and macro names are equal
+      if (strcmp(x3[2], a2[2]) == 0) {
+        # Replacing child with macro
+        a1[x1 + x0] = a2[3];
+      };
+    } else {
+      # Maybe it's another statement/expression with children?
+      compiler_use_macro(a0, x3, a2);
+    };
+    # Moving to next child
+    x0 = x0 + 1;
+  };
+  goto &compiler_use_macro_exit;
+label compiler_use_macro_vector;
+  # x0 - index
+  x0 = 0; # Resetting index
+  while (x0 < vector_size(a1[x1])) {
+    # Fetching child
+    x3 = vector_get(a1[x1], x0);
+    # Checking if we can apply macro
+    if (x3[NODE_TYPE] == STMT_EXPR_IDENTIFIER) {
+      # Checking if identifier and macro names are equal
+      if (strcmp(x3[2], a2[2]) == 0) {
+        # Replacing child with macro
+        vector_set(a1[x1], x0, a2[3]);
+      };
+    } else {
+      # Maybe it's another statement/expression with children?
+      compiler_use_macro(a0, x3, a2);
+    };
+    # Moving to next child
+    x0 = x0 + 1;
+  };
+  goto &compiler_use_macro_exit;
 };
 
 ## Compile top level statement
