@@ -3946,17 +3946,17 @@ compile_address_index_address : (a0, a1) {
   if (x2 == STMT_EXPR_INDEX) {
     # Compile it
     compile_address_index_address(a0, x1);
-    # Moving address to %ebx
-    compiler_alloc_register(a0, REG_EBX);
-    fputs(x0, "\tmovl (%eax), %ebx\n");
+    # Moving address to %edx
+    compiler_alloc_register(a0, REG_ECX);
+    fputs(x0, "\tmovl (%eax), %ecx\n");
   } else {
     # If indexed expression is not identifier, compiling it and moving to %ebx
     if (x2 != STMT_EXPR_IDENTIFIER) {
       # Compiling expression
       compile_expression(a0, x1);
       # Moving value to %ebx
-      compiler_alloc_register(a0, REG_EBX);
-      fputs(x0, "\tmovl %eax, %ebx\n");
+      compiler_alloc_register(a0, REG_ECX);
+      fputs(x0, "\tmovl %eax, %ecx\n");
     };
   };
   # Compiling second operand
@@ -3966,8 +3966,8 @@ compile_address_index_address : (a0, a1) {
   if (x2 == STMT_EXPR_IDENTIFIER) {
     fputs(x0, "test(,%eax,4)");
   } else {
-    fputs(x0, "(%ebx,%eax,4)");
-    compiler_free_register(a0, REG_EBX);
+    fputs(x0, "(%ecx,%eax,4)");
+    compiler_free_register(a0, REG_ECX);
   };
   fputs(x0, ", %eax\n");
 };
