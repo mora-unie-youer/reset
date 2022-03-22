@@ -275,6 +275,7 @@ stresclen : (a0) {
 ## Copy string
 # a0 - src
 # a1 - dest
+# @return char count
 strcpy : (a0, a1) {
   # x0 - pos
   # x1 - char
@@ -293,6 +294,8 @@ strcpy : (a0, a1) {
   };
   # Writing NULL character
   writechar(a1, x0, '\0');
+  # Returning number of copied characters
+  return(x0);
 };
 
 ## Compare string
