@@ -3844,17 +3844,17 @@ compile_expression : (a0, a1) {
   ## Ternary
   if (x0 == STMT_EXPR_TERNARY)     { compile_ternary_expression(a0, a1); };
   ## Assignment
-  if (x0 == STMT_EXPR_ASSIGN)      { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_ADD_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_SUB_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_MUL_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_DIV_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_MOD_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_AND_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_XOR_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_OR_ASSIGN)   { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_SHL_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
-  if (x0 == STMT_EXPR_SHR_ASSIGN)  { compile_assignment_expression(a0, a1, x0); };
+  if (x0 == STMT_EXPR_ASSIGN)      { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_ADD_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_SUB_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_MUL_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_DIV_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_MOD_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_AND_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_XOR_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_OR_ASSIGN)   { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_SHL_ASSIGN)  { compile_assignment_expression(a0, a1); };
+  if (x0 == STMT_EXPR_SHR_ASSIGN)  { compile_assignment_expression(a0, a1); };
 };
 
 ## Compile address call expression
@@ -4294,8 +4294,35 @@ compile_ternary_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 # a2 - type
-compile_assignment_expression : (a0, a1, a2) {
-  compiler_error(a0, a1, "Compilation of assignment expressions is not implemented yet.");
+compile_assignment_expression : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - statement ID
+  # x2 - first operand
+  # x3 - first operand's ID
+  allocate(4);
+  # Getting compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching assignment type
+  x1 = a1[NODE_TYPE];
+  # For now, we can compile only simple assignment
+  if (x1 == STMT_EXPR_ASSIGN) {
+    # Fetching first operand
+    x2 = a1[2];
+    # Fetching its ID
+    x3 = x2[NODE_TYPE];
+    # Compiling expression
+    compile_expression(a0, a1[3]);
+    # Compiling assignment
+    fputs(x0, "\tmovl %eax, ");
+    if (x3 == STMT_EXPR_IDENTIFIER) { fputs(x0, x2[2]);   fputc(x0, '\n'); return; };
+    if (x3 == STMT_EXPR_ARGUMENT)   { fputarg(x0, x2[2]); fputc(x0, '\n'); return; };
+    if (x3 == STMT_EXPR_VARIABLE)   { fputvar(x0, x2[2]); fputc(x0, '\n'); return; };
+    # TODO: indexed address must be supported, e.g. test[0], x0[1], x0[x1]
+    # Couldn't compile, erroring
+    compiler_error(a0, a1, "Can't use this as assignable operand.");
+    return;
+  };
+  compiler_error(a0, a1, "Compilation of complex assignment expressions is not implemented yet.");
 };
 
 ## Compile integer expression
