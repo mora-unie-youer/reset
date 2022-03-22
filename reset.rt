@@ -4113,7 +4113,7 @@ compile_simple_readchar_expression : (a0, a1) {
   # Adding index to base address
   fputs(x0, "\taddl %eax, %ebx\n");
   # Loading byte from address and freeing %ebx
-  fputs(x0, "\tmovsbl (%ebx), %al\n");
+  fputs(x0, "\tmovsbl (%ebx), %eax\n");
   compiler_free_register(a0, REG_EBX);
 };
 
