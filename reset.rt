@@ -3948,7 +3948,7 @@ compile_address_index_address : (a0, a1) {
     compile_address_index_address(a0, x1);
     # Moving address to %ebx
     compiler_alloc_register(a0, REG_EBX);
-    fputs(x0, "\tmovl %eax, %ebx\n");
+    fputs(x0, "\tmovl (%eax), %ebx\n");
   } else {
     # If indexed expression is not identifier, compiling it and moving to %ebx
     if (x2 != STMT_EXPR_IDENTIFIER) {
