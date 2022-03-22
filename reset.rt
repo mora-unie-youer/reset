@@ -3238,7 +3238,12 @@ string_buffer_export : (a0, a1) {
 COM_OCHAN    => 0;
 COM_STRBUF   => 1;
 COM_LABEL    => 2;
-COM_REGFLAGS => 3;
+COM_SEGMENT  => 3;
+COM_REGFLAGS => 4;
+## Segment flags
+SEG_TEXT     => 0;
+SEG_DATA     => 1;
+SEG_RODATA   => 2;
 ## Register usage flags
 REG_EAX      =>  1; # 0x01
 REG_EBX      =>  2; # 0x02
@@ -3251,7 +3256,7 @@ REG_EDI      => 32; # 0x20
 # a0 - output chan
 # a1 - string buffer
 # @return compiler
-compiler : (a0, a1) { return(tuple4(a0, a1, 0, 0)); };
+compiler : (a0, a1) { return(tuple5(a0, a1, 0, SEG_TEXT, 0)); };
 
 ## Get compiler's output channel
 # a0 - compiler
@@ -3262,6 +3267,24 @@ compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
 # a0 - compiler
 # @return label ID
 compiler_label_id : (a0) { return(a0[COM_LABEL]); };
+
+## Set new segment if needed
+# a0 - compiler
+# a1 - segment
+compiler_set_segment : (a0, a1) {
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting compiler output channel
+  x0 = compiler_output_chan(a0);
+  # Checking if we already in this segment
+  if (a0[COM_SEGMENT] == a1) { return; };
+  # Switching segment in compiler
+  a0[COM_SEGMENT] = a1;
+  # Printing required text, to switch segment
+  if (a1 == SEG_TEXT)   { fputs(x0, ".text\n"); };
+  if (a1 == SEG_DATA)   { fputs(x0, ".data\n"); };
+  if (a1 == SEG_RODATA) { fputs(x0, ".section .rodata\n"); };
+};
 
 ## Get compiler's register state
 # a0 - compiler
@@ -3343,6 +3366,8 @@ compiler_compile : (a0, a1) {
     compile_top_level_statement(a0, vector_get(a1, x0));
     x0 = x0 + 1;
   };
+  # Changing segment to .rodata
+  compiler_set_segment(a0, SEG_RODATA);
   # Exporting string buffer
   string_buffer_export(a0[COM_STRBUF], a0[COM_OCHAN]);
 };
@@ -3531,6 +3556,8 @@ compile_function_declaration : (a0, a1) {
   x0 = compiler_output_chan(a0);
   # Fetching block statement
   x1 = a1[4];
+  # Changing segment to .text, if needed
+  compiler_set_segment(a0, SEG_TEXT);
   # Writing function label
   fputs(x0, a1[2]);
   fputs(x0, ":\n");
@@ -3590,6 +3617,8 @@ compile_array_declaration : (a0, a1) {
   x0 = compiler_output_chan(a0);
   # Getting label ID
   x1 = compiler_new_label(a0);
+  # Changing segment to .data, if needed
+  compiler_set_segment(a0, SEG_DATA);
   # Creating variable label
   fputs(x0, a1[2]);
   fputs(x0, ":.long ");
@@ -3628,6 +3657,8 @@ compile_type_array_declaration : (a0, a1, a2) {
   if (x2[NODE_TYPE] != STMT_EXPR_INTEGER) {
     compiler_error(a0, x2, "Only integers can be used for size of array");
   };
+  # Changing segment to .data, if needed
+  compiler_set_segment(a0, SEG_DATA);
   # Creating variable label
   fputs(x0, a1[2]);
   fputs(x0, ":.long ");
@@ -3652,6 +3683,8 @@ compile_variable_declaration : (a0, a1) {
   allocate(1);
   # Getting output channel
   x0 = compiler_output_chan(a0);
+  # Changing segment to .data, if needed
+  compiler_set_segment(a0, SEG_DATA);
   # Creating variable label
   fputs(x0, a1[2]);
   fputs(x0, ":.long ");
