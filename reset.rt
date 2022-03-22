@@ -3112,7 +3112,7 @@ constant_string_expression : (a0, a1) {
 
 ### String buffer
 ## String buffer constants
-STRBUF_SIZE => 4096;
+STRBUF_SIZE => 16384;
 ## String buffer parts
 STRBUF_BUFFER => 0;
 STRBUF_OFFSET => 1;
