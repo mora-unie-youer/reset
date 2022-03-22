@@ -424,6 +424,23 @@ tuple5 : (a0, a1, a2, a3, a4) {
   return(x0);
 };
 
+## Make tuple with 6 values
+# a0, a1, a2, a3, a4, a5 - values
+# @return tuple
+tuple6 : (a0, a1, a2, a3, a4, a5) {
+  # x0 - tuple
+  allocate(1);
+  x0 = allocate_tuple(6);
+  # Fill tuple
+  x0[0] = a0;
+  x0[1] = a1;
+  x0[2] = a2;
+  x0[3] = a3;
+  x0[4] = a4;
+  x0[5] = a5;
+  return(x0);
+};
+
 ## Make tuple with 7 values
 # a0, a1, a2, a3, a4, a5, a6 - values
 # @return tuple
@@ -3258,7 +3275,7 @@ registers : [ "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" ];
 # a0 - output chan
 # a1 - string buffer
 # @return compiler
-compiler : (a0, a1) { return(tuple5(a0, a1, 0, SEG_TEXT, vector(6, 6))); };
+compiler : (a0, a1) { return(tuple5(a0, a1, 0, SEG_TEXT, tuple6(0,0,0,0,0,0))); };
 
 ## Get compiler's output channel
 # a0 - compiler
@@ -3288,25 +3305,19 @@ compiler_set_segment : (a0, a1) {
   if (a1 == SEG_RODATA) { fputs(x0, ".section .rodata\n"); };
 };
 
-## Get compiler's register state
-# a0 - compiler
-# a1 - register
-# @return register state
-compiler_get_register_state : (a0, a1) { return(vector_get(a0[COM_REGFLAGS], a1)); };
-
 ## Prepare register for use
 # a0 - compiler
 # a1 - register
 compiler_allocate_register : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - register state
+  # x1 - registers state
   allocate(2);
   # Getting output channel
   x0 = compiler_output_chan(a0);
   # Fetching register state
-  x1 = compiler_get_register_state(a0, a1);
+  x1 = a0[COM_REGFLAGS];
   # Checking if we need to push register to stack (do this, if regstate != 0)
-  if (x1 != 0) {
+  if (x1[a1] != 0) {
     # Printing push instruction
     fputs(x0, "\tpushl ");
     # Printing register
@@ -3315,7 +3326,7 @@ compiler_allocate_register : (a0, a1) {
     fputc(x0, '\n');
   };
   # Increment register state by one
-  vector_set(a0[COM_REGFLAGS], a1, x1 + 1);
+  x1[a1] = x1[a1] + 1;
 };
 
 ## Restore register state, if it is needed
@@ -3328,11 +3339,11 @@ compiler_free_register : (a0, a1) {
   # Getting output channel
   x0 = compiler_output_chan(a0);
   # Fetching register state
-  x1 = compiler_get_register_state(a0, a1);
+  x1 = a0[COM_REGFLAGS];
   # Checking, if register was never allocated
-  assert(x1 != 0, "Tried to free not used register.");
-  # Checking if we need to push register to stack (do this, if regstate != 1)
-  if (x1 != 0) {
+  assert(x1[a1] != 0, "Tried to free not used register.");
+  # Checking if we need to pop register from stack (do this, if regstate != 1)
+  if (x1[a1] != 1) {
     # Printing push instruction
     fputs(x0, "\tpopl ");
     # Printing register
@@ -3340,8 +3351,8 @@ compiler_free_register : (a0, a1) {
     # Printing newline
     fputc(x0, '\n');
   };
-  # Increment register state by one
-  vector_set(a0[COM_REGFLAGS], a1, x1 - 1);
+  # Decrement register state by one
+  x1[a1] = x1[a1] - 1;
 };
 
 ## Set new label ID
@@ -4234,11 +4245,11 @@ compile_simple_syscall_expression : (a0, a1) {
   fputs(x0, "\tint $0x80\n");
   # Restoring all backed up registers
   if (x2 > 6) { fputs(x0, "\tpopl %ebp\n"); };
-  if (x2 > 5) { compiler_allocate_register(a0, REG_EDI); };
-  if (x2 > 4) { compiler_allocate_register(a0, REG_ESI); };
-  if (x2 > 3) { compiler_allocate_register(a0, REG_EDX); };
-  if (x2 > 2) { compiler_allocate_register(a0, REG_ECX); };
-  if (x2 > 1) { compiler_allocate_register(a0, REG_EBX); };
+  if (x2 > 5) { compiler_free_register(a0, REG_EDI); };
+  if (x2 > 4) { compiler_free_register(a0, REG_ESI); };
+  if (x2 > 3) { compiler_free_register(a0, REG_EDX); };
+  if (x2 > 2) { compiler_free_register(a0, REG_ECX); };
+  if (x2 > 1) { compiler_free_register(a0, REG_EBX); };
 };
 
 ## Compile readchar expression
