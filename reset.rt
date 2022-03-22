@@ -4713,7 +4713,7 @@ main : (a0, a1) {
   # Creating input channel
   x0 = input_chan_file(a1[1]);
   # Creating output channel
-  x1 = output_chan_file("output.asm");
+  x1 = output_chan_file("output.S");
   # Creating lexer
   x2 = lexer(x0, a1[1]);
   # Creating string buffer

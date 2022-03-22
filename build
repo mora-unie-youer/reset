@@ -4,10 +4,8 @@ set -e
 # If there's no bootstrap version, compile it
 if [ ! -f rtc.bootstrap ]; then
     echo "Building bootstrap compiler..."
-    # Picking latest bootstrap
-    boot=$(find bootstrap | tail -1)
     # Building bootstrap compiler
-    as --32       -o rtc.bootstrap.o $boot
+    as --32       -o rtc.bootstrap.o reset.bootstrap.S
     ld -melf_i386 -o rtc.bootstrap   rtc.bootstrap.o
 fi
 
