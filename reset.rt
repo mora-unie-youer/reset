@@ -980,35 +980,36 @@ LOC_FILE   => 0;
 LOC_LINE   => 1;
 LOC_COLUMN => 2;
 ### Token IDs
-TOKEN_END        => 256;
-TOKEN_INTEGER    => 257;
-TOKEN_IDENTIFIER => 258;
-TOKEN_STRING     => 259;
-TOKEN_ARGUMENT   => 260;
-TOKEN_VARIABLE   => 261;
+TOKEN_END          => 256;
+TOKEN_INTEGER      => 257;
+TOKEN_IDENTIFIER   => 258;
+TOKEN_STRING       => 259;
+TOKEN_ARGUMENT     => 260;
+TOKEN_VARIABLE     => 261;
 ## Keywords
 # Conditionals
-TOKEN_IF         => 270;
-TOKEN_ELSE       => 271;
+TOKEN_IF           => 270;
+TOKEN_ELSE         => 271;
 # Loops
-TOKEN_BREAK      => 272;
-TOKEN_WHILE      => 273;
+TOKEN_BREAK        => 272;
+TOKEN_WHILE        => 273;
 # Functions
-TOKEN_ALLOCATE   => 274;
-TOKEN_RETURN     => 275;
-TOKEN_SYSCALL    => 276;
+TOKEN_ALLOCATE     => 274;
+TOKEN_RETURN       => 275;
+TOKEN_SYSCALL      => 276;
 #labels
-TOKEN_GLOBAL     => 277;
-TOKEN_GOTO       => 278;
-TOKEN_LABEL      => 279;
+TOKEN_GLOBAL       => 277;
+TOKEN_GOTO         => 278;
+TOKEN_LABEL        => 279;
 # Byte operations
-TOKEN_READCHAR   => 280;
-TOKEN_WRITECHAR  => 281;
+TOKEN_READCHAR     => 280;
+TOKEN_WRITECHAR    => 281;
 # Array types
-TOKEN_TYPE_CHAR  => 282;
-TOKEN_TYPE_INT   => 283;
+TOKEN_TYPE_CHAR    => 282;
+TOKEN_TYPE_INT     => 283;
 # File
-TOKEN_INCLUDE    => 284;
+TOKEN_INCLUDE      => 284;
+TOKEN_INCLUDE_ONCE => 285;
 ## Symbols
 # Equality
 TOKEN_EQ    => 300;
@@ -1076,7 +1077,7 @@ reserved_keywords : [
   "global", "goto", "label",       #labels
   "readchar", "writechar",         # Byte operations
   "char", "int",                   # Array types
-  "include",
+  "include", "include_once",
   NULL
 ];
 ## Lexer triggers
@@ -1524,9 +1525,10 @@ label le07;
 
 ### Parser
 ## Parser parts
-PARSER_LEX    => 0;
-PARSER_BUFFER => 1;
-PARSER_SWITCH => 2;
+PARSER_LEX     => 0;
+PARSER_BUFFER  => 1;
+PARSER_SWITCH  => 2;
+PARSER_INCLIST => 3;
 ## Node parts
 NODE_TYPE => 0;
 NODE_LOC  => 1;
@@ -1616,7 +1618,7 @@ STMT_VAR_DECL         => 59;
 # a0 - lexer of main file
 # a1 - string buffer
 # @return parser
-parser : (a0, a1) { return(tuple3(list(a0), a1, FALSE)); };
+parser : (a0, a1) { return(tuple4(list(a0), a1, FALSE, vector(0, 1))); };
 
 ## Get current lexer in parser
 # a0 - parser
@@ -1640,6 +1642,40 @@ parser_token_location : (a0) {
   x0[LOC_COLUMN] = x0[LOC_COLUMN] - lexer_token_length(parser_lexer(a0)) + 1;
   # Returning location
   return(x0);
+};
+
+## Search if file was included before
+# a0 - parser
+# a1 - filename
+parser_include_search : (a0, a1) {
+  # x0 - include list
+  # x1 - index
+  allocate(2);
+  # Getting include list
+  x0 = a0[PARSER_INCLIST];
+  # Iterating through includes
+  x1 = 0;
+  while (x1 < vector_size(x0)) {
+    # Checking if filenames are equal
+    if (!strcmp(vector_get(x0, x1), a1)) { return(TRUE); };
+    # Moving to next file
+    x1 = x1 + 1;
+  };
+  return(FALSE);
+};
+
+## Add file to parser, if it is needed
+# a0 - parser
+# a1 - filename
+# a2 - include once
+parser_include_add : (a0, a1, a2) {
+  # Checking, if we need to add this file
+  if (!(a2 && parser_include_search(a0, a1))) {
+    # Adding lexer to list
+    a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], lexer_file(a1));
+    # Adding file to vector, if we are including it once
+    if (a2) { vector_push(a0[PARSER_INCLIST], a1); };
+  };
 };
 
 ## Hold current lexer in parser
@@ -1730,9 +1766,11 @@ top_level_statement : (a0, a1, a2) {
   # x1 - identifier
   allocate(2);
   # Parsing global statement
-  if (a1 == TOKEN_GLOBAL) { return(global_statement(a0, a2)); };
+  if (a1 == TOKEN_GLOBAL)       { return(global_statement(a0, a2)); };
   # Parsing include statement
-  if (a1 == TOKEN_INCLUDE) { return(include_statement(a0, a2)); };
+  if (a1 == TOKEN_INCLUDE)      { return(include_statement(a0, a2, FALSE)); };
+  # Parsing include_once statement
+  if (a1 == TOKEN_INCLUDE_ONCE) { return(include_statement(a0, a2, TRUE)); };
   # Parsing statements starting with identifier
   if (a1 == TOKEN_IDENTIFIER) {
     # Duplicating identifier
@@ -1808,8 +1846,9 @@ label global_statement_invalid;
 ## Parse include statement
 # a0 - parser
 # a1 - token location
+# a2 - include once
 # @return NULL
-include_statement : (a0, a1) {
+include_statement : (a0, a1, a2) {
   # x0 - file vector
   # x1 - next token/i
   # x2 - file
@@ -1850,8 +1889,8 @@ label include_statement_next;
   while (x1 < vector_size(x0)) {
     # Getting filename
     x2 = vector_get(x0, x1);
-    # Adding lexer to list
-    a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], lexer_file(x2));
+    # Adding file to parse
+    parser_include_add(a0, x2, a2);
     # Moving to next file
     x1 = x1 + 1;
   };
