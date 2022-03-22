@@ -3499,7 +3499,7 @@ compiler_use_macro : (a0, a1, a2) {
   if (x0 == STMT_WHILE)           { x2 = 2;         goto &compiler_use_macro_tuple; };
   if (x0 == STMT_WRITECHAR)       { x2 = 3;         goto &compiler_use_macro_tuple; };
   if (x0 == STMT_GOTO)            { x2 = 1;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_MACRO)           { x2 = 1;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_MACRO)           { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
   if (x0 == STMT_FUN_DECL)        { x1 = 4; x2 = 1; goto &compiler_use_macro_tuple; };
   if (x0 == STMT_CHAR_ARRAY_DECL) { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
   if (x0 == STMT_INT_ARRAY_DECL)  { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
