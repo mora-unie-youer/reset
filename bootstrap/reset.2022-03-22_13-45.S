@@ -18244,4 +18244,4 @@ strbuf:
 .string "VAR: "
 .string "usage: "
 .string " [option]... <file>\n"
-.string "output.asm"
+.string "output.S"

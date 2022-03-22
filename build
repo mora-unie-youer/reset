@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+# If there's no bootstrap version, compile it
+if [ ! -f rtc.bootstrap ]; then
+    echo "Building bootstrap compiler..."
+    # Picking latest bootstrap
+    boot=$(find bootstrap | tail -1)
+    # Building bootstrap compiler
+    as --32       -o rtc.bootstrap.o $boot
+    ld -melf_i386 -o rtc.bootstrap   rtc.bootstrap.o
+fi
+
+echo "Building compiler..."
+./rtc.bootstrap reset.rt
+as --32       -o rtc.o output.S
+ld -melf_i386 -o rtc   rtc.o
+echo "Compiler was built successfully!"

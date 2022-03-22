@@ -8,8 +8,13 @@ The main goal is to create programming language literally from scratch.
 * Getting started
 If you'd like to play with Reset, you can compile it by yourself.
 
-Firstly, you need to compile bootstrapped version, located in =bootstrap=
-folder.
+You can use already prepared script for that:
+#+begin_src shell
+./build
+#+end_src
+
+Otherwise, you can do it without script. Firstly, you need to compile
+bootstrapped version, located in =bootstrap= folder.
 #+begin_src shell
 as --32 -o reset.bootstrap.o <bootstrapped file>
 ld -melf_i386 -o reset.bootstrap reset.bootstrap.o
