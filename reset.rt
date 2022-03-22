@@ -4296,7 +4296,17 @@ compile_prefix_minus_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_prefix_logical_not_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of logical not expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling expression to negate
+  compile_expression(a0, a1[2]);
+  # Comparing with zero
+  fputs(x0, "\tcmpl $0, %eax\n");
+  # Setting equal flag
+  fputs(x0, "\tsete %al\n");
+  fputs(x0, "\tmovzbl %al, %eax\n");
 };
 
 ## Compile not expression
