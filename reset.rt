@@ -4008,26 +4008,10 @@ compile_expression : (a0, a1) {
 # a1 - statement
 compile_address_call_expression : (a0, a1) {
   # x0 - compiler output channel
-  # x1 - to be called
-  allocate(2);
-  # Getting output channel
-  x0 = compiler_output_chan(a0);
-  # Fetching expression, that is going to be called
-  x1 = vector_get(a1[2], 0);
-  # If expression is identifier - compiling function call
-  if (x1[NODE_TYPE] == STMT_EXPR_IDENTIFIER) { compile_function_call_expression(a0, a1); return; };
-  compiler_error(a0, a1, "Compilation of address call expressions is not implemented yet.");
-};
-
-## Compile function call expression
-# a0 - compiler
-# a1 - statement
-compile_function_call_expression : (a0, a1) {
-  # x0 - compiler output channel
   # x1 - call vector
   # x2 - call vector size
   # x3 - argument index
-  # x4 - identifier
+  # x4 - expression to call
   allocate(5);
   # Getting output channel
   x0 = compiler_output_chan(a0);
@@ -4035,8 +4019,18 @@ compile_function_call_expression : (a0, a1) {
   x1 = a1[2];
   # Getting call vector size
   x2 = vector_size(x1);
+  # Fetching expression to call
+  x4 = vector_get(x1, 0);
   # Backing up all needed registers
   compiler_allocate_register(a0, REG_EBX);
+  # We need to put address in %ebx, if we have address and not identifier
+  if (x4[NODE_TYPE] != STMT_EXPR_IDENTIFIER) {
+    # Compiling expression to call
+    compile_expression(a0, x4);
+    # Moving it in %ebx
+    fputs(x0, "\tmovl %eax, %ebx\n");
+  };
+  # Backing up the rest of registers
   compiler_allocate_register(a0, REG_ECX);
   compiler_allocate_register(a0, REG_EDX);
   compiler_allocate_register(a0, REG_ESI);
@@ -4059,12 +4053,15 @@ compile_function_call_expression : (a0, a1) {
     # Moving to next argument
     x3 = x3 + 1;
   };
-  # Fetching identifier expression
-  x4 = vector_get(x1, 0);
   # Printing call instruction
-  fputs(x0, "\tcall ");
-  fputs(x0, x4[2]);
-  fputc(x0, '\n');
+  if (x4[NODE_TYPE] == STMT_EXPR_IDENTIFIER) {
+    fputs(x0, "\tcall ");
+    fputs(x0, x4[2]);
+    fputc(x0, '\n');
+  } else {
+    # Calling it (it's in %ebx)
+    fputs(x0, "\tcall *%ebx\n");
+  };
   # Restoring stack
   if (x2 > 1) {
     fputs(x0, "\taddl $");
