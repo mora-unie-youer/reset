@@ -4121,14 +4121,21 @@ compile_simple_readchar_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_prefix_plus_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of plus prefix expressions is not implemented yet.");
+  # DO NOTHING :P
 };
 
 ## Compile minus prefix expression
 # a0 - compiler
 # a1 - statement
 compile_prefix_minus_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of minus prefix expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling expression to negate
+  compile_expression(a0, a1[2]);
+  # Negating
+  fputs(x0, "\tnegl %eax\n");
 };
 
 ## Compile logical not expression
@@ -4142,7 +4149,14 @@ compile_prefix_logical_not_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_prefix_not_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of not expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling expression to bitwise negate
+  compile_expression(a0, a1[2]);
+  # Bitwise negating
+  fputs(x0, "\tnotl %eax\n");
 };
 
 ## Compile dereference expression
