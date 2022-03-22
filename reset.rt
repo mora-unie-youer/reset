@@ -3928,6 +3928,50 @@ compile_address_index_expression : (a0, a1) {
   compiler_error(a0, a1, "Compilation of address index expressions is not implemented yet.");
 };
 
+## Compile address from address index expression
+# a0 - compiler
+# a1 - statement
+compile_address_index_address : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - first operand
+  # x2 - first operand type
+  allocate(3);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching first operand
+  x1 = a1[2];
+  # Fetching first operand type
+  x2 = x1[NODE_TYPE];
+  # Checking if first operand is another address index
+  if (x2 == STMT_EXPR_INDEX) {
+    # Compile it
+    compile_address_index_address(a0, x1);
+    # Moving address to %ebx
+    compiler_alloc_register(a0, REG_EBX);
+    fputs(x0, "\tmovl %eax, %ebx\n");
+  } else {
+    # If indexed expression is not identifier, compiling it and moving to %ebx
+    if (x2 != STMT_EXPR_IDENTIFIER) {
+      # Compiling expression
+      compile_expression(a0, x1);
+      # Moving value to %ebx
+      compiler_alloc_register(a0, REG_EBX);
+      fputs(x0, "\tmovl %eax, %ebx\n");
+    };
+  };
+  # Compiling second operand
+  compile_expression(a0, a1[3]);
+  # Calculating address
+  fputs(x0, "\tleal ");
+  if (x2 == STMT_EXPR_IDENTIFIER) {
+    fputs(x0, "test(,%eax,4)");
+  } else {
+    fputs(x0, "(%ebx,%eax,4)");
+    compiler_free_register(a0, REG_EBX);
+  };
+  fputs(x0, ", %eax\n");
+};
+
 ## Compile identifier expression
 # a0 - compiler
 # a1 - statement
@@ -4310,6 +4354,12 @@ compile_assignment_expression : (a0, a1) {
     x2 = a1[2];
     # Fetching its ID
     x3 = x2[NODE_TYPE];
+    # If it is indexed address, compiling it, and moving to %ebx
+    if (x3 == STMT_EXPR_INDEX) {
+      compile_address_index_address(a0, x2);
+      compiler_alloc_register(a0, REG_EBX);
+      fputs(x0, "\tmovl %eax, %ebx\n");
+    };
     # Compiling expression
     compile_expression(a0, a1[3]);
     # Compiling assignment
@@ -4317,7 +4367,11 @@ compile_assignment_expression : (a0, a1) {
     if (x3 == STMT_EXPR_IDENTIFIER) { fputs(x0, x2[2]);   fputc(x0, '\n'); return; };
     if (x3 == STMT_EXPR_ARGUMENT)   { fputarg(x0, x2[2]); fputc(x0, '\n'); return; };
     if (x3 == STMT_EXPR_VARIABLE)   { fputvar(x0, x2[2]); fputc(x0, '\n'); return; };
-    # TODO: indexed address must be supported, e.g. test[0], x0[1], x0[x1]
+    if (x3 == STMT_EXPR_INDEX) {
+      fputs(x0, "(%ebx)\n");
+      compiler_free_register(a0, REG_EBX);
+      return;
+    };
     # Couldn't compile, erroring
     compiler_error(a0, a1, "Can't use this as assignable operand.");
     return;
