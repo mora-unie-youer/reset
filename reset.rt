@@ -4134,14 +4134,35 @@ compile_prefix_not_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_prefix_deref_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of dereference expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling expression to dereference
+  compile_expression(a0, a1[2]);
+  # Dereferencing
+  fputs(x0, "\tmovl (%eax), %eax\n");
 };
 
 ## Compile addressof expression
 # a0 - compiler
 # a1 - statement
 compile_prefix_addrof_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of addressof expressions is not implemented yet.");
+  # x0 - compiler output channel
+  # x1 - expression
+  # x2 - expression type
+  allocate(3);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Getting expression
+  x1 = a1[2];
+  # Getting expression type
+  x2 = x1[NODE_TYPE];
+  # Compiling
+  if (x2 == STMT_EXPR_IDENTIFIER) { fputs(x0, "\tmovl $");  fputs(x0, x1[2]); fputs(x0, ", %eax\n"); return; };
+  if (x2 == STMT_EXPR_ARGUMENT)   { fputs(x0, "\tleal "); fputarg(x0, x1[2]); fputs(x0, ", %eax\n"); return; };
+  if (x2 == STMT_EXPR_VARIABLE)   { fputs(x0, "\tleal "); fputvar(x0, x1[2]); fputs(x0, ", %eax\n"); return; };
+  compiler_error(a0, a1, "Can't compile addressof for this expression.");
 };
 
 ## Compile division expression
