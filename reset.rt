@@ -3925,7 +3925,15 @@ compile_function_call_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_address_index_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of address index expressions is not implemented yet.");
+  # x0 - compiler output channel
+  # x1 - to be called
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling address
+  compile_address_index_address(a0, a1);
+  # Loading value from address
+  fputs(x0, "\tmovl (%eax), %eax\n");
 };
 
 ## Compile address from address index expression
