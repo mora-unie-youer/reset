@@ -4041,7 +4041,6 @@ compile_simple_syscall_expression : (a0, a1) {
   if (compiler_get_register_state(a0, REG_EDX) * (x2 > 3)) { fputs(x0, "\tpopl %edx\n"); };
   if (compiler_get_register_state(a0, REG_ECX) * (x2 > 2)) { fputs(x0, "\tpopl %ecx\n"); };
   if (compiler_get_register_state(a0, REG_EBX) * (x2 > 1)) { fputs(x0, "\tpopl %ebx\n"); };
-  compiler_error(a0, a1, "Compilation of syscall expressions is not implemented yet.");
 };
 
 ## Compile readchar expression
