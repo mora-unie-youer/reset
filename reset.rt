@@ -13,6 +13,7 @@ SYS_open   => 5;
 SYS_close  => 6;
 SYS_brk    => 45;
 SYS_munmap => 91;
+SYS_getcwd => 183;
 SYS_mmap2  => 192;
 
 ### System call functions
@@ -67,6 +68,11 @@ munmap : (a0, a1) { return(syscall(SYS_munmap, a0, a1)); };
 mmap2 : (a0, a1, a2, a3, a4, a5) {
   return(syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5));
 };
+
+## Get current work directory
+# a0 - buffer
+# a1 - buffer size
+getcwd : (a0, a1) { return(syscall(SYS_getcwd, a0, a1)); };
 
 ### Useful functions
 ## Align number up to another number (which is power of 2)
