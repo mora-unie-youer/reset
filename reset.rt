@@ -3972,7 +3972,8 @@ compile_address_index_address : (a0, a1) {
   # Calculating address
   fputs(x0, "\tleal ");
   if (x2 == STMT_EXPR_IDENTIFIER) {
-    fputs(x0, "test(,%eax,4)");
+    fputs(x0, x1[2]);
+    fputs(x0, "(,%eax,4)");
   } else {
     fputs(x0, "(%ecx,%eax,4)");
     compiler_free_register(a0, REG_ECX);
