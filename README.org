@@ -1,0 +1,23 @@
+#+TITLE: Reset
+Programming language firstly written using only GNU Assembly.
+The main goal is to create programming language literally from scratch.
+* Goals
+- [X] Written in Assembly (see =asm= branch)
+- [X] Bootstrapped
+- [ ] Optimized
+* Getting started
+If you'd like to play with Reset, you can compile it by yourself.
+
+Firstly, you need to compile bootstrapped version, located in =bootstrap=
+folder.
+#+begin_src shell
+as --32 -o reset.bootstrap.o <bootstrapped file>
+ld -melf_i386 -o reset.bootstrap reset.bootstrap.o
+#+end_src
+
+Using generated binary you can compile *.rt files. To compile one, you can do:
+#+begin_src shell
+./reset.bootstrap <reset file>
+#+end_src
+This will generate =output.asm= file for you. Using instructions above you can
+compile it, to run your binary. That's it. Have fun!

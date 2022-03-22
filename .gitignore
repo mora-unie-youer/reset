@@ -1,4 +1,4 @@
 *.o
-rtc
+*.S
 reset
-reset.S
+reset.bootstrap
