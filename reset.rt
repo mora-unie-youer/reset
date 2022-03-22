@@ -3626,22 +3626,9 @@ compile_function_declaration_return : (a0, a1) {
   x2 = x1[NODE_TYPE];
   # If last statement is return, returning :D
   if (x2 == STMT_RETURN) { return; };
-  # If last statement with block, run recursively
-  if (x2 == STMT_IF) {
-    # Looking at last block in if statement
-    compile_function_declaration_return(a0, vector_pop(x1[2]));
-    return;
-  };
-  if (x2 == STMT_WHILE) {
-    # Looking at while block
-    compile_function_declaration_return(a0, x1[3]);
-    return;
-  };
-
 label compile_function_declaration_return_print;
   # If we are here, we need to print return things :3
   fputs(a0, "\tleave\n\tret\n");
-  return;
 };
 
 ## Compile array declaration
