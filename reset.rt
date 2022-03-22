@@ -4185,7 +4185,32 @@ compile_prefix_addrof_expression : (a0, a1) {
 # a1 - statement
 # a2 - modulo division
 compile_division_expression : (a0, a1, a2) {
-  compiler_error(a0, a1, "Compilation of division expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Backing up registers, if needed
+  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
+  if (compiler_get_register_state(a0, REG_EDX)) { fputs(x0, "\tpushl %edx\n"); };
+  # Compiling first operand
+  compile_expression(a0, a1[2]);
+  # Backing it up in stack
+  fputs(x0, "\tpushl %eax\n");
+  # Compiling second operand
+  compile_expression(a0, a1[3]);
+  # Storing its value in %ebx
+  fputs(x0, "\tmovl %eax, %ebx\n");
+  # Restoring %eax
+  fputs(x0, "\tpushl %eax\n");
+  # Preparing %edx for division
+  fputs(x0, "\tcltd\n");
+  # Dividing
+  fputs(x0, "\tidiv %ebx\n");
+  # Storing modulus, if we did modulus division
+  if (a1[NODE_TYPE] == STMT_EXPR_MOD) { fputs(x0, "\tmovl %edx, %eax\n"); };
+  # Restoring registers, if needed
+  if (compiler_get_register_state(a0, REG_EDX)) { fputs(x0, "\tpopl %edx\n"); };
+  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpopl %ebx\n"); };
 };
 
 ## Compile bitwise shift expression
