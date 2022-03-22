@@ -1256,8 +1256,7 @@ lexer_lex : (a0) {
 label lx00;
   ## Entry point of lexer
   # If token is space/tab/newline, skip it
-  # NOTE: We're using here + instead of || as we don't have it now
-  if ((lexer_look(a0) == CHAR_SPACES) + (lexer_look(a0) == CHAR_NEWLINE)) {
+  if (lexer_look(a0) == CHAR_SPACES || lexer_look(a0) == CHAR_NEWLINE) {
     # Consuming char
     lexer_consume(a0);
     # Retrying
@@ -1495,8 +1494,7 @@ label lx18;
   # Checking for comment
   if (x0 == '#') {
     ## Skipping line
-    # NOTE: using * insead of &&, because we don't have it
-    while ((x0 != '\n') * (x0 != '\0')) { x0 = fgetc(a0[LEX_ICHAN]); };
+    while (x0 != '\n' && x0 != '\0') { x0 = fgetc(a0[LEX_ICHAN]); };
     # Resetting line and column
     a0[LEX_LINE] = a0[LEX_LINE] + 1;
     a0[LEX_COLUMN] = 1;
@@ -3474,15 +3472,13 @@ compiler_use_macro : (a0, a1, a2) {
   if (x0 == STMT_EXPR_INDEX)    { x2 = 2; goto &compiler_use_macro_tuple; };
   # Unary operators
   ## From STMT_EXPR_PLUS to STMT_EXPR_ADDROF
-  # NOTE: Using * instead of && due feature lack
-  if ((x0 >= STMT_EXPR_PLUS) * (x0 <= STMT_EXPR_ADDROF)) {
+  if (x0 >= STMT_EXPR_PLUS && x0 <= STMT_EXPR_ADDROF) {
     x2 = 1;
     goto &compiler_use_macro_tuple;
   };
   # Binary operators
   ## From STMT_EXPR_MUL to STMT_EXPR_SHR_ASSIGN
-  # NOTE: Using * instead of && due feature lack
-  if ((x0 >= STMT_EXPR_MUL) * (x0 <= STMT_EXPR_SHR_ASSIGN)) {
+  if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_SHR_ASSIGN) {
     x2 = 2;
     goto &compiler_use_macro_tuple;
   };
@@ -3742,8 +3738,7 @@ compile_block_statement : (a0, a1) {
     # Compiling statement
     compile_statement(a0, vector_get(a1[2], x0));
     # Checking if statement is return or goto
-    # NOTE: using + instead of || because of not having this feature
-    if ((x2[NODE_TYPE] == STMT_RETURN) + (x2[NODE_TYPE] == STMT_GOTO)) { x1 = TRUE; };
+    if (x2[NODE_TYPE] == STMT_RETURN || x2[NODE_TYPE] == STMT_GOTO) { x1 = TRUE; };
     # Moving to next statement
     x0 = x0 + 1;
   };
@@ -4212,7 +4207,6 @@ compile_simple_syscall_expression : (a0, a1) {
   # Fetching arguments count
   x2 = vector_size(x1);
   # Backing up all needed registers
-  # NOTE: using * instead of && because of not having this feature
   if (x2 > 1) { compiler_allocate_register(a0, REG_EBX); };
   if (x2 > 2) { compiler_allocate_register(a0, REG_ECX); };
   if (x2 > 3) { compiler_allocate_register(a0, REG_EDX); };
