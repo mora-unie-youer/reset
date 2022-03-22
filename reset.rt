@@ -4099,7 +4099,22 @@ compile_simple_syscall_expression : (a0, a1) {
 # a0 - compiler
 # a1 - statement
 compile_simple_readchar_expression : (a0, a1) {
-  compiler_error(a0, a1, "Compilation of readchar expressions is not implemented yet.");
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling base address expression
+  compile_expression(a0, a1[2]);
+  # Storing base address in %ebx and reserving it
+  compiler_alloc_register(a0, REG_EBX);
+  fputs(x0, "\tmovl %eax, %ebx\n");
+  # Compiling index expression
+  compile_expression(a0, a1[3]);
+  # Adding index to base address
+  fputs(x0, "\taddl %eax, %ebx\n");
+  # Loading byte from address and freeing %ebx
+  fputs(x0, "\tmovsbl (%ebx), %al\n");
+  compiler_free_register(a0, REG_EBX);
 };
 
 ## Compile plus prefix expression
