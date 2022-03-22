@@ -3245,18 +3245,20 @@ SEG_TEXT     => 0;
 SEG_DATA     => 1;
 SEG_RODATA   => 2;
 ## Register usage flags
-REG_EAX      =>  1; # 0x01
-REG_EBX      =>  2; # 0x02
-REG_ECX      =>  4; # 0x04
-REG_EDX      =>  8; # 0x08
-REG_ESI      => 16; # 0x10
-REG_EDI      => 32; # 0x20
+REG_EAX      => 0;
+REG_EBX      => 1;
+REG_ECX      => 2;
+REG_EDX      => 3;
+REG_ESI      => 4;
+REG_EDI      => 5;
+# Register list (%ebp used only for syscalls)
+registers : [ "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" ];
 
 ## Create new compiler
 # a0 - output chan
 # a1 - string buffer
 # @return compiler
-compiler : (a0, a1) { return(tuple5(a0, a1, 0, SEG_TEXT, 0)); };
+compiler : (a0, a1) { return(tuple5(a0, a1, 0, SEG_TEXT, vector(6, 6))); };
 
 ## Get compiler's output channel
 # a0 - compiler
@@ -3290,19 +3292,56 @@ compiler_set_segment : (a0, a1) {
 # a0 - compiler
 # a1 - register
 # @return register state
-compiler_get_register_state : (a0, a1) { return(a0[COM_REGFLAGS] & a1); };
+compiler_get_register_state : (a0, a1) { return(vector_get(a0[COM_REGFLAGS], a1)); };
 
-## Allocate register
+## Prepare register for use
 # a0 - compiler
 # a1 - register
-compiler_alloc_register : (a0, a1) {
-  assert((a0[COM_REGFLAGS] & a1) == 0, "Tried to allocate used register.");
-  a0[COM_REGFLAGS] = a0[COM_REGFLAGS] | a1;
+compiler_allocate_register : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - register state
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching register state
+  x1 = compiler_get_register_state(a0, a1);
+  # Checking if we need to push register to stack (do this, if regstate != 0)
+  if (x1 != 0) {
+    # Printing push instruction
+    fputs(x0, "\tpushl ");
+    # Printing register
+    fputs(x0, registers[a1]);
+    # Printing newline
+    fputc(x0, '\n');
+  };
+  # Increment register state by one
+  vector_set(a0[COM_REGFLAGS], a1, x1 + 1);
 };
 
+## Restore register state, if it is needed
+# a0 - compiler
+# a1 - register
 compiler_free_register : (a0, a1) {
-  assert((a0[COM_REGFLAGS] & a1) != 0, "Tried to free unused register.");
-  a0[COM_REGFLAGS] = a0[COM_REGFLAGS] & (~a1);
+  # x0 - compiler output channel
+  # x1 - register state
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching register state
+  x1 = compiler_get_register_state(a0, a1);
+  # Checking, if register was never allocated
+  assert(x1 != 0, "Tried to free not used register.");
+  # Checking if we need to push register to stack (do this, if regstate != 1)
+  if (x1 != 0) {
+    # Printing push instruction
+    fputs(x0, "\tpopl ");
+    # Printing register
+    fputs(x0, registers[a1]);
+    # Printing newline
+    fputc(x0, '\n');
+  };
+  # Increment register state by one
+  vector_set(a0[COM_REGFLAGS], a1, x1 - 1);
 };
 
 ## Set new label ID
@@ -3876,7 +3915,7 @@ compile_writechar_statement : (a0, a1) {
   # Compiling base address expression
   compile_expression(a0, a1[2]);
   # Storing base address in %edx and reserving it
-  compiler_alloc_register(a0, REG_EDX);
+  compiler_allocate_register(a0, REG_EDX);
   fputs(x0, "\tmovl %eax, %edx\n");
   # Compiling index expression
   compile_expression(a0, a1[3]);
@@ -4014,6 +4053,12 @@ compile_function_call_expression : (a0, a1) {
   x1 = a1[2];
   # Getting call vector size
   x2 = vector_size(x1);
+  # Backing up all needed registers
+  compiler_allocate_register(a0, REG_EBX);
+  compiler_allocate_register(a0, REG_ECX);
+  compiler_allocate_register(a0, REG_EDX);
+  compiler_allocate_register(a0, REG_ESI);
+  compiler_allocate_register(a0, REG_EDI);
   # Allocating enough stack for arguments
   if (x2 > 1) {
     fputs(x0, "\tsubl $");
@@ -4044,6 +4089,12 @@ compile_function_call_expression : (a0, a1) {
     fputd(x0, 4 * (x2 - 1));
     fputs(x0, ", %esp\n");
   };
+  # Restoring all backed up registers
+  compiler_free_register(a0, REG_EDI);
+  compiler_free_register(a0, REG_ESI);
+  compiler_free_register(a0, REG_EDX);
+  compiler_free_register(a0, REG_ECX);
+  compiler_free_register(a0, REG_EBX);
 };
 
 ## Compile address index expression
@@ -4080,16 +4131,16 @@ compile_address_index_address : (a0, a1) {
     # Compile it
     compile_address_index_address(a0, x1);
     # Moving address to %edx
-    compiler_alloc_register(a0, REG_ECX);
-    fputs(x0, "\tmovl (%eax), %ecx\n");
+    compiler_allocate_register(a0, REG_EDX);
+    fputs(x0, "\tmovl (%eax), %edx\n");
   } else {
     # If indexed expression is not identifier, compiling it and moving to %ebx
     if (x2 != STMT_EXPR_IDENTIFIER) {
       # Compiling expression
       compile_expression(a0, x1);
       # Moving value to %ebx
-      compiler_alloc_register(a0, REG_ECX);
-      fputs(x0, "\tmovl %eax, %ecx\n");
+      compiler_allocate_register(a0, REG_EDX);
+      fputs(x0, "\tmovl %eax, %edx\n");
     };
   };
   # Compiling second operand
@@ -4098,12 +4149,11 @@ compile_address_index_address : (a0, a1) {
   fputs(x0, "\tleal ");
   if (x2 == STMT_EXPR_IDENTIFIER) {
     fputs(x0, x1[2]);
-    fputs(x0, "(,%eax,4)");
+    fputs(x0, "(,%eax,4), %eax\n");
   } else {
-    fputs(x0, "(%ecx,%eax,4)");
-    compiler_free_register(a0, REG_ECX);
+    fputs(x0, "(%edx,%eax,4), %eax\n");
+    compiler_free_register(a0, REG_EDX);
   };
-  fputs(x0, ", %eax\n");
 };
 
 ## Compile identifier expression
@@ -4170,7 +4220,6 @@ fputvar : (a0, a1) {
 ## Compile syscall expression
 # a0 - compiler
 # a1 - statement
-syscall_registers : [ "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" ];
 compile_simple_syscall_expression : (a0, a1) {
   # x0 - compiler output channel
   # x1 - arguments
@@ -4185,12 +4234,12 @@ compile_simple_syscall_expression : (a0, a1) {
   x2 = vector_size(x1);
   # Backing up all needed registers
   # NOTE: using * instead of && because of not having this feature
-  if (compiler_get_register_state(a0, REG_EBX) * (x2 > 1)) { fputs(x0, "\tpushl %ebx\n"); };
-  if (compiler_get_register_state(a0, REG_ECX) * (x2 > 2)) { fputs(x0, "\tpushl %ecx\n"); };
-  if (compiler_get_register_state(a0, REG_EDX) * (x2 > 3)) { fputs(x0, "\tpushl %edx\n"); };
-  if (compiler_get_register_state(a0, REG_ESI) * (x2 > 4)) { fputs(x0, "\tpushl %esi\n"); };
-  if (compiler_get_register_state(a0, REG_EDI) * (x2 > 5)) { fputs(x0, "\tpushl %edi\n"); };
-  if (x2 > 6)                                              { fputs(x0, "\tpushl %ebp\n"); };
+  if (x2 > 1) { compiler_allocate_register(a0, REG_EBX); };
+  if (x2 > 2) { compiler_allocate_register(a0, REG_ECX); };
+  if (x2 > 3) { compiler_allocate_register(a0, REG_EDX); };
+  if (x2 > 4) { compiler_allocate_register(a0, REG_ESI); };
+  if (x2 > 5) { compiler_allocate_register(a0, REG_EDI); };
+  if (x2 > 6) { fputs(x0, "\tpushl %ebp\n"); };
   # Iterating through arguments
   x3 = 0;
   while (x3 < x2) {
@@ -4199,7 +4248,7 @@ compile_simple_syscall_expression : (a0, a1) {
     # Moving value to needed register (when x3 != 0 != %eax)
     if (x3 != 0) {
       fputs(x0, "\tmovl %eax, ");
-      fputs(x0, syscall_registers[x3]);
+      fputs(x0, registers[x3]);
       fputc(x0, '\n');
     };
     #  If we have more than one argument, we HAVE to push %eax, as it will be
@@ -4213,12 +4262,12 @@ compile_simple_syscall_expression : (a0, a1) {
   # Calling syscall
   fputs(x0, "\tint $0x80\n");
   # Restoring all backed up registers
-  if (x2 > 6)                                              { fputs(x0, "\tpopl %ebp\n"); };
-  if (compiler_get_register_state(a0, REG_EDI) * (x2 > 5)) { fputs(x0, "\tpopl %edi\n"); };
-  if (compiler_get_register_state(a0, REG_ESI) * (x2 > 4)) { fputs(x0, "\tpopl %esi\n"); };
-  if (compiler_get_register_state(a0, REG_EDX) * (x2 > 3)) { fputs(x0, "\tpopl %edx\n"); };
-  if (compiler_get_register_state(a0, REG_ECX) * (x2 > 2)) { fputs(x0, "\tpopl %ecx\n"); };
-  if (compiler_get_register_state(a0, REG_EBX) * (x2 > 1)) { fputs(x0, "\tpopl %ebx\n"); };
+  if (x2 > 6) { fputs(x0, "\tpopl %ebp\n"); };
+  if (x2 > 5) { compiler_allocate_register(a0, REG_EDI); };
+  if (x2 > 4) { compiler_allocate_register(a0, REG_ESI); };
+  if (x2 > 3) { compiler_allocate_register(a0, REG_EDX); };
+  if (x2 > 2) { compiler_allocate_register(a0, REG_ECX); };
+  if (x2 > 1) { compiler_allocate_register(a0, REG_EBX); };
 };
 
 ## Compile readchar expression
@@ -4232,15 +4281,15 @@ compile_simple_readchar_expression : (a0, a1) {
   # Compiling base address expression
   compile_expression(a0, a1[2]);
   # Storing base address in %ebx and reserving it
-  compiler_alloc_register(a0, REG_EBX);
-  fputs(x0, "\tmovl %eax, %ebx\n");
+  compiler_allocate_register(a0, REG_EDX);
+  fputs(x0, "\tmovl %eax, %edx\n");
   # Compiling index expression
   compile_expression(a0, a1[3]);
   # Adding index to base address
-  fputs(x0, "\taddl %eax, %ebx\n");
+  fputs(x0, "\taddl %eax, %edx\n");
   # Loading byte from address and freeing %ebx
-  fputs(x0, "\tmovsbl (%ebx), %eax\n");
-  compiler_free_register(a0, REG_EBX);
+  fputs(x0, "\tmovsbl (%edx), %eax\n");
+  compiler_free_register(a0, REG_EDX);
 };
 
 ## Compile plus prefix expression
@@ -4330,8 +4379,8 @@ compile_division_expression : (a0, a1, a2) {
   # Getting output channel
   x0 = compiler_output_chan(a0);
   # Backing up registers, if needed
-  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
-  if (compiler_get_register_state(a0, REG_EDX)) { fputs(x0, "\tpushl %edx\n"); };
+  compiler_allocate_register(a0, REG_EBX);
+  compiler_allocate_register(a0, REG_EDX);
   # Compiling first operand
   compile_expression(a0, a1[2]);
   # Backing it up in stack
@@ -4349,8 +4398,8 @@ compile_division_expression : (a0, a1, a2) {
   # Storing modulus, if we did modulus division
   if (a1[NODE_TYPE] == STMT_EXPR_MOD) { fputs(x0, "\tmovl %edx, %eax\n"); };
   # Restoring registers, if needed
-  if (compiler_get_register_state(a0, REG_EDX)) { fputs(x0, "\tpopl %edx\n"); };
-  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpopl %ebx\n"); };
+  compiler_free_register(a0, REG_EDX);
+  compiler_free_register(a0, REG_EBX);
 };
 
 ## Compile bitwise shift expression
@@ -4365,18 +4414,19 @@ compile_bitwise_shift_expression : (a0, a1, a2) {
   # Compiling first operand
   compile_expression(a0, a1[2]);
   # Moving it's value to %ebx
-  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
+  compiler_allocate_register(a0, REG_EBX);
   fputs(x0, "\tmovl %eax, %ebx\n");
   # Compiling second operand
   compile_expression(a0, a1[3]);
   # Moving it's value to %ecx (shift can work only with %cl)
+  compiler_allocate_register(a0, REG_ECX);
   fputs(x0, "\tmovl %eax, %ecx\n");
   # Compiling bitwise shift
   fputc(x0, '\t');
-  fputs(x0, "shl");
-  # EVIL INSTRUCTION HACK
-  if (a2) { fputc(x0, 'r'); } else { fputc(x0, 'l'); };
+  if (a2) { fputs(x0, "shlr"); } else { fputs(x0, "shll"); };
   fputs(x0, " %cl, %ebx\n\tmovl %ebx, %eax\n");
+  compiler_free_register(a0, REG_ECX);
+  compiler_free_register(a0, REG_EBX);
 };
 
 ## Compile bitwise arithmetic expression
@@ -4393,7 +4443,7 @@ compile_bitwise_arithmetic_expression : (a0, a1) {
   # Compiling first operand
   compile_expression(a0, a1[2]);
   # Moving it's value to %ebx
-  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpushl %ebx\n"); };
+  compiler_allocate_register(a0, REG_EBX);
   #  TODO: optimize this. When arithm/bitwise operations are chained, it can be
   # omitted I guess.
   if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tpushl %eax\n"); } else { fputs(x0, "\tmovl %eax, %ebx\n"); };
@@ -4410,7 +4460,7 @@ compile_bitwise_arithmetic_expression : (a0, a1) {
   if (x1 == STMT_EXPR_OR)  { fputs(x0, "or"); };
   fputs(x0, "l %ebx, %eax\n");
   # Restoring %ebx, if it is needed
-  if (compiler_get_register_state(a0, REG_EBX)) { fputs(x0, "\tpopl %ebx\n"); };
+  compiler_free_register(a0, REG_EBX);
 };
 
 ## Compile comparison expression
@@ -4428,7 +4478,7 @@ compile_comparison_expression : (a0, a1) {
   # Compiling first operand
   compile_expression(a0, a1[2]);
   # Moving it's value to %edx
-  compiler_alloc_register(a0, REG_EDX);
+  compiler_allocate_register(a0, REG_EDX);
   fputs(x0, "\tmovl %eax, %edx\n");
   # Compiling second operand
   compile_expression(a0, a1[3]);
@@ -4566,7 +4616,7 @@ compile_assignment_expression : (a0, a1) {
     # If it is indexed address, compiling it, and moving to %ebx
     if (x3 == STMT_EXPR_INDEX) {
       compile_address_index_address(a0, x2);
-      compiler_alloc_register(a0, REG_EBX);
+      compiler_allocate_register(a0, REG_EBX);
       fputs(x0, "\tmovl %eax, %ebx\n");
     };
     # Compiling expression
