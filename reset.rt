@@ -1742,7 +1742,7 @@ top_level_statement : (a0, a1, a2) {
       return(variable_declaration(a0, x1, x0, a2));
     };
   };
-  parser_error(a0, "Syntax error - none of available top level statements matched");
+  parser_error(a0, a2, "Syntax error - none of available top level statements matched");
 };
 
 ## Parse global statement
