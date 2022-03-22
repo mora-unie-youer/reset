@@ -3992,7 +3992,55 @@ fputvar : (a0, a1) {
 ## Compile syscall expression
 # a0 - compiler
 # a1 - statement
+syscall_registers : [ "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" ];
 compile_simple_syscall_expression : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - arguments
+  # x2 - argument count
+  # x3 - argument index
+  allocate(4);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Fetching arguments
+  x1 = a1[2];
+  # Fetching arguments count
+  x2 = vector_size(x1);
+  # Backing up all needed registers
+  # NOTE: using * instead of && because of not having this feature
+  if (compiler_get_register_state(a0, REG_EBX) * (x2 > 1)) { fputs(x0, "\tpushl %ebx\n"); };
+  if (compiler_get_register_state(a0, REG_ECX) * (x2 > 2)) { fputs(x0, "\tpushl %ecx\n"); };
+  if (compiler_get_register_state(a0, REG_EDX) * (x2 > 3)) { fputs(x0, "\tpushl %edx\n"); };
+  if (compiler_get_register_state(a0, REG_ESI) * (x2 > 4)) { fputs(x0, "\tpushl %esi\n"); };
+  if (compiler_get_register_state(a0, REG_EDI) * (x2 > 5)) { fputs(x0, "\tpushl %edi\n"); };
+  if (x2 > 6)                                              { fputs(x0, "\tpushl %ebp\n"); };
+  # Iterating through arguments
+  x3 = 0;
+  while (x3 < x2) {
+    # Compiling argument value
+    compile_expression(a0, vector_get(x1, x3));
+    # Moving value to needed register (when x3 != 0 != %eax)
+    if (x3 != 0) {
+      fputs(x0, "\tmovl %eax, ");
+      fputs(x0, syscall_registers[x3]);
+      fputc(x0, '\n');
+    };
+    #  If we have more than one argument, we HAVE to push %eax, as it will be
+    # overwritten by compilation of expressions
+    if ((x3 == 0) * (x2 > 1)) { fputs(x0, "\tpushl %eax\n"); };
+    # Moving to next argument
+    x3 = x3 + 1;
+  };
+  # Restoring %eax, if needed
+  if (x2 > 1) { fputs(x0, "\tpopl %eax\n"); };
+  # Calling syscall
+  fputs(x0, "\tint $0x80\n");
+  # Restoring all backed up registers
+  if (x2 > 6)                                              { fputs(x0, "\tpopl %ebp\n"); };
+  if (compiler_get_register_state(a0, REG_EDI) * (x2 > 5)) { fputs(x0, "\tpopl %edi\n"); };
+  if (compiler_get_register_state(a0, REG_ESI) * (x2 > 4)) { fputs(x0, "\tpopl %esi\n"); };
+  if (compiler_get_register_state(a0, REG_EDX) * (x2 > 3)) { fputs(x0, "\tpopl %edx\n"); };
+  if (compiler_get_register_state(a0, REG_ECX) * (x2 > 2)) { fputs(x0, "\tpopl %ecx\n"); };
+  if (compiler_get_register_state(a0, REG_EBX) * (x2 > 1)) { fputs(x0, "\tpopl %ebx\n"); };
   compiler_error(a0, a1, "Compilation of syscall expressions is not implemented yet.");
 };
 
