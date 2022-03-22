@@ -4341,7 +4341,7 @@ compile_division_expression : (a0, a1, a2) {
   # Storing its value in %ebx
   fputs(x0, "\tmovl %eax, %ebx\n");
   # Restoring %eax
-  fputs(x0, "\tpushl %eax\n");
+  fputs(x0, "\tpopl %eax\n");
   # Preparing %edx for division
   fputs(x0, "\tcltd\n");
   # Dividing
