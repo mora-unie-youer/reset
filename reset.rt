@@ -144,9 +144,8 @@ free_end   : NULL;
 ## Allocate new memory page
 allocate_new_page : () {
   # If free_end is NULL, finding brk(NULL)
-  if (free_end == NULL) { free_end = brk(NULL); };
+  if (free_end == NULL) { free_end = brk(NULL); free_start = free_end; };
   # Moving free memory segment pointers
-  free_start = free_end;
   free_end = brk(free_end + PAGE_SIZE);
 };
 
@@ -156,10 +155,8 @@ allocate_new_page : () {
 malloc : (a0) {
   # x0 - address
   allocate(1);
-  # Checking if requested size is too big
-  assert(a0 <= PAGE_SIZE, "Requested memory is bigger than PAGE_SIZE");
   # Checking if we need to allocate more memory
-  if (free_start + a0 > free_end) { allocate_new_page(); };
+  while (free_start + a0 > free_end) { allocate_new_page(); };
   # Setting address
   x0 = free_start;
   # Moving free segment pointer
