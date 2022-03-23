@@ -1001,24 +1001,25 @@ TOKEN_IF           => 270;
 TOKEN_ELSE         => 271;
 # Loops
 TOKEN_BREAK        => 272;
-TOKEN_WHILE        => 273;
+TOKEN_CONTINUE     => 273;
+TOKEN_WHILE        => 274;
 # Functions
-TOKEN_ALLOCATE     => 274;
-TOKEN_RETURN       => 275;
-TOKEN_SYSCALL      => 276;
+TOKEN_ALLOCATE     => 275;
+TOKEN_RETURN       => 276;
+TOKEN_SYSCALL      => 277;
 #labels
-TOKEN_GLOBAL       => 277;
-TOKEN_GOTO         => 278;
-TOKEN_LABEL        => 279;
+TOKEN_GLOBAL       => 278;
+TOKEN_GOTO         => 279;
+TOKEN_LABEL        => 280;
 # Byte operations
-TOKEN_READCHAR     => 280;
-TOKEN_WRITECHAR    => 281;
+TOKEN_READCHAR     => 281;
+TOKEN_WRITECHAR    => 282;
 # Array types
-TOKEN_TYPE_CHAR    => 282;
-TOKEN_TYPE_INT     => 283;
+TOKEN_TYPE_CHAR    => 283;
+TOKEN_TYPE_INT     => 284;
 # File
-TOKEN_INCLUDE      => 284;
-TOKEN_INCLUDE_ONCE => 285;
+TOKEN_INCLUDE      => 285;
+TOKEN_INCLUDE_ONCE => 286;
 ## Symbols
 # Equality
 TOKEN_EQ    => 300;
@@ -1081,7 +1082,7 @@ char_to_escape : [
 ## Reserved keywords
 reserved_keywords : [
   "if", "else",                    # Conditionals
-  "break", "while",                # Loops
+  "break", "continue", "while",    # Loops
   "allocate", "return", "syscall", # Functions
   "global", "goto", "label",       #labels
   "readchar", "writechar",         # Byte operations
@@ -1609,19 +1610,21 @@ STMT_IF               => 45;
 STMT_WHILE            => 46;
 STMT_ALLOCATE         => 47;
 STMT_RETURN           => 48;
-STMT_WRITECHAR        => 49;
-STMT_LABEL            => 50;
-STMT_GOTO             => 51;
+STMT_BREAK            => 49;
+STMT_CONTINUE         => 50;
+STMT_WRITECHAR        => 51;
+STMT_LABEL            => 52;
+STMT_GOTO             => 53;
 # Block statement
-STMT_BLOCK            => 52;
+STMT_BLOCK            => 54;
 # Top level statements
-STMT_GLOBAL           => 53;
-STMT_MACRO            => 54;
-STMT_FUN_DECL         => 55;
-STMT_ARRAY_DECL       => 56;
-STMT_CHAR_ARRAY_DECL  => 57;
-STMT_INT_ARRAY_DECL   => 58;
-STMT_VAR_DECL         => 59;
+STMT_GLOBAL           => 55;
+STMT_MACRO            => 56;
+STMT_FUN_DECL         => 57;
+STMT_ARRAY_DECL       => 58;
+STMT_CHAR_ARRAY_DECL  => 59;
+STMT_INT_ARRAY_DECL   => 60;
+STMT_VAR_DECL         => 61;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2101,6 +2104,8 @@ statement : (a0, a1, a2) {
   if (a1 == TOKEN_ALLOCATE) { return(allocate_statement(a0, a2)); };
   # Parsing return statement
   if (a1 == TOKEN_RETURN) { return(return_statement(a0, a2)); };
+  # Parsing loop jump statement
+  if (a1 == TOKEN_BREAK || a1 == TOKEN_CONTINUE) { return(loop_jump_statement(a0, a2, a1)); };
   # Parsing writechar statement
   if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0, a2)); };
   # Parsinglabel statement
@@ -2237,6 +2242,15 @@ return_statement : (a0, a1) {
   vector_push(x0, x2);
 label return_statement_end;
   return(tuple3(STMT_RETURN, a1, x0));
+};
+
+## Parse break/continue statement
+# a0 - parser
+# a1 - token location
+# a2 - statement token
+# @return statement
+loop_jump_statement : (a0, a1, a2) {
+  return(tuple2(STMT_BREAK + a2 - TOKEN_BREAK, a1));
 };
 
 ## Parse writechar statement
@@ -3303,6 +3317,7 @@ COM_STRBUF   => 1;
 COM_LABEL    => 2;
 COM_SEGMENT  => 3;
 COM_REGFLAGS => 4;
+COM_LOOP     => 5;
 ## Segment flags
 SEG_TEXT     => 0;
 SEG_DATA     => 1;
@@ -3321,7 +3336,9 @@ registers : [ "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" ];
 # a0 - output chan
 # a1 - string buffer
 # @return compiler
-compiler : (a0, a1) { return(tuple5(a0, a1, 0, SEG_TEXT, tuple6(0,0,0,0,0,0))); };
+compiler : (a0, a1) {
+  return(tuple6(a0, a1, 0, SEG_TEXT, tuple6(0,0,0,0,0,0), list(NULL)));
+};
 
 ## Get compiler's output channel
 # a0 - compiler
@@ -3413,6 +3430,37 @@ compiler_new_label : (a0) {
   a0[COM_LABEL] = x0 + 1;
   # Returning old label ID
   return(x0);
+};
+
+## Get current loop
+# a0 - compiler
+# @return loop tuple
+compiler_loop : (a0) { return(list_value(a0[COM_LOOP])); };
+
+## Push new loop to list
+# a0 - compiler
+# a1 - label to start of loop
+# a2 - label to end of loop
+compiler_push_loop : (a0, a1, a2) {
+  # x0 - loop tuple
+  allocate(1);
+  # Creating tuple
+  x0 = tuple2(a1, a2);
+  # Pushing loop to list
+  a0[COM_LOOP] = list_insert(a0[COM_LOOP], x0);
+};
+
+## Pop loop from list
+# a0 - compiler
+compiler_pop_loop : (a0, a1, a2) {
+  # x0 - loop tuple
+  allocate(1);
+  # Fetching loop from list
+  x0 = list_value(a0[COM_LOOP]);
+  # Checking if list wasn't empty
+  assert(x0 != NULL, "Tried to pop loop from empty list.");
+  # Popping
+  a0[COM_LOOP] = list_pop(a0[COM_LOOP]);
 };
 
 ## Print label
@@ -3766,27 +3814,31 @@ compile_block_statement : (a0, a1) {
   # x0 - statement index
   # x1 - unreachable
   # x2 - statement
-  allocate(3);
+  # x3 - statement type
+  allocate(4);
   # Iterating through statements
   x0 = 0;
   x1 = FALSE;
   while (x0 < vector_size(a1[2])) {
     # Fetching statement
     x2 = vector_get(a1[2], x0);
+    # Fetching statement type
+    x3 = x2[NODE_TYPE];
     # Checking if code is unreachable
     if (x1) {
       # If we are defining new label, toggle unreachable flag
-      if (x2[NODE_TYPE] == STMT_LABEL) {
+      if (x3 == STMT_LABEL) {
         x1 = FALSE;
       } else {
         # Otherwise, erroring
-        compiler_error(a0, x2, "Unreachable code: already returned in this block.");
+        compiler_error(a0, x2, "Unreachable code.");
       };
     };
     # Compiling statement
     compile_statement(a0, vector_get(a1[2], x0));
-    # Checking if statement is return or goto
-    if (x2[NODE_TYPE] == STMT_RETURN || x2[NODE_TYPE] == STMT_GOTO) { x1 = TRUE; };
+    # Checking if statement is break/continue/goto/return
+    if (x3 == STMT_RETURN || x3 == STMT_GOTO
+      || x3 == STMT_BREAK || x3 == STMT_CONTINUE) { x1 = TRUE; };
     # Moving to next statement
     x0 = x0 + 1;
   };
@@ -3805,6 +3857,7 @@ compile_statement : (a0, a1) {
   if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1);     return; };
   if (x0 == STMT_ALLOCATE)  { compile_allocate_statement(a0, a1);  return; };
   if (x0 == STMT_RETURN)    { compile_return_statement(a0, a1);    return; };
+  if (x0 == STMT_BREAK || x0 == STMT_CONTINUE) { compile_loop_jump_statement(a0, a1); return; };
   if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); return; };
   if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1);     return; };
   if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1);      return; };
@@ -3875,8 +3928,12 @@ compile_while_statement : (a0, a1) {
   fputs(x0, "\tje ");
   fputlabel(x0, x2);
   fputc(x0, '\n');
+  # Pushing loop to list
+  compiler_push_loop(a0, x1, x2);
   # Compiling while block
   compile_block_statement(a0, a1[3]);
+  # Pop loop from list
+  compiler_pop_loop(a0, x1, x2);
   # Making next iteration in while loop
   fputs(x0, "\tjmp ");
   fputlabel(x0, x1);
@@ -3928,6 +3985,31 @@ compile_return_statement : (a0, a1) {
   };
   # Compiling return expression
   fputs(compiler_output_chan(a0), "\tleave\n\tret\n");
+};
+
+## Compile break/continue statement
+# a0 - compiler
+# a1 - statement
+compile_loop_jump_statement : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - loop tuple
+  # x2 - label
+  allocate(3);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Getting current loop
+  x1 = compiler_loop(a0);
+  # If loop is there, compiling instruction
+  if (x1) {
+    # Taking label from tuple
+    x2 = a1[NODE_TYPE] == STMT_BREAK ? x1[1] : x1[0];
+    # Jump to label
+    fputs(x0, "\tjmp ");
+    fputlabel(x0, x2);
+    fputc(x0, '\n');
+  } else {
+    compiler_error(a0, a1, "Tried to break/continue with no loop there.");
+  };
 };
 
 ## Compile writechar statement
