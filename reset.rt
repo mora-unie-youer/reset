@@ -2160,11 +2160,19 @@ label if_statement_parse;
   x2 = block_statement(a0, x1);
   # Append else block to vector
   vector_push(x0, x2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking if we have another else branch
+  if (x1 == TOKEN_ELSE) { goto &if_statement_else_invalid; };
+  # Holding token
+  parser_lexer_hold(a0);
 label if_statement_end;
   # Return statement
   return(tuple3(STMT_IF, a1, x0));
 label if_statement_invalid;
   parser_error(a0, a1, "Invalid if statement syntax");
+label if_statement_else_invalid;
+  parser_error(a0, a1, "Put else branches with condition before last else branch.");
 };
 
 ## Parse while statement
@@ -3878,15 +3886,13 @@ compile_if_statement : (a0, a1) {
   # x2 - next label
   # x3 - counter
   # x4 - statement
-  # x5 - was last else (without condition)
-  allocate(6);
+  allocate(5);
   # Getting output channel
   x0 = compiler_output_chan(a0);
   # Generating exit label
   x1 = compiler_new_label(a0);
   # Iterating through branches
   x3 = 2;
-  x5 = FALSE;
   while (x3 < vector_size(a1[2])) {
     # If we compiling else branch, finish previous branch
     if (x3 != 2) {
@@ -3901,8 +3907,6 @@ compile_if_statement : (a0, a1) {
     x4 = vector_get(a1[2], x3);
     # If statement is not a block (thus it's condition)
     if (x4[NODE_TYPE] != STMT_BLOCK) {
-      # Checking if we had last else branch already
-      if (x5) { compiler_error(a0, x4, "Put this else branch before last else."); };
       # Compiling condition
       compile_expression(a0, x4);
       # Generating next label, if this is not last branch. Otherwise, use exit
@@ -3913,9 +3917,6 @@ compile_if_statement : (a0, a1) {
       # Moving to block statement
       x3 = x3 + 1;
       x4 = vector_get(a1[2], x3);
-    } else {
-      # If we had no condition, we have last else branch.
-      x5 = TRUE;
     };
     # Compiling block statement
     compile_block_statement(a0, x4);
