@@ -3892,10 +3892,10 @@ compile_if_statement : (a0, a1) {
   # Generating exit label
   x1 = compiler_new_label(a0);
   # Iterating through branches
-  x3 = 2;
+  x3 = 0;
   while (x3 < vector_size(a1[2])) {
     # If we compiling else branch, finish previous branch
-    if (x3 != 2) {
+    if (x3 != 0) {
       # Jump to exit label
       fputs(x0, "\tjmp ");
       fputlabel(x0, x1);
