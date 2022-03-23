@@ -4015,14 +4015,15 @@ compile_if_statement : (a0, a1) {
 # a1 - statement
 compile_for_statement : (a0, a1) {
   # x0 - compiler output channel
-  # x1, x2 - labels
-  # x3 - counter
-  allocate(4);
+  # x1, x2, x3 - labels
+  # x4 - counter
+  allocate(5);
   # Getting output channel
   x0 = compiler_output_chan(a0);
   # Getting label IDs
   x1 = compiler_new_label(a0);
   x2 = compiler_new_label(a0);
+  x3 = compiler_new_label(a0);
   # Compile init expression if it's not null
   if (a1[2]) { compile_expression(a0, a1[2]); };
   # Printing label for "loop start"
@@ -4034,29 +4035,31 @@ compile_for_statement : (a0, a1) {
     fputs(x0, "\tcmpl $0, %eax\n");
     # If equal to zero, exitting loop
     fputs(x0, "\tje ");
-    fputlabel(x0, x2);
+    fputlabel(x0, x3);
     fputc(x0, '\n');
   };
   # Pushing loop to list
-  compiler_push_loop(a0, x1, x2);
+  compiler_push_loop(a0, x2, x3);
   # Compiling for block
   compile_block_statement(a0, a1[5]);
   # Pop loop from list
-  compiler_pop_loop(a0, x1, x2);
+  compiler_pop_loop(a0);
+  # Printing label for iterating expressions
+  fputlabeldef(x0, x2);
   # Iterating through iteration list
-  x3 = 0;
-  while (x3 < vector_size(a1[4])) {
+  x4 = 0;
+  while (x4 < vector_size(a1[4])) {
     # Compiling iteration expression
-    compile_expression(a0, vector_get(a1[4], x3));
+    compile_expression(a0, vector_get(a1[4], x4));
     # Moving to next expression
-    x3 = x3 + 1;
+    x4 = x4 + 1;
   };
   # Making next iteration in for loop
   fputs(x0, "\tjmp ");
   fputlabel(x0, x1);
   fputc(x0, '\n');
   # Printing exit label
-  fputlabeldef(x0, x2);
+  fputlabeldef(x0, x3);
 };
 
 ## Compile while statement
