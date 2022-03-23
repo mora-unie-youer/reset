@@ -1046,6 +1046,9 @@ TOKEN_AXOR  => 315;
 TOKEN_AOR   => 316;
 TOKEN_ASHL  => 317;
 TOKEN_ASHR  => 318;
+# Increment/decrement
+TOKEN_INC => 319;
+TOKEN_DEC => 320;
 ## Char table
 char_table : [
   # X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -1439,71 +1442,50 @@ label lx18;
   x2 = fnextc(a0[LEX_ICHAN], 1);
   # Checking for double-char or triple-char symbols
   if (x0 == '=') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); };
-    if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); };
-  };
-
-  if (x0 == '!') {
+         if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); }
+    else if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); };
+  } else if (x0 == '!') {
     if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_NE); };
-  };
-
-  if (x0 == '+') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AADD); };
-  };
-
-  if (x0 == '-') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ASUB); };
-  };
-
-  if (x0 == '*') {
+  } else if (x0 == '+') {
+         if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AADD); }
+    else if (x1 == '+') { lexer_consume(a0); lexer_token_set(a0, TOKEN_INC); };
+  } else if (x0 == '-') {
+         if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ASUB); }
+    else if (x1 == '-') { lexer_consume(a0); lexer_token_set(a0, TOKEN_DEC); };
+  } else if (x0 == '*') {
     if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMUL); };
-  };
-
-  if (x0 == '/') {
+  } else if (x0 == '/') {
     if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ADIV); };
-  };
-
-  if (x0 == '%') {
+  } else if (x0 == '%') {
     if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMOD); };
-  };
-
-  if (x0 == '<') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); };
-    if (x1 == '<') {
+  } else if (x0 == '<') {
+         if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); }
+    else if (x1 == '<') {
       if (x2 == '=') {
         lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHL);
       } else {
         lexer_consume(a0); lexer_token_set(a0, TOKEN_SHL);
       };
     };
-  };
-
-  if (x0 == '>') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); };
-    if (x1 == '>') {
+  } else if (x0 == '>') {
+         if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); }
+    else if (x1 == '>') {
       if (x2 == '=') {
         lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHR);
       } else {
         lexer_consume(a0); lexer_token_set(a0, TOKEN_SHR);
       };
     };
-  };
-
-  if (x0 == '^') {
+  } else if (x0 == '^') {
     if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AXOR); };
-  };
-
-  if (x0 == '&') {
-    if (x1 == '&') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LAND); };
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AAND); };
-  };
-
-  if (x0 == '|') {
-    if (x1 == '|') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LOR); };
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AOR); };
-  };
-  # Checking for comment
-  if (x0 == '#') {
+  } else if (x0 == '&') {
+         if (x1 == '&') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LAND); }
+    else if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AAND); };
+  } else if (x0 == '|') {
+         if (x1 == '|') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LOR); }
+    else if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AOR); };
+  } else if (x0 == '#') {
+    # Checking for comment
     ## Skipping line
     while (x0 != '\n' && x0 != '\0') { x0 = fgetc(a0[LEX_ICHAN]); };
     # Resetting line and column
@@ -1603,28 +1585,32 @@ STMT_EXPR_SHR_ASSIGN  => 40;
 STMT_EXPR_AND_ASSIGN  => 41;
 STMT_EXPR_XOR_ASSIGN  => 42;
 STMT_EXPR_OR_ASSIGN   => 43;
+STMT_EXPR_PREDEC      => 44;
+STMT_EXPR_PREINC      => 45;
+STMT_EXPR_POSTDEC     => 46;
+STMT_EXPR_POSTINC     => 47;
 # Ternary
-STMT_EXPR_TERNARY     => 44;
+STMT_EXPR_TERNARY     => 48;
 # Statements
-STMT_IF               => 45;
-STMT_WHILE            => 46;
-STMT_ALLOCATE         => 47;
-STMT_RETURN           => 48;
-STMT_BREAK            => 49;
-STMT_CONTINUE         => 50;
-STMT_WRITECHAR        => 51;
-STMT_LABEL            => 52;
-STMT_GOTO             => 53;
+STMT_IF               => 49;
+STMT_WHILE            => 50;
+STMT_ALLOCATE         => 51;
+STMT_RETURN           => 52;
+STMT_BREAK            => 53;
+STMT_CONTINUE         => 54;
+STMT_WRITECHAR        => 55;
+STMT_LABEL            => 56;
+STMT_GOTO             => 57;
 # Block statement
-STMT_BLOCK            => 54;
+STMT_BLOCK            => 58;
 # Top level statements
-STMT_GLOBAL           => 55;
-STMT_MACRO            => 56;
-STMT_FUN_DECL         => 57;
-STMT_ARRAY_DECL       => 58;
-STMT_CHAR_ARRAY_DECL  => 59;
-STMT_INT_ARRAY_DECL   => 60;
-STMT_VAR_DECL         => 61;
+STMT_GLOBAL           => 59;
+STMT_MACRO            => 60;
+STMT_FUN_DECL         => 61;
+STMT_ARRAY_DECL       => 62;
+STMT_CHAR_ARRAY_DECL  => 63;
+STMT_INT_ARRAY_DECL   => 64;
+STMT_VAR_DECL         => 65;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2899,20 +2885,15 @@ multiplicative_expr : (a0, a1, a2, a3) {
 # a2 - token location
 # @return statement
 prefix_expression : (a0, a1, a2) {
-  # Parsing unary plus
-  if (a1 == '+') { return(prefix_expr(a0, STMT_EXPR_PLUS, a2)); };
-  # Parsing unary minus
-  if (a1 == '-') { return(prefix_expr(a0, STMT_EXPR_MINUS, a2)); };
-  # Parsing logical not
-  if (a1 == '!') { return(prefix_expr(a0, STMT_EXPR_LOGICAL_NOT, a2)); };
-  # Parsing bitwise not
-  if (a1 == '~') { return(prefix_expr(a0, STMT_EXPR_NOT, a2)); };
-  # Parsing dereference
-  if (a1 == '*') { return(prefix_expr(a0, STMT_EXPR_DEREF, a2)); };
-  # Parsing addressof
-  if (a1 == '&') { return(prefix_expr(a0, STMT_EXPR_ADDROF, a2)); };
-  # Parsing simple expression
-  return(simple_expression(a0, a1, a2));
+       if (a1 == '+')       { return(prefix_expr(a0, STMT_EXPR_PLUS, a2)); }
+  else if (a1 == '-')       { return(prefix_expr(a0, STMT_EXPR_MINUS, a2)); }
+  else if (a1 == '!')       { return(prefix_expr(a0, STMT_EXPR_LOGICAL_NOT, a2)); }
+  else if (a1 == '~')       { return(prefix_expr(a0, STMT_EXPR_NOT, a2)); }
+  else if (a1 == '*')       { return(prefix_expr(a0, STMT_EXPR_DEREF, a2)); }
+  else if (a1 == '&')       { return(prefix_expr(a0, STMT_EXPR_ADDROF, a2)); }
+  else if (a1 == TOKEN_DEC) { return(prefix_expr(a0, STMT_EXPR_PREDEC, a2)); }
+  else if (a1 == TOKEN_INC) { return(prefix_expr(a0, STMT_EXPR_PREINC, a2)); }
+  else                      { return(simple_expression(a0, a1, a2)); };
 };
 
 ## Parse prefix expression
@@ -3092,10 +3073,10 @@ simple_postfix_expression : (a0, a1) {
   x0 = parser_lex(a0);
   # Fetching token location
   x1 = parser_token_location(a0);
-  # Parsing address call
-  if (x0 == '(') { return(simple_address_call_expression(a0, a1, x1)); };
-  # Parsing address indexing
-  if (x0 == '[') { return(simple_address_index_expression(a0, a1, x1)); };
+       if (x0 == '(')       { return(simple_address_call_expression(a0, a1, x1)); }
+  else if (x0 == '[')       { return(simple_address_index_expression(a0, a1, x1)); }
+  else if (x0 == TOKEN_DEC) { return(simple_postfix_expression(a0, tuple3(STMT_EXPR_POSTDEC, x1, a1))); }
+  else if (x0 == TOKEN_INC) { return(simple_postfix_expression(a0, tuple3(STMT_EXPR_POSTINC, x1, a1))); };
   # Holding the token
   parser_lexer_hold(a0);
   # Freeing unused token location
@@ -4125,8 +4106,8 @@ compile_expression : (a0, a1) {
   if (x0 == STMT_EXPR_LOGICAL_OR)  { compile_logical_expression(a0, a1, TRUE); };
   ## Ternary
   if (x0 == STMT_EXPR_TERNARY)     { compile_ternary_expression(a0, a1); };
-  ## Assignment
-  if (x0 >= STMT_EXPR_ASSIGN && x0 <= STMT_EXPR_SHR_ASSIGN) {
+  ## Assignment and {post,pre}{dec,inc}
+  if (x0 >= STMT_EXPR_ASSIGN && x0 <= STMT_EXPR_POSTINC) {
     compile_assignment_expression(a0, a1);
   };
 };
@@ -4711,20 +4692,43 @@ compile_assignment_expression : (a0, a1) {
   if (x1 == STMT_EXPR_ASSIGN) {
     # If we have simple assignment, compile expression
     compile_expression(a0, a1[3]);
+  } else if (x1 >= STMT_EXPR_PREDEC && x1 <= STMT_EXPR_POSTINC) {
+    # Compile expression to increment/decrement
+    compile_expression(a0, x2);
+         if (x1 == STMT_EXPR_PREDEC) { fputs(x0, "\tsubl $1, %eax\n"); }
+    else if (x1 == STMT_EXPR_PREINC) { fputs(x0, "\taddl $1, %eax\n"); }
+    else {
+      # Reserving %edx for our purposes
+      compiler_allocate_register(a0, REG_EDX);
+      # Storing new value in %edx
+      fputs(x0, "\tleal ");
+      if (x1 == STMT_EXPR_POSTDEC) { fputc(x0, '-'); };
+      fputs(x0, "1(%eax), %edx\n");
+    };
   } else {
     # If we have complex assignment, calculate value to set
     compile_bitwise_arithmetic_expression(
-      a0, x1 - STMT_EXPR_MUL_ASSIGN + STMT_EXPR_MUL, x2, a1[3]);
+      a0, x1 - STMT_EXPR_MUL_ASSIGN + STMT_EXPR_MUL, x2, a1[3]
+    );
   };
   # Compiling assignment
-  fputs(x0, "\tmovl %eax, ");
+  fputs(x0, "\tmovl ");
+  # If we had post{dec,inc} we need to load value from %edx
+  if (x1 == STMT_EXPR_POSTDEC || x1 == STMT_EXPR_POSTINC) {
+    fputs(x0, "%edx");
+  } else {
+    fputs(x0, "%eax");
+  };
+  # Compiling where to move
+  fputs(x0, ", ");
        if (x3 == STMT_EXPR_IDENTIFIER) { fputs(x0,   x2[2]); }
   else if (x3 == STMT_EXPR_ARGUMENT)   { fputarg(x0, x2[2]); }
   else if (x3 == STMT_EXPR_VARIABLE)   { fputvar(x0, x2[2]); }
-  else if (x3 == STMT_EXPR_INDEX) {
-    fputs(x0, "(%ebx)");
-    compiler_free_register(a0, REG_EBX);
-  } else { compiler_error(a0, a1, "Can't use this as assignable operand."); };
+  else if (x3 == STMT_EXPR_INDEX)      { fputs(x0, "(%ebx)"); }
+  else { compiler_error(a0, a1, "Can't use this as assignable operand."); };
+  # Freeing used registers
+  if (x1 == STMT_EXPR_POSTDEC || x1 == STMT_EXPR_POSTINC) { compiler_free_register(a0, REG_EDX); };
+  if (x3 == STMT_EXPR_INDEX) { compiler_free_register(a0, REG_EBX); };
   fputc(x0, '\n');
 };
 
