@@ -1573,20 +1573,20 @@ STMT_EXPR_SUB         => 19;
 # Bitwise shift
 STMT_EXPR_SHL         => 20;
 STMT_EXPR_SHR         => 21;
-# Relational
-STMT_EXPR_LESS        => 22;
-STMT_EXPR_GREATER     => 23;
-STMT_EXPR_LE          => 24;
-STMT_EXPR_GE          => 25;
-# Equality
-STMT_EXPR_EQ          => 26;
-STMT_EXPR_NE          => 27;
 # Bitwise and
-STMT_EXPR_AND         => 28;
+STMT_EXPR_AND         => 22;
 # Bitwise xor
-STMT_EXPR_XOR         => 29;
+STMT_EXPR_XOR         => 23;
 # Bitwise or
-STMT_EXPR_OR          => 30;
+STMT_EXPR_OR          => 24;
+# Relational
+STMT_EXPR_LESS        => 25;
+STMT_EXPR_GREATER     => 26;
+STMT_EXPR_LE          => 27;
+STMT_EXPR_GE          => 28;
+# Equality
+STMT_EXPR_EQ          => 29;
+STMT_EXPR_NE          => 30;
 # Logical and
 STMT_EXPR_LOGICAL_AND => 31;
 # Logical or
