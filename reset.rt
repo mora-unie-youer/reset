@@ -3808,6 +3808,7 @@ compile_statement : (a0, a1) {
   if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); return; };
   if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1);     return; };
   if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1);      return; };
+  if (x0 == STMT_BLOCK)     { compile_block_statement(a0, a1);     return; };
   # If none of statements wasn't found, trying to compile expression
   compile_expression(a0, a1);
 };
