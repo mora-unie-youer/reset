@@ -3684,6 +3684,8 @@ compiler_use_macro : (a0, a1, a2) {
   if (x0 == STMT_ARRAY_DECL) { x1 = 3; goto &compiler_use_macro_vector; };
   ## Not vectored statements
   if (x0 == STMT_ALLOCATE)        { x2 = 1;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_FOR)             { x2 = 4;         goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_DO_WHILE)        { x2 = 2;         goto &compiler_use_macro_tuple; };
   if (x0 == STMT_WHILE)           { x2 = 2;         goto &compiler_use_macro_tuple; };
   if (x0 == STMT_WRITECHAR)       { x2 = 3;         goto &compiler_use_macro_tuple; };
   if (x0 == STMT_GOTO)            { x2 = 1;         goto &compiler_use_macro_tuple; };
