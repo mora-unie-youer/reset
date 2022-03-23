@@ -11,6 +11,7 @@ fi
 
 echo "Building compiler..."
 ./rtc.bootstrap reset.rt
-as --32       -o rtc.o output.S
-ld -melf_i386 -o rtc   rtc.o
+mv output.S rtc.S
+as --32       $@ -o rtc.o rtc.S
+ld -melf_i386    -o rtc   rtc.o
 echo "Compiler was built successfully!"
