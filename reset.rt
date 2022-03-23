@@ -1002,25 +1002,26 @@ TOKEN_ELSE         => 271;
 # Loops
 TOKEN_BREAK        => 272;
 TOKEN_CONTINUE     => 273;
-TOKEN_FOR          => 274;
-TOKEN_WHILE        => 275;
+TOKEN_DO           => 274;
+TOKEN_FOR          => 275;
+TOKEN_WHILE        => 276;
 # Functions
-TOKEN_ALLOCATE     => 276;
-TOKEN_RETURN       => 277;
-TOKEN_SYSCALL      => 278;
+TOKEN_ALLOCATE     => 277;
+TOKEN_RETURN       => 278;
+TOKEN_SYSCALL      => 279;
 #labels
-TOKEN_GLOBAL       => 279;
-TOKEN_GOTO         => 280;
-TOKEN_LABEL        => 281;
+TOKEN_GLOBAL       => 280;
+TOKEN_GOTO         => 281;
+TOKEN_LABEL        => 282;
 # Byte operations
-TOKEN_READCHAR     => 282;
-TOKEN_WRITECHAR    => 283;
+TOKEN_READCHAR     => 283;
+TOKEN_WRITECHAR    => 284;
 # Array types
-TOKEN_TYPE_CHAR    => 284;
-TOKEN_TYPE_INT     => 285;
+TOKEN_TYPE_CHAR    => 285;
+TOKEN_TYPE_INT     => 286;
 # File
-TOKEN_INCLUDE      => 286;
-TOKEN_INCLUDE_ONCE => 287;
+TOKEN_INCLUDE      => 287;
+TOKEN_INCLUDE_ONCE => 288;
 ## Symbols
 # Equality
 TOKEN_EQ    => 300;
@@ -1085,13 +1086,13 @@ char_to_escape : [
 ];
 ## Reserved keywords
 reserved_keywords : [
-  "if", "else",                         # Conditionals
-  "break", "continue", "for", "while",  # Loops
-  "allocate", "return", "syscall",      # Functions
-  "global", "goto", "label",            # Labels
-  "readchar", "writechar",              # Byte operations
-  "char", "int",                        # Array types
-  "include", "include_once",            # File operations
+  "if", "else",                               # Conditionals
+  "break", "continue", "do", "for", "while",  # Loops
+  "allocate", "return", "syscall",            # Functions
+  "global", "goto", "label",                  # Labels
+  "readchar", "writechar",                    # Byte operations
+  "char", "int",                              # Array types
+  "include", "include_once",                  # File operations
   NULL
 ];
 ## Lexer triggers
@@ -1595,24 +1596,25 @@ STMT_EXPR_TERNARY     => 48;
 # Statements
 STMT_IF               => 49;
 STMT_FOR              => 50;
-STMT_WHILE            => 51;
-STMT_ALLOCATE         => 52;
-STMT_RETURN           => 53;
-STMT_BREAK            => 54;
-STMT_CONTINUE         => 55;
-STMT_WRITECHAR        => 56;
-STMT_LABEL            => 57;
-STMT_GOTO             => 58;
+STMT_DO_WHILE         => 51;
+STMT_WHILE            => 52;
+STMT_ALLOCATE         => 53;
+STMT_RETURN           => 54;
+STMT_BREAK            => 55;
+STMT_CONTINUE         => 56;
+STMT_WRITECHAR        => 57;
+STMT_LABEL            => 58;
+STMT_GOTO             => 59;
 # Block statement
-STMT_BLOCK            => 59;
+STMT_BLOCK            => 60;
 # Top level statements
-STMT_GLOBAL           => 60;
-STMT_MACRO            => 61;
-STMT_FUN_DECL         => 62;
-STMT_ARRAY_DECL       => 63;
-STMT_CHAR_ARRAY_DECL  => 64;
-STMT_INT_ARRAY_DECL   => 65;
-STMT_VAR_DECL         => 66;
+STMT_GLOBAL           => 61;
+STMT_MACRO            => 62;
+STMT_FUN_DECL         => 63;
+STMT_ARRAY_DECL       => 64;
+STMT_CHAR_ARRAY_DECL  => 65;
+STMT_INT_ARRAY_DECL   => 66;
+STMT_VAR_DECL         => 67;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2086,6 +2088,7 @@ label block_statement_content_invalid;
 statement : (a0, a1, a2) {
        if (a1 == TOKEN_IF)                            { return(if_statement(a0, a2)); }
   else if (a1 == TOKEN_FOR)                           { return(for_statement(a0, a2)); }
+  else if (a1 == TOKEN_DO)                            { return(do_while_statement(a0, a2)); }
   else if (a1 == TOKEN_WHILE)                         { return(while_statement(a0, a2)); }
   else if (a1 == TOKEN_ALLOCATE)                      { return(allocate_statement(a0, a2)); }
   else if (a1 == TOKEN_RETURN)                        { return(return_statement(a0, a2)); }
@@ -2225,6 +2228,41 @@ label for_statement_iter_end;
   return(tuple6(STMT_FOR, a1, x1, x2, x3, x4));
 label for_statement_invalid;
   parser_error(a0, a1, "Invalid for statement syntax");
+};
+
+## Parse do-while statement
+# a0 - parser
+# a1 - token location
+# @return statement
+do_while_statement : (a0, a1) {
+  # x0 - next token
+  # x1 - cond expression
+  # x2 - block statement
+  allocate(3);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching block statement
+  x2 = block_statement(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != TOKEN_WHILE) { goto &do_while_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != '(') { goto &do_while_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching condition expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ')') { goto &do_while_statement_invalid; };
+  # Return statement
+  return(tuple4(STMT_DO_WHILE, a1, x1, x2));
+label do_while_statement_invalid;
+  parser_error(a0, a1, "Invalid do-while statement syntax");
 };
 
 ## Parse while statement
@@ -3907,7 +3945,8 @@ compile_statement : (a0, a1) {
   # Searching for statement
        if (x0 == STMT_IF)                           { compile_if_statement(a0, a1); }
   else if (x0 == STMT_FOR)                          { compile_for_statement(a0, a1); }
-  else if (x0 == STMT_WHILE)                        { compile_while_statement(a0, a1); }
+  else if (x0 == STMT_DO_WHILE)                     { compile_while_statement(a0, a1, TRUE); }
+  else if (x0 == STMT_WHILE)                        { compile_while_statement(a0, a1, FALSE); }
   else if (x0 == STMT_ALLOCATE)                     { compile_allocate_statement(a0, a1); }
   else if (x0 == STMT_RETURN)                       { compile_return_statement(a0, a1); }
   else if (x0 == STMT_BREAK || x0 == STMT_CONTINUE) { compile_loop_jump_statement(a0, a1); }
@@ -4021,7 +4060,8 @@ compile_for_statement : (a0, a1) {
 ## Compile while statement
 # a0 - compiler
 # a1 - statement
-compile_while_statement : (a0, a1) {
+# a2 - cond in the end
+compile_while_statement : (a0, a1, a2) {
   # x0 - compiler output channel
   # x1, x2 - labels
   allocate(3);
@@ -4032,26 +4072,47 @@ compile_while_statement : (a0, a1) {
   x2 = compiler_new_label(a0);
   # Printing label for "loop start"
   fputlabeldef(x0, x1);
-  # Compiling condition
-  compile_expression(a0, a1[2]);
-  # Comparing condition with zero
-  fputs(x0, "\tcmpl $0, %eax\n");
-  # If equal to zero, exitting loop
-  fputs(x0, "\tje ");
-  fputlabel(x0, x2);
-  fputc(x0, '\n');
+  # Compiling condition if it's in the start
+  if (!a2) { compile_while_condition(a0, a1[2], a2, x1, x2); };
   # Pushing loop to list
   compiler_push_loop(a0, x1, x2);
   # Compiling while block
   compile_block_statement(a0, a1[3]);
   # Pop loop from list
   compiler_pop_loop(a0, x1, x2);
-  # Making next iteration in while loop
-  fputs(x0, "\tjmp ");
-  fputlabel(x0, x1);
-  fputc(x0, '\n');
+  # Compiling condition if it's in the end
+  if (a2) {
+    compile_while_condition(a0, a1[2], a2, x1, x2);
+  } else {
+    # Making next iteration in while loop
+    fputs(x0, "\tjmp ");
+    fputlabel(x0, x1);
+    fputc(x0, '\n');
+  };
   # Printing exit label
   fputlabeldef(x0, x2);
+};
+
+## Compile while condition
+# a0 - compiler
+# a1 - expression
+# a2 - cond in the end
+# a3 - loop label
+# a4 - exit label
+compile_while_condition : (a0, a1, a2, a3, a4) {
+  # x0 - compiler output channel
+  allocate(1);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Compiling condition
+  compile_expression(a0, a1);
+  # Comparing condition with zero
+  fputs(x0, "\tcmpl $0, %eax\n");
+  # If in the start, jump to exit label when == 0
+  # If in the end, jump to loop label when != 0
+  fputs(x0,     a2 ? "\tjne " : "\tje ");
+  fputlabel(x0, a2 ? a3 : a4);
+  fputc(x0, '\n');
 };
 
 ## Compile allocate statement
