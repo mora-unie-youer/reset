@@ -4108,21 +4108,10 @@ compile_expression : (a0, a1) {
   if (x0 == STMT_EXPR_NOT)         { compile_prefix_not_expression(a0, a1); };
   if (x0 == STMT_EXPR_DEREF)       { compile_prefix_deref_expression(a0, a1); };
   if (x0 == STMT_EXPR_ADDROF)      { compile_prefix_addrof_expression(a0, a1); };
-  ## Multiplicative
-  if (x0 == STMT_EXPR_MUL)         { compile_bitwise_arithmetic_expression(a0, a1); };
-  if (x0 == STMT_EXPR_DIV)         { compile_division_expression(a0, a1, FALSE); };
-  if (x0 == STMT_EXPR_MOD)         { compile_division_expression(a0, a1, TRUE); };
-  ## Additive
-  if (x0 == STMT_EXPR_ADD)         { compile_bitwise_arithmetic_expression(a0, a1); };
-  if (x0 == STMT_EXPR_SUB)         { compile_bitwise_arithmetic_expression(a0, a1); };
-  ## Bitwise operations
-  ### Shift
-  if (x0 == STMT_EXPR_SHL)         { compile_bitwise_shift_expression(a0, a1, FALSE); };
-  if (x0 == STMT_EXPR_SHR)         { compile_bitwise_shift_expression(a0, a1, TRUE); };
-  ### Logical (and, or, xor)
-  if (x0 == STMT_EXPR_AND)         { compile_bitwise_arithmetic_expression(a0, a1); };
-  if (x0 == STMT_EXPR_XOR)         { compile_bitwise_arithmetic_expression(a0, a1); };
-  if (x0 == STMT_EXPR_OR)          { compile_bitwise_arithmetic_expression(a0, a1); };
+  ## Arithmetic and bitwise operations
+  if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_OR) {
+    compile_bitwise_arithmetic_expression(a0, x0, a1[2], a1[3]);
+  };
   ## Relational
   if (x0 == STMT_EXPR_LESS)        { compile_comparison_expression(a0, a1); };
   if (x0 == STMT_EXPR_GREATER)     { compile_comparison_expression(a0, a1); };
@@ -4504,97 +4493,71 @@ compile_prefix_addrof_expression : (a0, a1) {
   compiler_error(a0, a1, "Can't compile addressof for this expression.");
 };
 
-## Compile division expression
-# a0 - compiler
-# a1 - statement
-# a2 - modulo division
-compile_division_expression : (a0, a1, a2) {
-  # x0 - compiler output channel
-  allocate(1);
-  # Getting output channel
-  x0 = compiler_output_chan(a0);
-  # Backing up registers, if needed
-  compiler_allocate_register(a0, REG_EBX);
-  compiler_allocate_register(a0, REG_EDX);
-  # Compiling first operand
-  compile_expression(a0, a1[2]);
-  # Backing it up in stack
-  fputs(x0, "\tpushl %eax\n");
-  # Compiling second operand
-  compile_expression(a0, a1[3]);
-  # Storing its value in %ebx
-  fputs(x0, "\tmovl %eax, %ebx\n");
-  # Restoring %eax
-  fputs(x0, "\tpopl %eax\n");
-  # Preparing %edx for division
-  fputs(x0, "\tcltd\n");
-  # Dividing
-  fputs(x0, "\tidiv %ebx\n");
-  # Storing modulus, if we did modulus division
-  if (a1[NODE_TYPE] == STMT_EXPR_MOD) { fputs(x0, "\tmovl %edx, %eax\n"); };
-  # Restoring registers, if needed
-  compiler_free_register(a0, REG_EDX);
-  compiler_free_register(a0, REG_EBX);
-};
-
-## Compile bitwise shift expression
-# a0 - compiler
-# a1 - statement
-# a2 - right-way
-compile_bitwise_shift_expression : (a0, a1, a2) {
-  # x0 - compiler output channel
-  allocate(1);
-  # Getting output channel
-  x0 = compiler_output_chan(a0);
-  # Compiling first operand
-  compile_expression(a0, a1[2]);
-  # Moving it's value to %ebx
-  compiler_allocate_register(a0, REG_EBX);
-  fputs(x0, "\tmovl %eax, %ebx\n");
-  # Compiling second operand
-  compile_expression(a0, a1[3]);
-  # Moving it's value to %ecx (shift can work only with %cl)
-  compiler_allocate_register(a0, REG_ECX);
-  fputs(x0, "\tmovl %eax, %ecx\n");
-  # Compiling bitwise shift
-  fputc(x0, '\t');
-  if (a2) { fputs(x0, "shlr"); } else { fputs(x0, "shll"); };
-  fputs(x0, " %cl, %ebx\n\tmovl %ebx, %eax\n");
-  compiler_free_register(a0, REG_ECX);
-  compiler_free_register(a0, REG_EBX);
-};
-
 ## Compile bitwise arithmetic expression
 # a0 - compiler
-# a1 - statement
-compile_bitwise_arithmetic_expression : (a0, a1) {
+# a1 - operation type
+# a2 - first operand
+# a3 - second operand
+compile_bitwise_arithmetic_expression : (a0, a1, a2, a3) {
   # x0 - compiler output channel
-  # x1 - statement ID
-  allocate(2);
+  allocate(1);
   # Getting output channel
   x0 = compiler_output_chan(a0);
-  # Fetching statement ID
-  x1 = a1[NODE_TYPE];
   # Compiling first operand
-  compile_expression(a0, a1[2]);
-  # Moving it's value to %ebx
+  compile_expression(a0, a2);
+  # Reserving %ebx
   compiler_allocate_register(a0, REG_EBX);
-  #  TODO: optimize this. When arithm/bitwise operations are chained, it can be
-  # omitted I guess.
-  if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tpushl %eax\n"); } else { fputs(x0, "\tmovl %eax, %ebx\n"); };
+  # Moving it's value
+  if (a1 == STMT_EXPR_SUB) {
+    # If SUB, DIV or MOD, we are pushing %eax to stack
+    fputs(x0, "\tpushl %eax\n");
+  } else if (a1 == STMT_EXPR_DIV || a1 == STMT_EXPR_MOD) {
+    # Allocating %edx for future purposes
+    compiler_allocate_register(a0, REG_EDX);
+    # If SUB, DIV or MOD, we are pushing %eax to stack
+    fputs(x0, "\tpushl %eax\n");
+  } else {
+    # Move value to %ebx when not SUB, DIV or MOD
+    fputs(x0, "\tmovl %eax, %ebx\n");
+  };
   # Compiling second operand
-  compile_expression(a0, a1[3]);
-  if (x1 == STMT_EXPR_SUB) { fputs(x0, "\tmovl %eax, %ebx\n"); fputs(x0, "\tpopl %eax\n"); };
-  # Compiling bitwise instruction
+  compile_expression(a0, a3);
+  # Moving it's value
+  if (a1 == STMT_EXPR_SHL || a1 == STMT_EXPR_SHR) {
+    # If we have shift expressions, move value to %ecx
+    compiler_allocate_register(a0, REG_ECX);
+    fputs(x0, "\tmovl %eax, %ecx\n");
+    # Moving value to be shifted to %eax
+    fputs(x0, "\tmovl %ebx, %eax\n");
+  } else if (a1 == STMT_EXPR_SUB) {
+    # If we have SUB, DIV or MOD, move value to %ebx
+    fputs(x0, "\tmovl %eax, %ebx\n");
+    # And restore %eax
+    fputs(x0, "\tpopl %eax\n");
+  } else if (a1 == STMT_EXPR_DIV || a1 == STMT_EXPR_MOD) {
+    # If we have SUB, DIV or MOD, move value to %ebx
+    fputs(x0, "\tmovl %eax, %ebx\n");
+    # And restore %eax
+    fputs(x0, "\tpopl %eax\n");
+    # Clear %edx for division
+    fputs(x0, "\tcltd\n");
+  };
+  # Compiling operation
   fputc(x0, '\t');
-  if (x1 == STMT_EXPR_MUL) { fputs(x0, "imul"); };
-  if (x1 == STMT_EXPR_ADD) { fputs(x0, "add"); };
-  if (x1 == STMT_EXPR_SUB) { fputs(x0, "sub"); };
-  if (x1 == STMT_EXPR_AND) { fputs(x0, "and"); };
-  if (x1 == STMT_EXPR_XOR) { fputs(x0, "xor"); };
-  if (x1 == STMT_EXPR_OR)  { fputs(x0, "or"); };
-  fputs(x0, "l %ebx, %eax\n");
-  # Restoring %ebx, if it is needed
+       if (a1 == STMT_EXPR_MUL) { fputs(x0, "imull %ebx, %eax"); }
+  else if (a1 == STMT_EXPR_DIV) { fputs(x0, "idivl %ebx"); }
+  else if (a1 == STMT_EXPR_MOD) { fputs(x0, "idivl %ebx\n\tmovl %edx, %eax"); }
+  else if (a1 == STMT_EXPR_ADD) { fputs(x0, "addl %ebx, %eax"); }
+  else if (a1 == STMT_EXPR_SUB) { fputs(x0, "subl %ebx, %eax"); }
+  else if (a1 == STMT_EXPR_SHL) { fputs(x0, "shll %cl, %eax"); }
+  else if (a1 == STMT_EXPR_SHR) { fputs(x0, "shlr %cl, %eax"); }
+  else if (a1 == STMT_EXPR_AND) { fputs(x0, "andl %ebx, %eax"); }
+  else if (a1 == STMT_EXPR_XOR) { fputs(x0, "xorl %ebx, %eax"); }
+  else if (a1 == STMT_EXPR_OR)  { fputs(x0, "orl %ebx, %eax"); };
+  fputc(x0, '\n');
+  # Freeing used registers
+       if (a1 == STMT_EXPR_SHL || a1 == STMT_EXPR_SHR) { compiler_free_register(a0, REG_ECX); }
+  else if (a1 == STMT_EXPR_DIV || a1 == STMT_EXPR_MOD) { compiler_free_register(a0, REG_EDX); };
   compiler_free_register(a0, REG_EBX);
 };
 
