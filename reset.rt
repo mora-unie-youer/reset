@@ -1002,24 +1002,25 @@ TOKEN_ELSE         => 271;
 # Loops
 TOKEN_BREAK        => 272;
 TOKEN_CONTINUE     => 273;
-TOKEN_WHILE        => 274;
+TOKEN_FOR          => 274;
+TOKEN_WHILE        => 275;
 # Functions
-TOKEN_ALLOCATE     => 275;
-TOKEN_RETURN       => 276;
-TOKEN_SYSCALL      => 277;
+TOKEN_ALLOCATE     => 276;
+TOKEN_RETURN       => 277;
+TOKEN_SYSCALL      => 278;
 #labels
-TOKEN_GLOBAL       => 278;
-TOKEN_GOTO         => 279;
-TOKEN_LABEL        => 280;
+TOKEN_GLOBAL       => 279;
+TOKEN_GOTO         => 280;
+TOKEN_LABEL        => 281;
 # Byte operations
-TOKEN_READCHAR     => 281;
-TOKEN_WRITECHAR    => 282;
+TOKEN_READCHAR     => 282;
+TOKEN_WRITECHAR    => 283;
 # Array types
-TOKEN_TYPE_CHAR    => 283;
-TOKEN_TYPE_INT     => 284;
+TOKEN_TYPE_CHAR    => 284;
+TOKEN_TYPE_INT     => 285;
 # File
-TOKEN_INCLUDE      => 285;
-TOKEN_INCLUDE_ONCE => 286;
+TOKEN_INCLUDE      => 286;
+TOKEN_INCLUDE_ONCE => 287;
 ## Symbols
 # Equality
 TOKEN_EQ    => 300;
@@ -1084,13 +1085,13 @@ char_to_escape : [
 ];
 ## Reserved keywords
 reserved_keywords : [
-  "if", "else",                    # Conditionals
-  "break", "continue", "while",    # Loops
-  "allocate", "return", "syscall", # Functions
-  "global", "goto", "label",       #labels
-  "readchar", "writechar",         # Byte operations
-  "char", "int",                   # Array types
-  "include", "include_once",
+  "if", "else",                         # Conditionals
+  "break", "continue", "for", "while",  # Loops
+  "allocate", "return", "syscall",      # Functions
+  "global", "goto", "label",            # Labels
+  "readchar", "writechar",              # Byte operations
+  "char", "int",                        # Array types
+  "include", "include_once",            # File operations
   NULL
 ];
 ## Lexer triggers
@@ -1593,24 +1594,25 @@ STMT_EXPR_POSTINC     => 47;
 STMT_EXPR_TERNARY     => 48;
 # Statements
 STMT_IF               => 49;
-STMT_WHILE            => 50;
-STMT_ALLOCATE         => 51;
-STMT_RETURN           => 52;
-STMT_BREAK            => 53;
-STMT_CONTINUE         => 54;
-STMT_WRITECHAR        => 55;
-STMT_LABEL            => 56;
-STMT_GOTO             => 57;
+STMT_FOR              => 50;
+STMT_WHILE            => 51;
+STMT_ALLOCATE         => 52;
+STMT_RETURN           => 53;
+STMT_BREAK            => 54;
+STMT_CONTINUE         => 55;
+STMT_WRITECHAR        => 56;
+STMT_LABEL            => 57;
+STMT_GOTO             => 58;
 # Block statement
-STMT_BLOCK            => 58;
+STMT_BLOCK            => 59;
 # Top level statements
-STMT_GLOBAL           => 59;
-STMT_MACRO            => 60;
-STMT_FUN_DECL         => 61;
-STMT_ARRAY_DECL       => 62;
-STMT_CHAR_ARRAY_DECL  => 63;
-STMT_INT_ARRAY_DECL   => 64;
-STMT_VAR_DECL         => 65;
+STMT_GLOBAL           => 60;
+STMT_MACRO            => 61;
+STMT_FUN_DECL         => 62;
+STMT_ARRAY_DECL       => 63;
+STMT_CHAR_ARRAY_DECL  => 64;
+STMT_INT_ARRAY_DECL   => 65;
+STMT_VAR_DECL         => 66;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -2082,24 +2084,16 @@ label block_statement_content_invalid;
 # a2 - token location
 # @return statement
 statement : (a0, a1, a2) {
-  # Parsing if statement
-  if (a1 == TOKEN_IF) { return(if_statement(a0, a2)); };
-  # Parsing while statement
-  if (a1 == TOKEN_WHILE) { return(while_statement(a0, a2)); };
-  # Parsing allocate statement
-  if (a1 == TOKEN_ALLOCATE) { return(allocate_statement(a0, a2)); };
-  # Parsing return statement
-  if (a1 == TOKEN_RETURN) { return(return_statement(a0, a2)); };
-  # Parsing loop jump statement
-  if (a1 == TOKEN_BREAK || a1 == TOKEN_CONTINUE) { return(loop_jump_statement(a0, a2, a1)); };
-  # Parsing writechar statement
-  if (a1 == TOKEN_WRITECHAR) { return(writechar_statement(a0, a2)); };
-  # Parsinglabel statement
-  if (a1 == TOKEN_LABEL) { return(label_statement(a0, a2)); };
-  # Parsing goto statement
-  if (a1 == TOKEN_GOTO) { return(goto_statement(a0, a2)); };
-  # Returning expression, as statements were not found here
-  return(expression(a0, a1));
+       if (a1 == TOKEN_IF)                            { return(if_statement(a0, a2)); }
+  else if (a1 == TOKEN_FOR)                           { return(for_statement(a0, a2)); }
+  else if (a1 == TOKEN_WHILE)                         { return(while_statement(a0, a2)); }
+  else if (a1 == TOKEN_ALLOCATE)                      { return(allocate_statement(a0, a2)); }
+  else if (a1 == TOKEN_RETURN)                        { return(return_statement(a0, a2)); }
+  else if (a1 == TOKEN_BREAK || a1 == TOKEN_CONTINUE) { return(loop_jump_statement(a0, a2, a1)); }
+  else if (a1 == TOKEN_WRITECHAR)                     { return(writechar_statement(a0, a2)); }
+  else if (a1 == TOKEN_LABEL)                         { return(label_statement(a0, a2)); }
+  else if (a1 == TOKEN_GOTO)                          { return(goto_statement(a0, a2)); }
+  else                                                { return(expression(a0, a1)); };
 };
 
 ## Parse if statement
@@ -2159,6 +2153,78 @@ label if_statement_invalid;
   parser_error(a0, a1, "Invalid if statement syntax");
 label if_statement_else_invalid;
   parser_error(a0, a1, "Put else branches with condition before last else branch.");
+};
+
+## Parse for statement
+# a0 - parser
+# a1 - token location
+# @return statement
+for_statement : (a0, a1) {
+  # x0 - next token
+  # x1 - init expression
+  # x2 - cond expression
+  # x3 - iteration expressions vector
+  # x4 - block statement
+  # x5 - expression
+  allocate(6);
+  # Initializing iteration expressions vector
+  x3 = vector(0, 1);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != '(') { goto &for_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking if init expression is empty
+  if (x0 == ';') { x1 = NULL; goto &for_statement_skip_init; };
+  # Fetching init expression
+  x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ';') { goto &for_statement_invalid; };
+label for_statement_skip_init;
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking if cond expression is empty
+  if (x0 == ';') { x2 = NULL; goto &for_statement_skip_cond; };
+  # Fetching cond expression
+  x2 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 != ';') { goto &for_statement_invalid; };
+label for_statement_skip_cond;
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for iteration expressions
+  if (x0 == ')') { goto &for_statement_iter_end; };
+  # Holding token
+  parser_lexer_hold(a0);
+label for_statement_iter_loop;
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x0 == ')') { goto &for_statement_invalid; };
+  # Fetching expression
+  x5 = expression(a0, x0);
+  # Pushing expression to vector
+  vector_push(x3, x5);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for another iteration expressions
+  if (x0 == ',') { goto &for_statement_iter_loop; };
+label for_statement_iter_end;
+  # Checking for correct syntax
+  if (x0 != ')') { goto &for_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Fetching block statement
+  x4 = block_statement(a0, x0);
+  # Returning statement
+  return(tuple6(STMT_FOR, a1, x1, x2, x3, x4));
+label for_statement_invalid;
+  parser_error(a0, a1, "Invalid for statement syntax");
 };
 
 ## Parse while statement
@@ -3643,18 +3709,12 @@ compile_top_level_statement : (a0, a1) {
   allocate(1);
   # Getting statement ID
   x0 = a1[NODE_TYPE];
-  # Compiling global statement
-  if (x0 == STMT_GLOBAL)          { compile_global_statement(a0, a1); };
-  # Compiling function declaration
-  if (x0 == STMT_FUN_DECL)        { compile_function_declaration(a0, a1); };
-  # Compiling array declaration
-  if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); };
-  # Compiling char array declaration
-  if (x0 == STMT_CHAR_ARRAY_DECL) { compile_type_array_declaration(a0, a1, 1); };
-  # Compiling int array declaration
-  if (x0 == STMT_INT_ARRAY_DECL)  { compile_type_array_declaration(a0, a1, 4); };
-  # Compiling variable declaration
-  if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
+       if (x0 == STMT_GLOBAL)          { compile_global_statement(a0, a1); }
+  else if (x0 == STMT_FUN_DECL)        { compile_function_declaration(a0, a1); }
+  else if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); }
+  else if (x0 == STMT_CHAR_ARRAY_DECL) { compile_type_array_declaration(a0, a1, 1); }
+  else if (x0 == STMT_INT_ARRAY_DECL)  { compile_type_array_declaration(a0, a1, 4); }
+  else if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
 };
 
 ## Compile global statement
@@ -3845,17 +3905,18 @@ compile_statement : (a0, a1) {
   # Fetching statement ID
   x0 = a1[NODE_TYPE];
   # Searching for statement
-  if (x0 == STMT_IF)        { compile_if_statement(a0, a1);        return; };
-  if (x0 == STMT_WHILE)     { compile_while_statement(a0, a1);     return; };
-  if (x0 == STMT_ALLOCATE)  { compile_allocate_statement(a0, a1);  return; };
-  if (x0 == STMT_RETURN)    { compile_return_statement(a0, a1);    return; };
-  if (x0 == STMT_BREAK || x0 == STMT_CONTINUE) { compile_loop_jump_statement(a0, a1); return; };
-  if (x0 == STMT_WRITECHAR) { compile_writechar_statement(a0, a1); return; };
-  if (x0 == STMT_LABEL)     { compile_label_statement(a0, a1);     return; };
-  if (x0 == STMT_GOTO)      { compile_goto_statement(a0, a1);      return; };
-  if (x0 == STMT_BLOCK)     { compile_block_statement(a0, a1);     return; };
+       if (x0 == STMT_IF)                           { compile_if_statement(a0, a1); }
+  else if (x0 == STMT_FOR)                          { compile_for_statement(a0, a1); }
+  else if (x0 == STMT_WHILE)                        { compile_while_statement(a0, a1); }
+  else if (x0 == STMT_ALLOCATE)                     { compile_allocate_statement(a0, a1); }
+  else if (x0 == STMT_RETURN)                       { compile_return_statement(a0, a1); }
+  else if (x0 == STMT_BREAK || x0 == STMT_CONTINUE) { compile_loop_jump_statement(a0, a1); }
+  else if (x0 == STMT_WRITECHAR)                    { compile_writechar_statement(a0, a1); }
+  else if (x0 == STMT_LABEL)                        { compile_label_statement(a0, a1); }
+  else if (x0 == STMT_GOTO)                         { compile_goto_statement(a0, a1); }
+  else if (x0 == STMT_BLOCK)                        { compile_block_statement(a0, a1); }
   # If none of statements wasn't found, trying to compile expression
-  compile_expression(a0, a1);
+  else { compile_expression(a0, a1); };
 };
 
 ## Compile if statement
@@ -3906,6 +3967,55 @@ compile_if_statement : (a0, a1) {
   };
   # Printing exit label definition
   fputlabeldef(x0, x1);
+};
+
+## Compile for statement
+# a0 - compiler
+# a1 - statement
+compile_for_statement : (a0, a1) {
+  # x0 - compiler output channel
+  # x1, x2 - labels
+  # x3 - counter
+  allocate(4);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Getting label IDs
+  x1 = compiler_new_label(a0);
+  x2 = compiler_new_label(a0);
+  # Compile init expression if it's not null
+  if (a1[2]) { compile_expression(a0, a1[2]); };
+  # Printing label for "loop start"
+  fputlabeldef(x0, x1);
+  # Compiling condition if it is not null
+  if (a1[3]) {
+    compile_expression(a0, a1[3]);
+    # Comparing condition with zero
+    fputs(x0, "\tcmpl $0, %eax\n");
+    # If equal to zero, exitting loop
+    fputs(x0, "\tje ");
+    fputlabel(x0, x2);
+    fputc(x0, '\n');
+  };
+  # Pushing loop to list
+  compiler_push_loop(a0, x1, x2);
+  # Compiling for block
+  compile_block_statement(a0, a1[5]);
+  # Pop loop from list
+  compiler_pop_loop(a0, x1, x2);
+  # Iterating through iteration list
+  x3 = 0;
+  while (x3 < vector_size(a1[4])) {
+    # Compiling iteration expression
+    compile_expression(a0, vector_get(a1[4], x3));
+    # Moving to next expression
+    x3 = x3 + 1;
+  };
+  # Making next iteration in for loop
+  fputs(x0, "\tjmp ");
+  fputlabel(x0, x1);
+  fputc(x0, '\n');
+  # Printing exit label
+  fputlabeldef(x0, x2);
 };
 
 ## Compile while statement
@@ -4071,44 +4181,46 @@ compile_expression : (a0, a1) {
   x0 = a1[0];
   # Looking for expressions
   ## Constant
-  if (x0 == STMT_EXPR_INTEGER)     { compile_integer_expression(a0, a1); };
-  if (x0 == STMT_EXPR_STRING)      { compile_string_expression(a0, a1); };
+       if (x0 == STMT_EXPR_INTEGER)     { compile_integer_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_STRING)      { compile_string_expression(a0, a1); }
   ## Postfix
-  if (x0 == STMT_EXPR_CALL)        { compile_address_call_expression(a0, a1); };
-  if (x0 == STMT_EXPR_INDEX)       { compile_address_index_expression(a0, a1); };
+  else if (x0 == STMT_EXPR_CALL)        { compile_address_call_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_INDEX)       { compile_address_index_expression(a0, a1); }
   ## Simple
-  if (x0 == STMT_EXPR_IDENTIFIER)  { compile_simple_identifier_expression(a0, a1); };
-  if (x0 == STMT_EXPR_ARGUMENT)    { compile_simple_argument_expression(a0, a1); };
-  if (x0 == STMT_EXPR_VARIABLE)    { compile_simple_variable_expression(a0, a1); };
-  if (x0 == STMT_EXPR_SYSCALL)     { compile_simple_syscall_expression(a0, a1); };
-  if (x0 == STMT_EXPR_READCHAR)    { compile_simple_readchar_expression(a0, a1); };
+  else if (x0 == STMT_EXPR_IDENTIFIER)  { compile_simple_identifier_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_ARGUMENT)    { compile_simple_argument_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_VARIABLE)    { compile_simple_variable_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_SYSCALL)     { compile_simple_syscall_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_READCHAR)    { compile_simple_readchar_expression(a0, a1); }
   ## Prefix
-  if (x0 == STMT_EXPR_PLUS)        { compile_prefix_plus_expression(a0, a1); };
-  if (x0 == STMT_EXPR_MINUS)       { compile_prefix_minus_expression(a0, a1); };
-  if (x0 == STMT_EXPR_LOGICAL_NOT) { compile_prefix_logical_not_expression(a0, a1); };
-  if (x0 == STMT_EXPR_NOT)         { compile_prefix_not_expression(a0, a1); };
-  if (x0 == STMT_EXPR_DEREF)       { compile_prefix_deref_expression(a0, a1); };
-  if (x0 == STMT_EXPR_ADDROF)      { compile_prefix_addrof_expression(a0, a1); };
+  else if (x0 == STMT_EXPR_PLUS)        { compile_prefix_plus_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_MINUS)       { compile_prefix_minus_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_LOGICAL_NOT) { compile_prefix_logical_not_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_NOT)         { compile_prefix_not_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_DEREF)       { compile_prefix_deref_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_ADDROF)      { compile_prefix_addrof_expression(a0, a1); }
   ## Arithmetic and bitwise operations
-  if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_OR) {
+  else if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_OR) {
     compile_bitwise_arithmetic_expression(a0, x0, a1[2], a1[3]);
-  };
+  }
   ## Relational
-  if (x0 == STMT_EXPR_LESS)        { compile_comparison_expression(a0, a1); };
-  if (x0 == STMT_EXPR_GREATER)     { compile_comparison_expression(a0, a1); };
-  if (x0 == STMT_EXPR_LE)          { compile_comparison_expression(a0, a1); };
-  if (x0 == STMT_EXPR_GE)          { compile_comparison_expression(a0, a1); };
+  else if (x0 == STMT_EXPR_LESS)        { compile_comparison_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_GREATER)     { compile_comparison_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_LE)          { compile_comparison_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_GE)          { compile_comparison_expression(a0, a1); }
   ## Equality
-  if (x0 == STMT_EXPR_EQ)          { compile_comparison_expression(a0, a1); };
-  if (x0 == STMT_EXPR_NE)          { compile_comparison_expression(a0, a1); };
+  else if (x0 == STMT_EXPR_EQ)          { compile_comparison_expression(a0, a1); }
+  else if (x0 == STMT_EXPR_NE)          { compile_comparison_expression(a0, a1); }
   ## Logical operations
-  if (x0 == STMT_EXPR_LOGICAL_AND) { compile_logical_expression(a0, a1, FALSE); };
-  if (x0 == STMT_EXPR_LOGICAL_OR)  { compile_logical_expression(a0, a1, TRUE); };
+  else if (x0 == STMT_EXPR_LOGICAL_AND) { compile_logical_expression(a0, a1, FALSE); }
+  else if (x0 == STMT_EXPR_LOGICAL_OR)  { compile_logical_expression(a0, a1, TRUE); }
   ## Ternary
-  if (x0 == STMT_EXPR_TERNARY)     { compile_ternary_expression(a0, a1); };
+  else if (x0 == STMT_EXPR_TERNARY)     { compile_ternary_expression(a0, a1); }
   ## Assignment and {post,pre}{dec,inc}
-  if (x0 >= STMT_EXPR_ASSIGN && x0 <= STMT_EXPR_POSTINC) {
+  else if (x0 >= STMT_EXPR_ASSIGN && x0 <= STMT_EXPR_POSTINC) {
     compile_assignment_expression(a0, a1);
+  } else {
+    compiler_error(a0, a1, "This expression can't be compiled.");
   };
 };
 
