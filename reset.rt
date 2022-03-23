@@ -3910,7 +3910,7 @@ compile_if_statement : (a0, a1) {
       # Compiling condition
       compile_expression(a0, x4);
       # Generating next label, if this is not last branch. Otherwise, use exit
-      x2 = x3 + 1 < vector_size(a1[2]) ? compiler_new_label(a0) : x1;
+      x2 = x3 + 2 < vector_size(a1[2]) ? compiler_new_label(a0) : x1;
       # Compiling condition jump (value == 0 -> jump to next label)
       fputs(x0, "\tcmpl $0, %eax\n");
       fputs(x0, "\tje "); fputlabel(x0, x2); fputc(x0, '\n');
