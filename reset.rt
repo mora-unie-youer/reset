@@ -1051,6 +1051,8 @@ TOKEN_ASHR  => 318;
 # Increment/decrement
 TOKEN_INC => 319;
 TOKEN_DEC => 320;
+# Ellipsis
+TOKEN_ELLIPSIS => 321;
 ## Char table
 char_table : [
   # X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  Xa  Xb  Xc  Xd  Xe  Xf
@@ -1495,6 +1497,10 @@ label lx18;
     a0[LEX_COLUMN] = 1;
     # Starting lexing from the start
     goto &lx00;
+  } else if (x0 == '.') {
+    if (x1 == '.') {
+      if (x2 == '.') { lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ELLIPSIS); };
+    };
   };
 label lx99;
   ## Finishing lexing. Returning current token ID
@@ -1939,6 +1945,7 @@ label function_declaration_arg_loop;
   # Checking if arguments ended
   if (x1 == ')') { goto &function_declaration_arg_end; };
   # Checking for argument
+  if (x1 == TOKEN_ELLIPSIS) { x1 = parser_lex(a0); goto &function_declaration_arg_end; };
   if (x1 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
   if (x0 != lexer_token_value(parser_lexer(a0)))
   { goto &function_declaration_arg_invalid; };
