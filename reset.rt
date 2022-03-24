@@ -1007,21 +1007,22 @@ TOKEN_FOR          => 275;
 TOKEN_WHILE        => 276;
 # Functions
 TOKEN_ALLOCATE     => 277;
-TOKEN_RETURN       => 278;
-TOKEN_SYSCALL      => 279;
-#labels
-TOKEN_GLOBAL       => 280;
-TOKEN_GOTO         => 281;
-TOKEN_LABEL        => 282;
+TOKEN_ASM          => 278;
+TOKEN_RETURN       => 279;
+TOKEN_SYSCALL      => 280;
+# Labels
+TOKEN_GLOBAL       => 281;
+TOKEN_GOTO         => 282;
+TOKEN_LABEL        => 283;
 # Byte operations
-TOKEN_READCHAR     => 283;
-TOKEN_WRITECHAR    => 284;
+TOKEN_READCHAR     => 284;
+TOKEN_WRITECHAR    => 285;
 # Array types
-TOKEN_TYPE_CHAR    => 285;
-TOKEN_TYPE_INT     => 286;
+TOKEN_TYPE_CHAR    => 286;
+TOKEN_TYPE_INT     => 287;
 # File
-TOKEN_INCLUDE      => 287;
-TOKEN_INCLUDE_ONCE => 288;
+TOKEN_INCLUDE      => 288;
+TOKEN_INCLUDE_ONCE => 289;
 ## Symbols
 # Equality
 TOKEN_EQ    => 300;
@@ -1090,7 +1091,7 @@ char_to_escape : [
 reserved_keywords : [
   "if", "else",                               # Conditionals
   "break", "continue", "do", "for", "while",  # Loops
-  "allocate", "return", "syscall",            # Functions
+  "allocate", "asm", "return", "syscall",     # Functions
   "global", "goto", "label",                  # Labels
   "readchar", "writechar",                    # Byte operations
   "char", "int",                              # Array types
@@ -1523,6 +1524,61 @@ label le07;
   lexer_error(a0, "Unterminated string literal");
 };
 
+## Fetch assembly line
+# a0 - lexer
+# @return is this assembly line last
+lexer_lex_asm : (a0) {
+  # x0 - char
+  # x1 - char type
+  # x2 - i
+  allocate(3);
+label lax00;
+  ## Entry point of assembly line lexer
+  # If token is space/tab/newline, skip it
+  if (lexer_look(a0) == CHAR_SPACES || lexer_look(a0) == CHAR_NEWLINE) {
+    # Consuming char
+    lexer_consume(a0);
+    # Retrying
+    goto &lax00;
+  };
+  # Resetting token buffer
+  lexer_reset_token(a0);
+  # Fetching char
+  x0 = lexer_consume(a0);
+label lax01;
+  ## Checking for block not being closed
+  if (x0 == '}') { goto &lae00; };
+label lax02;
+  ## Reading chars until semicolon
+  x0 = fnextc(a0[LEX_ICHAN], 0);
+  # Checking for block not being closed
+  if (x0 == '}') { goto &lae00; };
+  # Exitting loop, if next char is semicolon
+  if (x0 == ';') { goto &lax03; };
+  # Consuming char
+  lexer_consume(a0);
+  # Making next iteration
+  goto &lax02;
+label lax03;
+  ## Looking for next significant char to check if this is last line
+  x2 = 1;
+  do {
+    # Fetching char
+    ## FIXME: I guess this can get EOF when lexing at the end of buffer
+    x0 = fnextc(a0[LEX_ICHAN], x2++);
+    # Erroring, if we got EOF
+    if (x0 == EOF) { goto &lae01; };
+    # Fetching char type
+    x1 = char_table[x0];
+  } while (x1 == CHAR_SPACES || x1 == CHAR_NEWLINE);
+  # If we have } char, we return TRUE, otherwise FALSE
+  return(x0 == '}');
+label lae00;
+  lexer_error(a0, "Unexpected assembly block close");
+label lae01;
+  lexer_error(a0, "Unexpected end of file");
+};
+
 ### Parser
 ## Parser parts
 PARSER_LEX     => 0;
@@ -1605,22 +1661,23 @@ STMT_FOR              => 50;
 STMT_DO_WHILE         => 51;
 STMT_WHILE            => 52;
 STMT_ALLOCATE         => 53;
-STMT_RETURN           => 54;
-STMT_BREAK            => 55;
-STMT_CONTINUE         => 56;
-STMT_WRITECHAR        => 57;
-STMT_LABEL            => 58;
-STMT_GOTO             => 59;
+STMT_ASM              => 54;
+STMT_RETURN           => 55;
+STMT_BREAK            => 56;
+STMT_CONTINUE         => 57;
+STMT_WRITECHAR        => 58;
+STMT_LABEL            => 59;
+STMT_GOTO             => 60;
 # Block statement
-STMT_BLOCK            => 60;
+STMT_BLOCK            => 61;
 # Top level statements
-STMT_GLOBAL           => 61;
-STMT_MACRO            => 62;
-STMT_FUN_DECL         => 63;
-STMT_ARRAY_DECL       => 64;
-STMT_CHAR_ARRAY_DECL  => 65;
-STMT_INT_ARRAY_DECL   => 66;
-STMT_VAR_DECL         => 67;
+STMT_GLOBAL           => 62;
+STMT_MACRO            => 63;
+STMT_FUN_DECL         => 64;
+STMT_ARRAY_DECL       => 65;
+STMT_CHAR_ARRAY_DECL  => 66;
+STMT_INT_ARRAY_DECL   => 67;
+STMT_VAR_DECL         => 68;
 
 ## Create new parser
 # a0 - lexer of main file
@@ -1694,6 +1751,11 @@ parser_lexer_hold : (a0) { lexer_hold(parser_lexer(a0)); };
 # a0 - parser
 # @return token ID
 parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); };
+
+## Lex assembly line using current lexer in parser
+# a0 - parser
+# @return is last assembly line
+parser_lex_asm : (a0) { return(lexer_lex_asm(parser_lexer(a0))); };
 
 ## Print parser error
 # a0 - parser
@@ -2098,6 +2160,7 @@ statement : (a0, a1, a2) {
   else if (a1 == TOKEN_DO)                            { return(do_while_statement(a0, a2)); }
   else if (a1 == TOKEN_WHILE)                         { return(while_statement(a0, a2)); }
   else if (a1 == TOKEN_ALLOCATE)                      { return(allocate_statement(a0, a2)); }
+  else if (a1 == TOKEN_ASM)                           { return(assembly_statement(a0, a2)); }
   else if (a1 == TOKEN_RETURN)                        { return(return_statement(a0, a2)); }
   else if (a1 == TOKEN_BREAK || a1 == TOKEN_CONTINUE) { return(loop_jump_statement(a0, a2, a1)); }
   else if (a1 == TOKEN_WRITECHAR)                     { return(writechar_statement(a0, a2)); }
@@ -2327,6 +2390,44 @@ allocate_statement : (a0, a1) {
   return(tuple3(STMT_ALLOCATE, a1, x1));
 label allocate_statement_invalid;
   parser_error(a0, a1, "Invalid allocate statement syntax");
+};
+
+## Parse assembly statement
+# a0 - parser
+# a1 - token location
+# @return statement
+assembly_statement : (a0, a1) {
+  # x0 - asm vector
+  # x1 - next token/asm line
+  # x2 - last line
+  allocate(3);
+  # Allocating assembly vector
+  x0 = vector(0, 1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != '{') { goto &assembly_statement_invalid; };
+label assembly_statement_loop;
+  # Parsing assembly...
+  x2 = parser_lex_asm(a0);
+  # Duplicating assembly line
+  x1 = strdup(lexer_token_text(parser_lexer(a0)));
+  # Pushing assembly line to vector
+  vector_push(x0, x1);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # This must be a semicolon
+  if (x1 != ';') { goto &assembly_statement_invalid; };
+  # If we have another lines, parsing them
+  if (!x2) { goto &assembly_statement_loop; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for correct syntax
+  if (x1 != '}') { goto &assembly_statement_invalid; };
+  # Returning statement
+  return(tuple3(STMT_ASM, a1, x0));
+label assembly_statement_invalid;
+  parser_error(a0, a1, "Invalid assembly statement syntax");
 };
 
 ## Parse return statement
@@ -3957,6 +4058,7 @@ compile_statement : (a0, a1) {
   else if (x0 == STMT_DO_WHILE)                     { compile_while_statement(a0, a1, TRUE); }
   else if (x0 == STMT_WHILE)                        { compile_while_statement(a0, a1, FALSE); }
   else if (x0 == STMT_ALLOCATE)                     { compile_allocate_statement(a0, a1); }
+  else if (x0 == STMT_ASM)                          { compile_assembly_statement(a0, a1); }
   else if (x0 == STMT_RETURN)                       { compile_return_statement(a0, a1); }
   else if (x0 == STMT_BREAK || x0 == STMT_CONTINUE) { compile_loop_jump_statement(a0, a1); }
   else if (x0 == STMT_WRITECHAR)                    { compile_writechar_statement(a0, a1); }
@@ -4153,6 +4255,24 @@ compile_allocate_statement : (a0, a1) {
   fputs(x0, "\tsubl $");
   fputd(x0, x2);
   fputs(x0, ", %esp\n");
+};
+
+## Compile assembly statement
+# a0 - compiler
+# a1 - statement
+compile_assembly_statement : (a0, a1) {
+  # x0 - compiler output channel
+  # x1 - index
+  allocate(2);
+  # Getting output channel
+  x0 = compiler_output_chan(a0);
+  # Iterating through assembly lines
+  for (x1 = 0; x1 < vector_size(a1[2]); x1++) {
+    # Printing assembly line
+    fputc(x0, '\t');
+    fputs(x0, vector_get(a1[2], x1));
+    fputc(x0, '\n');
+  };
 };
 
 ## Compile return statement
