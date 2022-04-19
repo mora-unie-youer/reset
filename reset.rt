@@ -19,44 +19,44 @@ SYS_mmap2  => 192;
 ### System call functions
 ## Exit with code
 # a0 - exit code
-exit : (a0) { syscall(SYS_exit, a0); };
+exit : (a0) { syscall(SYS_exit, a0); }
 
 ## Read from file
 # a0 - file
 # a1 - buffer
 # a2 - count
 # @return read count
-read : (a0, a1, a2) { return(syscall(SYS_read, a0, a1, a2)); };
+read : (a0, a1, a2) { return(syscall(SYS_read, a0, a1, a2)); }
 
 ## Write to file
 # a0 - file
 # a1 - buffer
 # a2 - count
 # @return write count
-write : (a0, a1, a2) { return(syscall(SYS_write, a0, a1, a2)); };
+write : (a0, a1, a2) { return(syscall(SYS_write, a0, a1, a2)); }
 
 ## Open file
 # a0 - path
 # a1 - flags
 # a2 - mode
 # @return fd or error
-open : (a0, a1, a2) { return(syscall(SYS_open, a0, a1, a2)); };
+open : (a0, a1, a2) { return(syscall(SYS_open, a0, a1, a2)); }
 
 ## Close file
 # a0 - fd
 # @return result code
-close : (a0) { return(syscall(SYS_close, a0)); };
+close : (a0) { return(syscall(SYS_close, a0)); }
 
 ## Set/return heap segment limit
 # a0 - address (set) or NULL (return)
 # @return current heap limit
-brk : (a0) { return(syscall(SYS_brk, a0)); };
+brk : (a0) { return(syscall(SYS_brk, a0)); }
 
 ## Unmap memory page
 # a0 - address
 # a1 - size
 # @return zero on success, negative on error
-munmap : (a0, a1) { return(syscall(SYS_munmap, a0, a1)); };
+munmap : (a0, a1) { return(syscall(SYS_munmap, a0, a1)); }
 
 ## Map memory page
 # a0 - address
@@ -67,12 +67,12 @@ munmap : (a0, a1) { return(syscall(SYS_munmap, a0, a1)); };
 # a5 - offset
 mmap2 : (a0, a1, a2, a3, a4, a5) {
   return(syscall(SYS_mmap2, a0, a1, a2, a3, a4, a5));
-};
+}
 
 ## Get current work directory
 # a0 - buffer
 # a1 - buffer size
-getcwd : (a0, a1) { return(syscall(SYS_getcwd, a0, a1)); };
+getcwd : (a0, a1) { return(syscall(SYS_getcwd, a0, a1)); }
 
 ### Useful functions
 ## Align number up to another number (which is power of 2)
@@ -81,7 +81,7 @@ getcwd : (a0, a1) { return(syscall(SYS_getcwd, a0, a1)); };
 # @return aligned number
 align : (a0, a1) {
   return((a0 + a1 - 1) & ~(a1 - 1));
-};
+}
 
 ## Align number down to another number (which is power of 2)
 # a0 - number to be aligned
@@ -89,7 +89,7 @@ align : (a0, a1) {
 # @return aligned number
 align_down : (a0, a1) {
   return(a0 - (a0 & (a1 - 1)));
-};
+}
 
 ### Conversions
 ## Int to string
@@ -120,7 +120,7 @@ itoa : (a0, a1, a2) {
     a0 = a0 / a2;
     # Going to next char position
     x0 = x0 + 1;
-  };
+  }
   # Writing '\0' to the end of string
   writechar(a1, x0, '\0');
   # Reversing string
@@ -135,10 +135,10 @@ itoa : (a0, a1, a2) {
     writechar(a1, x0, x2);
     # Reversing next chars
     x1 = x1 + 1;
-  };
+  }
   # Returning result buffer
   return(a1);
-};
+}
 
 ### Memory Management
 ## Memory page size
@@ -150,10 +150,10 @@ free_end   : NULL;
 ## Allocate new memory page
 allocate_new_page : () {
   # If free_end is NULL, finding brk(NULL)
-  if (free_end == NULL) { free_end = brk(NULL); free_start = free_end; };
+  if (free_end == NULL) { free_end = brk(NULL); free_start = free_end; }
   # Moving free memory segment pointers
   free_end = brk(free_end + PAGE_SIZE);
-};
+}
 
 ## Allocate memory
 # a0 - size
@@ -162,19 +162,19 @@ malloc : (a0) {
   # x0 - address
   allocate(1);
   # Checking if we need to allocate more memory
-  while (free_start + a0 > free_end) { allocate_new_page(); };
+  while (free_start + a0 > free_end) { allocate_new_page(); }
   # Setting address
   x0 = free_start;
   # Moving free segment pointer
   free_start = x0 + a0;
   # Returning memory address
   return(x0);
-};
+}
 
 ## Free memory
 # a0 - address
 # NOTE: in this implementation of memory allocator it is impossible
-free : (a0) {};
+free : (a0) {}
 
 ## Allocate cleared memory
 # a0 - size
@@ -187,7 +187,7 @@ calloc : (a0) {
   # Clearing memory with zeroes
   memset(0, x0, a0);
   return(x0);
-};
+}
 
 ## Reallocate memory with new size
 # a0 - allocated memory
@@ -200,7 +200,7 @@ realloc : (a0, a1, a2) {
   allocate(2);
   # Finding out the amount of memory to be copied
   x0 = a1;
-  if (a2 < a1) { x0 = a2; };
+  if (a2 < a1) { x0 = a2; }
   # Allocating new memory
   x1 = calloc(a2);
   # Copying data to new memory space
@@ -208,7 +208,7 @@ realloc : (a0, a1, a2) {
   # Freeing old memory space
   free(a0);
   return(x1);
-};
+}
 
 ### Memory/String operations
 ## Fill memory block with value (char)
@@ -225,8 +225,8 @@ memset : (a0, a1, a2) {
     writechar(a1, x0, a0);
     # Moving to next byte
     x0 = x0 + 1;
-  };
-};
+  }
+}
 
 ## Copy data from one memory block to another
 # a0 - src
@@ -241,8 +241,8 @@ memcpy : (a0, a1, a2) {
     writechar(a1, x0, readchar(a0, x0));
     # Moving to next byte
     x0 = x0 + 1;
-  };
-};
+  }
+}
 
 ## Get length of string
 # a0 - string
@@ -252,9 +252,9 @@ strlen : (a0) {
   allocate(1);
   x0 = 0;
   # While char is not NULL, incrementing length
-  while (readchar(a0, x0) != '\0') { x0 = x0 + 1; };
+  while (readchar(a0, x0) != '\0') { x0 = x0 + 1; }
   return(x0);
-};
+}
 
 ## Get length of string counting escaped characters as one
 # a0 -string
@@ -265,12 +265,12 @@ stresclen : (a0) {
   x0 = 0;
   # While char is not NULL, incrementing length
   while (readchar(a0, 0) != '\0') {
-    if (readchar(a0, 0) == '\\') { a0 = a0 + 1; };
+    if (readchar(a0, 0) == '\\') { a0 = a0 + 1; }
     a0 = a0 + 1;
     x0 = x0 + 1;
-  };
+  }
   return(x0);
-};
+}
 
 ## Copy string
 # a0 - src
@@ -291,12 +291,12 @@ strcpy : (a0, a1) {
     x0 = x0 + 1;
     # Reading next char
     x1 = readchar(a0, x0);
-  };
+  }
   # Writing NULL character
   writechar(a1, x0, '\0');
   # Returning number of copied characters
   return(x0);
-};
+}
 
 ## Compare string
 # a0 - first string
@@ -313,16 +313,16 @@ strcmp : (a0, a1) {
   x2 = readchar(a1, x0);
   # Comparing char by char
   while (x1 != '\0') {
-    if (x1 != x2) { return(x1 - x2); };
+    if (x1 != x2) { return(x1 - x2); }
     # Moving to next char
     x0 = x0 + 1;
     # Reading next char
     x1 = readchar(a0, x0);
     x2 = readchar(a1, x0);
-  };
+  }
   # As first string ended, finding the difference between ending chars
   return(x1 - x2);
-};
+}
 
 ## Duplicate string
 # a0 - string
@@ -338,7 +338,7 @@ strdup : (a0) {
   memcpy(a0, x1, x0);
   # Return new string
   return(x1);
-};
+}
 
 ## Duplicate string literal (without double quotes)
 # a0 - string
@@ -355,13 +355,13 @@ strlitdup : (a0) {
   memcpy(a0 + 1, x1, x0);
   # Return new string
   return(x1);
-};
+}
 
 ### Tuples
 ## Allocate tuple
 # a0 - size
 # @return allocated tuple
-allocate_tuple : (a0) { return(malloc(4 * a0)); };
+allocate_tuple : (a0) { return(malloc(4 * a0)); }
 
 ## Make tuple with 1 value
 # a0 - value
@@ -373,7 +373,7 @@ tuple1 : (a0) {
   # Fill tuple
   x0[0] = a0;
   return(x0);
-};
+}
 
 ## Make tuple with 2 values
 # a0, a1 - values
@@ -386,7 +386,7 @@ tuple2 : (a0, a1) {
   x0[0] = a0;
   x0[1] = a1;
   return(x0);
-};
+}
 
 ## Make tuple with 3 values
 # a0, a1, a2 - values
@@ -400,7 +400,7 @@ tuple3 : (a0, a1, a2) {
   x0[1] = a1;
   x0[2] = a2;
   return(x0);
-};
+}
 
 ## Make tuple with 4 values
 # a0, a1, a2, a3 - values
@@ -415,7 +415,7 @@ tuple4 : (a0, a1, a2, a3) {
   x0[2] = a2;
   x0[3] = a3;
   return(x0);
-};
+}
 
 ## Make tuple with 5 values
 # a0, a1, a2, a3, a4 - values
@@ -431,7 +431,7 @@ tuple5 : (a0, a1, a2, a3, a4) {
   x0[3] = a3;
   x0[4] = a4;
   return(x0);
-};
+}
 
 ## Make tuple with 6 values
 # a0, a1, a2, a3, a4, a5 - values
@@ -448,7 +448,7 @@ tuple6 : (a0, a1, a2, a3, a4, a5) {
   x0[4] = a4;
   x0[5] = a5;
   return(x0);
-};
+}
 
 ## Make tuple with 7 values
 # a0, a1, a2, a3, a4, a5, a6 - values
@@ -466,7 +466,7 @@ tuple7 : (a0, a1, a2, a3, a4, a5, a6) {
   x0[5] = a5;
   x0[6] = a6;
   return(x0);
-};
+}
 
 ## Make tuple with 8 values
 # a0, a1, a2, a3, a4, a5, a6, a7 - values
@@ -485,7 +485,7 @@ tuple8 : (a0, a1, a2, a3, a4, a5, a6, a7) {
   x0[6] = a6;
   x0[7] = a7;
   return(x0);
-};
+}
 
 ### Linked List
 ## List parts
@@ -495,23 +495,23 @@ LIST_VALUE => 1;
 ## Create linked list with value
 # a0 - value
 # @return list
-list : (a0) { return(list_insert(NULL, a0)); };
+list : (a0) { return(list_insert(NULL, a0)); }
 
 ## Insert value in linked list
 # a0 - list
 # a1 - value
 # @return list with new value
-list_insert : (a0, a1) { return(tuple2(a0, a1)); };
+list_insert : (a0, a1) { return(tuple2(a0, a1)); }
 
 ## Get next element of linked list
 # a0 - list
 # @return list with next value
-list_next : (a0) { return(a0[LIST_NEXT]); };
+list_next : (a0) { return(a0[LIST_NEXT]); }
 
 ## Get value of current element of linked list
 # a0 - list
 # @return current element value
-list_value : (a0) { return(a0[LIST_VALUE]); };
+list_value : (a0) { return(a0[LIST_VALUE]); }
 
 ## Remove this element from list
 # a0 - list
@@ -524,7 +524,7 @@ list_pop : (a0) {
   # Deallocating current element
   free(a0);
   return(x0);
-};
+}
 
 ### Vector
 ## Vector parts
@@ -536,23 +536,23 @@ VEC_BUF  => 2;
 # a0 - size
 # a1 - capacity
 # @return character vector
-char_vector : (a0, a1) { return(tuple3(a0, a1, calloc(a1))); };
+char_vector : (a0, a1) { return(tuple3(a0, a1, calloc(a1))); }
 
 ## Create vector
 # a0 - size
 # a1 - capacity
 # @return vector
-vector : (a0, a1) { return(tuple3(a0, a1, calloc(4 * a1))); };
+vector : (a0, a1) { return(tuple3(a0, a1, calloc(4 * a1))); }
 
 ## Get vector buffer
 # a0 - vector
 # @return vector buffer
-vector_buffer : (a0) { return(a0[VEC_BUF]); };
+vector_buffer : (a0) { return(a0[VEC_BUF]); }
 
 ## Get vector size
 # a0 - vector
 # @return vector size
-vector_size : (a0) { return(a0[VEC_SIZE]); };
+vector_size : (a0) { return(a0[VEC_SIZE]); }
 
 ## Reserve more space for char vector buffer
 # a0 - char vector
@@ -564,8 +564,8 @@ char_vector_reserve : (a0, a1) {
     a0[VEC_BUF] = realloc(a0[VEC_BUF], a0[VEC_CAP], a1);
     # Setting new capacity
     a0[VEC_CAP] = a1;
-  };
-};
+  }
+}
 
 ## Reserve more space for vector buffer
 # a0 - vector
@@ -577,46 +577,46 @@ vector_reserve : (a0, a1) {
     a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a0[VEC_CAP], 4 * a1);
     # Setting new capacity
     a0[VEC_CAP] = a1;
-  };
-};
+  }
+}
 
 ## Resize char vector
 # a0 - char vector
 # a1 - new size
 char_vector_resize : (a0, a1) {
   # Reserving, if required
-  if (a1 > a0[VEC_SIZE]) { char_vector_reserve(a0, a1); };
+  if (a1 > a0[VEC_SIZE]) { char_vector_reserve(a0, a1); }
   # Setting new size
   a0[VEC_SIZE] = a1;
-};
+}
 
 ## Resize vector
 # a0 - vector
 # a1 - new size
 vector_resize : (a0, a1) {
   # Reserving, if required
-  if (a1 > a0[VEC_SIZE]) { vector_reserve(a0, a1); };
+  if (a1 > a0[VEC_SIZE]) { vector_reserve(a0, a1); }
   # Setting new size
   a0[VEC_SIZE] = a1;
-};
+}
 
 ## Get value at index in char vector
 # a0 - char vector
 # a1 - index
 # @return char
-char_vector_get : (a0, a1) { return(readchar(a0[VEC_BUF], a1)); };
+char_vector_get : (a0, a1) { return(readchar(a0[VEC_BUF], a1)); }
 
 ## Get value at index in vector
 # a0 - vector
 # a1 - index
 # @return value
-vector_get : (a0, a1) { return(a0[VEC_BUF][a1]); };
+vector_get : (a0, a1) { return(a0[VEC_BUF][a1]); }
 
 ## Set value at index in char vector
 # a0 - char vector
 # a1 - index
 # a2 - char
-char_vector_set : (a0, a1, a2) { writechar(a0[VEC_BUF], a1, a2); };
+char_vector_set : (a0, a1, a2) { writechar(a0[VEC_BUF], a1, a2); }
 
 ## Set value at index in vector
 # a0 - vector
@@ -627,7 +627,7 @@ vector_set : (a0, a1, a2) {
   allocate(1);
   x0 = a0[VEC_BUF];
   x0[a1] = a2;
-};
+}
 
 ## Insert value in the end of char vector
 # a0 - char vector
@@ -636,12 +636,12 @@ char_vector_push : (a0, a1) {
   # If vector buffer is full, reserving more
   if (a0[VEC_SIZE] == a0[VEC_CAP]) {
     char_vector_reserve(a0, a0[VEC_CAP] * 2);
-  };
+  }
   # Putting new value
   char_vector_set(a0, a0[VEC_SIZE], a1);
   # Incrementing size
   a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
-};
+}
 
 ## Insert value in the end of vector
 # a0 - vector
@@ -650,12 +650,12 @@ vector_push : (a0, a1) {
   # If vector buffer is full, reserving more
   if (a0[VEC_SIZE] == a0[VEC_CAP]) {
     vector_reserve(a0, a0[VEC_CAP] * 2);
-  };
+  }
   # Putting new value
   vector_set(a0, a0[VEC_SIZE], a1);
   # Incrementing size
   a0[VEC_SIZE] = a0[VEC_SIZE] + 1;
-};
+}
 
 ## Remove and return last value from char vector
 # a0 - char vector
@@ -665,7 +665,7 @@ char_vector_pop : (a0) {
   a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
   # Returning the value
   return(char_vector_get(a0, a0[VEC_SIZE]));
-};
+}
 
 ## Remove and return last value from vector
 # a0 - vector
@@ -675,7 +675,7 @@ vector_pop : (a0) {
   a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
   # Returning the value
   return(vector_get(a0, a0[VEC_SIZE]));
-};
+}
 
 ## Destroy vector
 # a0 - vector
@@ -684,7 +684,7 @@ vector_destroy : (a0) {
   free(a0[VEC_BUF]);
   # Deallocating vector
   free(a0);
-};
+}
 
 ### I/O
 ## Open flags
@@ -719,7 +719,7 @@ input_chan : (a0) {
   # Creating channel
   x0 = tuple5(a0, x0, 0, 0, FALSE);
   return(x0);
-};
+}
 
 ## Create new input channel based on file
 # a0 - file name
@@ -733,7 +733,7 @@ input_chan_file : (a0) {
   assert(x0 > 0, "Couldn't open file input channel");
   # Returning new channel
   return(input_chan(x0));
-};
+}
 
 ## Close input channel
 # a0 - channel
@@ -744,7 +744,7 @@ input_chan_close : (a0) {
   free(a0[CHAN_BUF]);
   # Deallocating channel
   free(a0);
-};
+}
 
 ## Create new output channel
 # a0 - fd
@@ -757,7 +757,7 @@ output_chan : (a0) {
   # Creating channel
   x0 = tuple3(a0, x0, 0);
   return(x0);
-};
+}
 
 ## Create new output channel based on file
 # a0 - file name
@@ -771,7 +771,7 @@ output_chan_file : (a0) {
   assert(x0 > 0, "Couldn't open file output channel");
   # Returning new channel
   return(output_chan(x0));
-};
+}
 
 ## Close output channel
 # a0 - channel
@@ -784,14 +784,14 @@ output_chan_close : (a0) {
   free(a0[CHAN_BUF]);
   # Deallocating channel
   free(a0);
-};
+}
 
 ## Initialize standard I/O
 initialize_io : () {
   stdin  = input_chan(0);  # stdin=0
   stdout = output_chan(1); # stdout=1
   stderr = output_chan(2); # stderr=2
-};
+}
 
 ## Fill input channel
 # a0 - channel
@@ -799,7 +799,7 @@ fill : (a0) {
   # x0 - read count
   allocate(1);
   # Checking if file is ended
-  if (a0[ICHAN_EOF]) { return; };
+  if (a0[ICHAN_EOF]) { return; }
   # Checking if buffer is exhausted
   if (a0[CHAN_IDX] == a0[ICHAN_END]) {
     # Input buffer is empty, refilling
@@ -808,9 +808,9 @@ fill : (a0) {
     a0[CHAN_IDX]  = 0;
     a0[ICHAN_END] = x0;
     # Setting EOF flag, if file is ended
-    if (a0[ICHAN_END] == 0) { a0[ICHAN_EOF] = TRUE; };
-  };
-};
+    if (a0[ICHAN_END] == 0) { a0[ICHAN_EOF] = TRUE; }
+  }
+}
 
 ## Read char
 # a0 - channel
@@ -821,17 +821,17 @@ fgetc : (a0) {
   # Filling buffer, if needed
   fill(a0);
   # Checking if input is ended
-  if (a0[CHAN_IDX] == a0[ICHAN_END]) { return(EOF); };
+  if (a0[CHAN_IDX] == a0[ICHAN_END]) { return(EOF); }
   # Fetching char
   x0 = readchar(a0[CHAN_BUF], a0[CHAN_IDX]);
   # Incrementing index and returning char
   a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
   return(x0);
-};
+}
 
 ## Read char from stdin
 # @return char
-getc : () { return(fgetc(stdin)); };
+getc : () { return(fgetc(stdin)); }
 
 ## Look ahead next char
 # a0 - channel
@@ -841,15 +841,15 @@ fnextc : (a0, a1) {
   # Filling buffer, if needed
   fill(a0);
   # Checking if input is ended
-  if (a0[CHAN_IDX] + a1 >= a0[ICHAN_END]) { return(EOF); };
+  if (a0[CHAN_IDX] + a1 >= a0[ICHAN_END]) { return(EOF); }
   # Fetching char
   return(readchar(a0[CHAN_BUF], a0[CHAN_IDX] + a1));
-};
+}
 
 ## Look ahead next char from stdin
 # a0 - offset
 # @return char
-nextc : (a0) { return(fnextc(stdin, a0)); };
+nextc : (a0) { return(fnextc(stdin, a0)); }
 
 ## Flush output channel
 # a0 - channel
@@ -858,8 +858,8 @@ flush : (a0) {
   if (a0[CHAN_IDX] > 0) {
     write(a0[CHAN_FD], a0[CHAN_BUF], a0[CHAN_IDX]);
     a0[CHAN_IDX] = 0;
-  };
-};
+  }
+}
 
 ## Put character
 # a0 - channel
@@ -870,16 +870,16 @@ fputc : (a0, a1) {
   # Incrementing index
   a0[CHAN_IDX] = a0[CHAN_IDX] + 1;
   # Checking if need to flush
-  if (a0[CHAN_IDX] == OBUFFER_SIZE) { flush(a0); return; };
-  if (a1 == '\n') { flush(a0); return; };
-};
+  if (a0[CHAN_IDX] == OBUFFER_SIZE) { flush(a0); return; }
+  if (a1 == '\n') { flush(a0); return; }
+}
 
 ## Put character in stdout
 # a0 - char
-putc  : (a0) { fputc(stdout, a0); };
+putc  : (a0) { fputc(stdout, a0); }
 ## Put character in stderr
 # a0 - char
-eputc : (a0) { fputc(stderr, a0); };
+eputc : (a0) { fputc(stderr, a0); }
 
 ## Put string
 # a0 - channel
@@ -896,15 +896,15 @@ fputs : (a0, a1) {
     # Reading next character
     a1 = a1 + 1;
     x0 = readchar(a1, 0);
-  };
-};
+  }
+}
 
 ## Put string in stdout
 # a0 - char
-puts  : (a0) { fputs(stdout, a0); };
+puts  : (a0) { fputs(stdout, a0); }
 ## Put string in stderr
 # a0 - char
-eputs : (a0) { fputs(stderr, a0); };
+eputs : (a0) { fputs(stderr, a0); }
 
 ## Put number
 # a0 - channel
@@ -913,50 +913,50 @@ eputs : (a0) { fputs(stderr, a0); };
 fputn_buffer : NULL;
 fputn : (a0, a1, a2) {
   # Allocating number buffer, if needed
-  if (fputn_buffer == NULL) { fputn_buffer = malloc(33); };
+  if (fputn_buffer == NULL) { fputn_buffer = malloc(33); }
   # Clearing buffer
   memset(0, fputn_buffer, 33);
   # Converting number to string
   itoa(a1, fputn_buffer, a2);
   # Putting string
   fputs(a0, fputn_buffer);
-};
+}
 
 ## Put decimal number in channel
 # a0 - channel
 # a1 - number
-fputd : (a0, a1) { fputn(a0, a1, 10); };
+fputd : (a0, a1) { fputn(a0, a1, 10); }
 ## Put hexadecimal number in channel
 # a0 - channel
 # a1 - number
-fputx : (a0, a1) { fputn(a0, a1, 16); };
+fputx : (a0, a1) { fputn(a0, a1, 16); }
 ## Put decimal number in stdout
 # a0 - number
-putd  : (a0) { fputn(stdout, a0, 10); };
+putd  : (a0) { fputn(stdout, a0, 10); }
 ## Put hexadecimal number in stdout
 # a0 - number
-putx  : (a0) { fputn(stdout, a0, 16); };
+putx  : (a0) { fputn(stdout, a0, 16); }
 ## Put decimal number in stderr
 # a0 - number
-eputd : (a0) { fputn(stderr, a0, 10); };
+eputd : (a0) { fputn(stderr, a0, 10); }
 ## Put hexadecimal number in stderr
 # a0 - number
-eputx : (a0) { fputn(stderr, a0, 16); };
+eputx : (a0) { fputn(stderr, a0, 16); }
 
 ## Assertion
 # a0 - condition
 # a1 - error string
 assert : (a0, a1) {
   # If condition success, returning
-  if (a0) { return; };
+  if (a0) { return; }
   # Printing assertion error
   eputs("ASSERT: ");
   # If error string is null, printing default message. If not, print a1
-  if (a1) { eputs(a1); } else { eputs("assertion failed"); };
+  if (a1) { eputs(a1); } else { eputs("assertion failed"); }
   eputc('\n');
   # Exitting
   exit(1);
-};
+}
 
 ### Lexer
 ## Character types
@@ -1127,12 +1127,12 @@ lexer : (a0, a1) {
   # Allocating lexer
   x1 = tuple8(a0, a1, 1, 1, FALSE, 0, 0, x0);
   return(x1);
-};
+}
 
 ## Create new lexer using file name
 # a0 - filename
 # @return lexer
-lexer_file : (a0) { return(lexer(input_chan_file(a0), a0)); };
+lexer_file : (a0) { return(lexer(input_chan_file(a0), a0)); }
 
 ## Destroy lexer
 # a0 - lexer
@@ -1145,7 +1145,7 @@ lexer_destroy : (a0) {
   free(a0[LEX_FILE]);
   # Destroying lexer
   free(a0);
-};
+}
 
 ## Look ahead for next character
 # a0 - lexer
@@ -1156,10 +1156,10 @@ lexer_look : (a0) {
   # Reading char
   x0 = fnextc(a0[LEX_ICHAN], 0);
   # If got EOF, returning CHAR_NULL
-  if (x0 == EOF) { return(CHAR_NULL); };
+  if (x0 == EOF) { return(CHAR_NULL); }
   # Returning char type
   return(char_table[x0]);
-};
+}
 
 ## Consume char to token buffer
 # a0 - lexer
@@ -1173,7 +1173,7 @@ lexer_consume : (a0) {
   if (x0 == '\n') {
     a0[LEX_LINE] = a0[LEX_LINE] + 1;
     a0[LEX_COLUMN] = 0;
-  };
+  }
   # Incrementing column
   a0[LEX_COLUMN] = a0[LEX_COLUMN] + 1;
   # Replacing last char (NULL) in buffer
@@ -1182,46 +1182,46 @@ lexer_consume : (a0) {
   char_vector_push(a0[LEX_TTEXT], '\0');
   # Returning char
   return(x0);
-};
+}
 
 ## Set token ID
 # a0 - lexer
 # a1 - token ID
-lexer_token_set : (a0, a1) { a0[LEX_TID] = a1; };
+lexer_token_set : (a0, a1) { a0[LEX_TID] = a1; }
 
 ## Get token ID
 # a0 - lexer
 # @return token ID
-lexer_token_get : (a0) { return(a0[LEX_TID]); };
+lexer_token_get : (a0) { return(a0[LEX_TID]); }
 
 ## Get token text
 # a0 - lexer
 # @return token text char vector
-lexer_token_text : (a0) { return(vector_buffer(a0[LEX_TTEXT])); };
+lexer_token_text : (a0) { return(vector_buffer(a0[LEX_TTEXT])); }
 
 ## Get token text length
 # a0 - lexer
 # @return token text length
-lexer_token_length : (a0) { return(vector_size(a0[LEX_TTEXT])); };
+lexer_token_length : (a0) { return(vector_size(a0[LEX_TTEXT])); }
 
 ## Get token value
 # a0 - lexer
 # @return token value
-lexer_token_value : (a0) { return(a0[LEX_TVALUE]); };
+lexer_token_value : (a0) { return(a0[LEX_TVALUE]); }
 
 ## Get token location
 # a0 - lexer
 # @return token location
 lexer_token_location : (a0) {
   return(tuple3(a0[LEX_FILE], a0[LEX_LINE], a0[LEX_COLUMN]));
-};
+}
 
 ## Hold token
 # a0 - lexer
 lexer_hold : (a0) {
   assert(a0[LEX_HOLD] == FALSE, "tried to hold two or more tokens");
   a0[LEX_HOLD] = TRUE;
-};
+}
 
 ## Reset token data
 # a0 - lexer
@@ -1231,7 +1231,7 @@ lexer_reset_token : (a0) {
   # Resetting token text buffer
   char_vector_resize(a0[LEX_TTEXT], 0);
   char_vector_push(a0[LEX_TTEXT], '\0');
-};
+}
 
 ## Print token location to output channel
 # a0 - token location
@@ -1242,7 +1242,7 @@ fputloc : (a0, a1) {
   fputn(a1, a0[LOC_LINE], 10);
   fputc(a1, ':');
   fputn(a1, a0[LOC_COLUMN], 10);
-};
+}
 
 ## Print lexer error
 # a0 - lexer
@@ -1257,7 +1257,7 @@ lexer_error : (a0, a1) {
   eputc('\n');
   # Exitting
   exit(1);
-};
+}
 
 ## Fetch token
 # a0 - lexer
@@ -1270,7 +1270,7 @@ lexer_lex : (a0) {
   if (a0[LEX_HOLD]) {
     a0[LEX_HOLD] = FALSE;
     return(a0[LEX_TID]);
-  };
+  }
 
 label lx00;
   ## Entry point of lexer
@@ -1280,7 +1280,7 @@ label lx00;
     lexer_consume(a0);
     # Retrying
     goto &lx00;
-  };
+  }
   # Resetting token buffer
   lexer_reset_token(a0);
   # Moving to next trigger
@@ -1325,8 +1325,8 @@ label lx05;
     } else {
       # It is decimal digit
       x0 = x0 - '0';
-    };
-  };
+    }
+  }
   # Adding digit to number
   a0[LEX_TVALUE] = a0[LEX_TVALUE] * 16 + x0;
   # Moving to next trigger
@@ -1360,10 +1360,10 @@ label lx08;
       # Setting keyword token ID
       lexer_token_set(a0, TOKEN_IF + x1);
       goto &lx99;
-    };
+    }
     # Checking next keyword
     x1 = x1 + 1;
-  };
+  }
   # We are here because identifier is not a keyword. Exitting
   goto &lx99;
 label lx09;
@@ -1372,7 +1372,7 @@ label lx09;
   x0 = lexer_consume(a0);
   # Checking if we have argument or variable
   x1 = TOKEN_VARIABLE;
-  if (x0 == 'a') { x1 = TOKEN_ARGUMENT; };
+  if (x0 == 'a') { x1 = TOKEN_ARGUMENT; }
   # Set token type
   lexer_token_set(a0, x1);
   # Moving to next trigger
@@ -1410,7 +1410,7 @@ label lx13;
   a0[LEX_TVALUE] = char_to_escape[x0];
 label lx14;
   # Checking if quotes are closed
-  if (lexer_look(a0) != CHAR_SQUOTE) { goto &le06; };
+  if (lexer_look(a0) != CHAR_SQUOTE) { goto &le06; }
   # Consuming char
   lexer_consume(a0);
   goto &lx99;
@@ -1448,21 +1448,21 @@ label lx18;
   # Checking for double-char or triple-char symbols
   if (x0 == '=') {
          if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_EQ); }
-    else if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); };
+    else if (x1 == '>') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ARROW); }
   } else if (x0 == '!') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_NE); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_NE); }
   } else if (x0 == '+') {
          if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AADD); }
-    else if (x1 == '+') { lexer_consume(a0); lexer_token_set(a0, TOKEN_INC); };
+    else if (x1 == '+') { lexer_consume(a0); lexer_token_set(a0, TOKEN_INC); }
   } else if (x0 == '-') {
          if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ASUB); }
-    else if (x1 == '-') { lexer_consume(a0); lexer_token_set(a0, TOKEN_DEC); };
+    else if (x1 == '-') { lexer_consume(a0); lexer_token_set(a0, TOKEN_DEC); }
   } else if (x0 == '*') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMUL); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMUL); }
   } else if (x0 == '/') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ADIV); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_ADIV); }
   } else if (x0 == '%') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMOD); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AMOD); }
   } else if (x0 == '<') {
          if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LE); }
     else if (x1 == '<') {
@@ -1470,8 +1470,8 @@ label lx18;
         lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHL);
       } else {
         lexer_consume(a0); lexer_token_set(a0, TOKEN_SHL);
-      };
-    };
+      }
+    }
   } else if (x0 == '>') {
          if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_GE); }
     else if (x1 == '>') {
@@ -1479,20 +1479,20 @@ label lx18;
         lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ASHR);
       } else {
         lexer_consume(a0); lexer_token_set(a0, TOKEN_SHR);
-      };
-    };
+      }
+    }
   } else if (x0 == '^') {
-    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AXOR); };
+    if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AXOR); }
   } else if (x0 == '&') {
          if (x1 == '&') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LAND); }
-    else if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AAND); };
+    else if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AAND); }
   } else if (x0 == '|') {
          if (x1 == '|') { lexer_consume(a0); lexer_token_set(a0, TOKEN_LOR); }
-    else if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AOR); };
+    else if (x1 == '=') { lexer_consume(a0); lexer_token_set(a0, TOKEN_AOR); }
   } else if (x0 == '#') {
     # Checking for comment
     ## Skipping line
-    while (x0 != '\n' && x0 != '\0') { x0 = fgetc(a0[LEX_ICHAN]); };
+    while (x0 != '\n' && x0 != '\0') { x0 = fgetc(a0[LEX_ICHAN]); }
     # Resetting line and column
     a0[LEX_LINE] = a0[LEX_LINE] + 1;
     a0[LEX_COLUMN] = 1;
@@ -1500,9 +1500,9 @@ label lx18;
     goto &lx00;
   } else if (x0 == '.') {
     if (x1 == '.') {
-      if (x2 == '.') { lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ELLIPSIS); };
-    };
-  };
+      if (x2 == '.') { lexer_consume(a0); lexer_consume(a0); lexer_token_set(a0, TOKEN_ELLIPSIS); }
+    }
+  }
 label lx99;
   ## Finishing lexing. Returning current token ID
   return(a0[LEX_TID]);
@@ -1522,7 +1522,7 @@ label le06;
   lexer_error(a0, "Unterminated character literal");
 label le07;
   lexer_error(a0, "Unterminated string literal");
-};
+}
 
 ## Fetch assembly line
 # a0 - lexer
@@ -1540,21 +1540,21 @@ label lax00;
     lexer_consume(a0);
     # Retrying
     goto &lax00;
-  };
+  }
   # Resetting token buffer
   lexer_reset_token(a0);
   # Fetching char
   x0 = lexer_consume(a0);
 label lax01;
   ## Checking for block not being closed
-  if (x0 == '}') { goto &lae00; };
+  if (x0 == '}') { goto &lae00; }
 label lax02;
   ## Reading chars until semicolon
   x0 = fnextc(a0[LEX_ICHAN], 0);
   # Checking for block not being closed
-  if (x0 == '}') { goto &lae00; };
+  if (x0 == '}') { goto &lae00; }
   # Exitting loop, if next char is semicolon
-  if (x0 == ';') { goto &lax03; };
+  if (x0 == ';') { goto &lax03; }
   # Consuming char
   lexer_consume(a0);
   # Making next iteration
@@ -1567,7 +1567,7 @@ label lax03;
     ## FIXME: I guess this can get EOF when lexing at the end of buffer
     x0 = fnextc(a0[LEX_ICHAN], x2++);
     # Erroring, if we got EOF
-    if (x0 == EOF) { goto &lae01; };
+    if (x0 == EOF) { goto &lae01; }
     # Fetching char type
     x1 = char_table[x0];
   } while (x1 == CHAR_SPACES || x1 == CHAR_NEWLINE);
@@ -1577,7 +1577,7 @@ label lae00;
   lexer_error(a0, "Unexpected assembly block close");
 label lae01;
   lexer_error(a0, "Unexpected end of file");
-};
+}
 
 ### Parser
 ## Parser parts
@@ -1683,17 +1683,17 @@ STMT_VAR_DECL         => 68;
 # a0 - lexer of main file
 # a1 - string buffer
 # @return parser
-parser : (a0, a1) { return(tuple4(list(a0), a1, FALSE, vector(0, 1))); };
+parser : (a0, a1) { return(tuple4(list(a0), a1, FALSE, vector(0, 1))); }
 
 ## Get current lexer in parser
 # a0 - parser
 # @return lexer
-parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); };
+parser_lexer : (a0) { return(list_value(a0[PARSER_LEX])); }
 
 ## Get string buffer in parser
 # a0 - parser
 # @return string buffer
-parser_buffer : (a0) { return(a0[PARSER_BUFFER]); };
+parser_buffer : (a0) { return(a0[PARSER_BUFFER]); }
 
 ## Get current token location
 # a0 - parser
@@ -1707,7 +1707,7 @@ parser_token_location : (a0) {
   x0[LOC_COLUMN] = x0[LOC_COLUMN] - lexer_token_length(parser_lexer(a0)) + 1;
   # Returning location
   return(x0);
-};
+}
 
 ## Search if file was included before
 # a0 - parser
@@ -1722,12 +1722,12 @@ parser_include_search : (a0, a1) {
   x1 = 0;
   while (x1 < vector_size(x0)) {
     # Checking if filenames are equal
-    if (!strcmp(vector_get(x0, x1), a1)) { return(TRUE); };
+    if (!strcmp(vector_get(x0, x1), a1)) { return(TRUE); }
     # Moving to next file
     x1 = x1 + 1;
-  };
+  }
   return(FALSE);
-};
+}
 
 ## Add file to parser, if it is needed
 # a0 - parser
@@ -1739,23 +1739,23 @@ parser_include_add : (a0, a1, a2) {
     # Adding lexer to list
     a0[PARSER_LEX] = list_insert(a0[PARSER_LEX], lexer_file(a1));
     # Adding file to vector, if we are including it once
-    if (a2) { vector_push(a0[PARSER_INCLIST], a1); };
-  };
-};
+    if (a2) { vector_push(a0[PARSER_INCLIST], a1); }
+  }
+}
 
 ## Hold current lexer in parser
 # a0 - parser
-parser_lexer_hold : (a0) { lexer_hold(parser_lexer(a0)); };
+parser_lexer_hold : (a0) { lexer_hold(parser_lexer(a0)); }
 
 ## Lex using current lexer in parser
 # a0 - parser
 # @return token ID
-parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); };
+parser_lex : (a0) { return(lexer_lex(parser_lexer(a0))); }
 
 ## Lex assembly line using current lexer in parser
 # a0 - parser
 # @return is last assembly line
-parser_lex_asm : (a0) { return(lexer_lex_asm(parser_lexer(a0))); };
+parser_lex_asm : (a0) { return(lexer_lex_asm(parser_lexer(a0))); }
 
 ## Print parser error
 # a0 - parser
@@ -1771,7 +1771,7 @@ parser_error : (a0, a1, a2) {
   eputc('\n');
   # Exitting
   exit(1);
-};
+}
 
 ## Parse file
 # a0 - parser
@@ -1795,19 +1795,19 @@ label parser_parse_continue;
     # Parsing statement
     x2 = top_level_statement(a0, x1, x3);
     # Adding statement, if needed
-    if (x2) { vector_push(x0, x2); };
+    if (x2) { vector_push(x0, x2); }
     # Fetching next token
     x1 = parser_lex(a0);
-  };
+  }
   # Destroying lexer
   lexer_destroy(parser_lexer(a0));
   # Switching to previous lexer
   a0[PARSER_LEX] = list_next(a0[PARSER_LEX]);
   # If lexer is not NULL, continuing
-  if (a0[PARSER_LEX] != NULL) { goto &parser_parse_continue; };
+  if (a0[PARSER_LEX] != NULL) { goto &parser_parse_continue; }
   # Returning statemtents vector
   return(x0);
-};
+}
 
 ## Parse top level statement
 # a0 - parser
@@ -1819,11 +1819,11 @@ top_level_statement : (a0, a1, a2) {
   # x1 - identifier
   allocate(2);
   # Parsing global statement
-  if (a1 == TOKEN_GLOBAL)       { return(global_statement(a0, a2)); };
+  if (a1 == TOKEN_GLOBAL)       { return(global_statement(a0, a2)); }
   # Parsing include statement
-  if (a1 == TOKEN_INCLUDE)      { return(include_statement(a0, a2, FALSE)); };
+  if (a1 == TOKEN_INCLUDE)      { return(include_statement(a0, a2, FALSE)); }
   # Parsing include_once statement
-  if (a1 == TOKEN_INCLUDE_ONCE) { return(include_statement(a0, a2, TRUE)); };
+  if (a1 == TOKEN_INCLUDE_ONCE) { return(include_statement(a0, a2, TRUE)); }
   # Parsing statements starting with identifier
   if (a1 == TOKEN_IDENTIFIER) {
     # Duplicating identifier
@@ -1831,25 +1831,25 @@ top_level_statement : (a0, a1, a2) {
     # Fetching next token
     x0 = parser_lex(a0);
     # Parsing macro definition
-    if (x0 == TOKEN_ARROW) { return(macro_declaration(a0, x1, a2)); };
+    if (x0 == TOKEN_ARROW) { return(macro_declaration(a0, x1, a2)); }
     # Parsing identifier declarations
     if (x0 == ':') {
       # Fetching next token
       x0 = parser_lex(a0);
       # Parsing function declaration
-      if (x0 == '(') { return(function_declaration(a0, x1, a2)); };
+      if (x0 == '(') { return(function_declaration(a0, x1, a2)); }
       # Parsing array declaration
-      if (x0 == '[') { return(array_declaration(a0, x1, a2)); };
+      if (x0 == '[') { return(array_declaration(a0, x1, a2)); }
       # Parsing reserved char array declaration
-      if (x0 == TOKEN_TYPE_CHAR) { return(type_array_declaration(a0, x1, STMT_CHAR_ARRAY_DECL, a2)); };
+      if (x0 == TOKEN_TYPE_CHAR) { return(type_array_declaration(a0, x1, STMT_CHAR_ARRAY_DECL, a2)); }
       # Parsing reserved int array declaration
-      if (x0 == TOKEN_TYPE_INT) { return(type_array_declaration(a0, x1, STMT_INT_ARRAY_DECL, a2)); };
+      if (x0 == TOKEN_TYPE_INT) { return(type_array_declaration(a0, x1, STMT_INT_ARRAY_DECL, a2)); }
       # Parsing simple variable declaration
       return(variable_declaration(a0, x1, x0, a2));
-    };
-  };
+    }
+  }
   parser_error(a0, a2, "Syntax error - none of available top level statements matched");
-};
+}
 
 ## Parse global statement
 # a0 - parser
@@ -1877,7 +1877,7 @@ label global_statement_next;
       # Fetching next token
       x1 = parser_lex(a0);
       # Checking if it is identifier
-      if (x1 != TOKEN_IDENTIFIER) { goto &global_statement_invalid; };
+      if (x1 != TOKEN_IDENTIFIER) { goto &global_statement_invalid; }
       # Making a copy of identifier
       x2 = strdup(lexer_token_text(parser_lexer(a0)));
       # Pushing identifier to ops
@@ -1885,22 +1885,22 @@ label global_statement_next;
       ## If next token is , - redoing loop
       # Fetching next token
       x1 = parser_lex(a0);
-      if (x1 == ',') { goto &global_statement_next; };
+      if (x1 == ',') { goto &global_statement_next; }
       # Checking for correct syntax
-      if (x1 != ')') { goto &global_statement_invalid; };
-    } else { goto &global_statement_invalid; };
-  };
+      if (x1 != ')') { goto &global_statement_invalid; }
+    } else { goto &global_statement_invalid; }
+  }
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for semicolon
-  if (x1 != ';') { goto &global_statement_end_error; };
+  if (x1 != ';') { goto &global_statement_end_error; }
   # Returning statement
   return(tuple3(STMT_GLOBAL, a1, x0));
 label global_statement_invalid;
   parser_error(a0, a1, "Invalid global statement");
 label global_statement_end_error;
   parser_error(a0, a1, "Global statement is not ended with semicolon");
-};
+}
 
 ## Parse include statement
 # a0 - parser
@@ -1929,7 +1929,7 @@ label include_statement_next;
       # Fetching next token
       x1 = parser_lex(a0);
       # Checking if it is string
-      if (x1 != TOKEN_STRING) { goto &include_statement_invalid; };
+      if (x1 != TOKEN_STRING) { goto &include_statement_invalid; }
       # Making a copy of data in string
       x2 = strlitdup(lexer_token_text(parser_lexer(a0)));
       # Pushing file to vector
@@ -1937,15 +1937,15 @@ label include_statement_next;
       ## If next token is , - redoing loop
       # Fetching next token
       x1 = parser_lex(a0);
-      if (x1 == ',') { goto &include_statement_next; };
+      if (x1 == ',') { goto &include_statement_next; }
       # Checking for correct syntax
-      if (x1 != ')') { goto &include_statement_invalid; };
-    } else { goto &include_statement_invalid; };
-  };
+      if (x1 != ')') { goto &include_statement_invalid; }
+    } else { goto &include_statement_invalid; }
+  }
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for semicolon
-  if (x1 != ';') { goto &include_statement_end_error; };
+  if (x1 != ';') { goto &include_statement_end_error; }
   # Creating lexers for specified files
   x1 = 0;
   while (x1 < vector_size(x0)) {
@@ -1955,7 +1955,7 @@ label include_statement_next;
     parser_include_add(a0, x2, a2);
     # Moving to next file
     x1 = x1 + 1;
-  };
+  }
   # Marking we switched file
   a0[PARSER_SWITCH] = TRUE;
   return(NULL);
@@ -1963,7 +1963,7 @@ label include_statement_invalid;
   parser_error(a0, a1, "Invalid include statement");
 label include_statement_end_error;
   parser_error(a0, a1, "Include statement is not ended with semicolon");
-};
+}
 
 ## Parse macro declaration
 # a0 - parser
@@ -1981,12 +1981,12 @@ macro_declaration : (a0, a1, a2) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &macro_declaration_end_error; };
+  if (x0 != ';') { goto &macro_declaration_end_error; }
   # Returning expression
   return(tuple4(STMT_MACRO, a2, a1, x1));
 label macro_declaration_end_error;
   parser_error(a0, a1, "Macro declaration is not ended with semicolon");
-};
+}
 
 ## Parse function declaration
 # a0 - parser
@@ -2005,21 +2005,21 @@ label function_declaration_arg_loop;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if arguments ended
-  if (x1 == ')') { goto &function_declaration_arg_end; };
+  if (x1 == ')') { goto &function_declaration_arg_end; }
   # Checking for argument
-  if (x1 == TOKEN_ELLIPSIS) { x1 = parser_lex(a0); goto &function_declaration_arg_end; };
-  if (x1 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; };
+  if (x1 == TOKEN_ELLIPSIS) { x1 = parser_lex(a0); goto &function_declaration_arg_end; }
+  if (x1 != TOKEN_ARGUMENT) { goto &function_declaration_arg_invalid; }
   if (x0 != lexer_token_value(parser_lexer(a0)))
-  { goto &function_declaration_arg_invalid; };
+  { goto &function_declaration_arg_invalid; }
   # Incrementing argument count
   x0 = x0 + 1;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for next argument
-  if (x1 == ',') { goto &function_declaration_arg_loop; };
+  if (x1 == ',') { goto &function_declaration_arg_loop; }
 label function_declaration_arg_end;
   # Checking we actually exitted arguments correctly
-  if (x1 != ')') { goto &function_declaration_arg_invalid; };
+  if (x1 != ')') { goto &function_declaration_arg_invalid; }
   # Fetching next token
   x1 = parser_lex(a0);
   # Fetching block statement
@@ -2028,7 +2028,7 @@ label function_declaration_arg_end;
   return(tuple5(STMT_FUN_DECL, a2, a1, x0, x2));
 label function_declaration_arg_invalid;
   parser_error(a0, a2, "Invalid function arguments declaration syntax");
-};
+}
 
 ## Parse array declaration
 # a0 - parser
@@ -2052,20 +2052,20 @@ label array_declaration_loop;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if there is another element
-  if (x1 == ',') { goto &array_declaration_loop; };
+  if (x1 == ',') { goto &array_declaration_loop; }
   # Checking for correct syntax
-  if (x1 != ']') { goto &array_declaration_invalid; };
+  if (x1 != ']') { goto &array_declaration_invalid; }
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for semicolon
-  if (x1 != ';') { goto &array_declaration_end_error; };
+  if (x1 != ';') { goto &array_declaration_end_error; }
   # Returning statement
   return(tuple4(STMT_ARRAY_DECL, a2, a1, x0));
 label array_declaration_invalid;
   parser_error(a0, a2, "Invalid array declaration syntax");
 label array_declaration_end_error;
   parser_error(a0, a1, "Array statement is not ended with semicolon");
-};
+}
 
 ## Parse type array declaration
 # a0 - parser
@@ -2080,7 +2080,7 @@ type_array_declaration : (a0, a1, a2, a3) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '[') { goto &type_array_declaration_invalid; };
+  if (x0 != '[') { goto &type_array_declaration_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching next expression
@@ -2088,18 +2088,18 @@ type_array_declaration : (a0, a1, a2, a3) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ']') { goto &type_array_declaration_invalid; };
+  if (x0 != ']') { goto &type_array_declaration_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &type_array_declaration_end_error; };
+  if (x0 != ';') { goto &type_array_declaration_end_error; }
   # Returning statement
   return(tuple4(a2, a3, a1, x1));
 label type_array_declaration_invalid;
   parser_error(a0, a3, "Invalid type array declaration syntax");
 label type_array_declaration_end_error;
   parser_error(a0, a1, "Type array statement is not ended with semicolon");
-};
+}
 
 ## Parse variable declaration
 # a0 - parser
@@ -2116,12 +2116,12 @@ variable_declaration : (a0, a1, a2, a3) {
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for semicolon
-  if (x1 != ';') { goto &variable_declaration_end_error; };
+  if (x1 != ';') { goto &variable_declaration_end_error; }
   # Returning statement
   return(tuple4(STMT_VAR_DECL, a3, a1, x0));
 label variable_declaration_end_error;
   parser_error(a0, a1, "Variable statement is not ended with semicolon");
-};
+}
 
 ## Parse block of statements
 # a0 - parser
@@ -2137,7 +2137,7 @@ block_statement : (a0, a1) {
   # Fetching token location
   x3 = parser_token_location(a0);
   # Checking for correct syntax
-  if (a1 != '{') { goto &block_statement_invalid; };
+  if (a1 != '{') { goto &block_statement_invalid; }
   # Allocating operand (statements) vector
   x0 = vector(0, 1);
 label block_statement_loop;
@@ -2146,11 +2146,11 @@ label block_statement_loop;
   # Fetching statement token location
   x4 = parser_token_location(a0);
   # Checking if we need to exit the loop
-  if (x1 == '}') { goto &block_statement_end; };
+  if (x1 == '}') { goto &block_statement_end; }
   # Checking if we have next block inside this
   if (x1 == '{') { x2 = block_statement(a0, x1); }
   # Else fetching statement
-  else { x2 = statement(a0, x1, x4); };
+  else { x2 = statement(a0, x1, x4); }
   # Pushing statement to vector
   vector_push(x0, x2);
   # Checking if expression is ended with semicolon
@@ -2158,8 +2158,8 @@ label block_statement_loop;
     # Fetching next token
     x1 = parser_lex(a0);
     # Checking for semicolon
-    if (x1 != ';') { goto &block_statement_content_invalid; };
-  };
+    if (x1 != ';') { goto &block_statement_content_invalid; }
+  }
   # So, making next iteration
   goto &block_statement_loop;
 label block_statement_end;
@@ -2169,7 +2169,7 @@ label block_statement_invalid;
   parser_error(a0, x3, "Invalid block statement syntax");
 label block_statement_content_invalid;
   parser_error(a0, x4, "Expression inside block is not ended with semicolon");
-};
+}
 
 ## Parse statement
 # a0 - parser
@@ -2188,8 +2188,8 @@ statement : (a0, a1, a2) {
   else if (a1 == TOKEN_WRITECHAR)                     { return(writechar_statement(a0, a2)); }
   else if (a1 == TOKEN_LABEL)                         { return(label_statement(a0, a2)); }
   else if (a1 == TOKEN_GOTO)                          { return(goto_statement(a0, a2)); }
-  else                                                { return(expression(a0, a1)); };
-};
+  else                                                { return(expression(a0, a1)); }
+}
 
 ## Parse if statement
 # a0 - parser
@@ -2206,7 +2206,7 @@ label if_statement_parse;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != '(') { goto &if_statement_invalid; };
+  if (x1 != '(') { goto &if_statement_invalid; }
   # Fetching next token
   x1 = parser_lex(a0);
   # Fetching condition expression
@@ -2216,7 +2216,7 @@ label if_statement_parse;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != ')') { goto &if_statement_invalid; };
+  if (x1 != ')') { goto &if_statement_invalid; }
   # Fetching next token
   x1 = parser_lex(a0);
   # Fetching block statement
@@ -2226,11 +2226,11 @@ label if_statement_parse;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if we have else statement
-  if (x1 != TOKEN_ELSE) { parser_lexer_hold(a0); goto &if_statement_end; };
+  if (x1 != TOKEN_ELSE) { parser_lexer_hold(a0); goto &if_statement_end; }
   # Fetching next token
   x1 = parser_lex(a0);
   # If this else have condition, parsing as if statement
-  if (x1 == TOKEN_IF) { goto &if_statement_parse; };
+  if (x1 == TOKEN_IF) { goto &if_statement_parse; }
   # Fetching else block statement
   x2 = block_statement(a0, x1);
   # Append else block to vector
@@ -2238,7 +2238,7 @@ label if_statement_parse;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if we have another else branch
-  if (x1 == TOKEN_ELSE) { goto &if_statement_else_invalid; };
+  if (x1 == TOKEN_ELSE) { goto &if_statement_else_invalid; }
   # Holding token
   parser_lexer_hold(a0);
 label if_statement_end;
@@ -2248,7 +2248,7 @@ label if_statement_invalid;
   parser_error(a0, a1, "Invalid if statement syntax");
 label if_statement_else_invalid;
   parser_error(a0, a1, "Put else branches with condition before last else branch.");
-};
+}
 
 ## Parse for statement
 # a0 - parser
@@ -2267,40 +2267,40 @@ for_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '(') { goto &for_statement_invalid; };
+  if (x0 != '(') { goto &for_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking if init expression is empty
-  if (x0 == ';') { x1 = NULL; goto &for_statement_skip_init; };
+  if (x0 == ';') { x1 = NULL; goto &for_statement_skip_init; }
   # Fetching init expression
   x1 = expression(a0, x0);
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ';') { goto &for_statement_invalid; };
+  if (x0 != ';') { goto &for_statement_invalid; }
 label for_statement_skip_init;
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking if cond expression is empty
-  if (x0 == ';') { x2 = NULL; goto &for_statement_skip_cond; };
+  if (x0 == ';') { x2 = NULL; goto &for_statement_skip_cond; }
   # Fetching cond expression
   x2 = expression(a0, x0);
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ';') { goto &for_statement_invalid; };
+  if (x0 != ';') { goto &for_statement_invalid; }
 label for_statement_skip_cond;
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for iteration expressions
-  if (x0 == ')') { goto &for_statement_iter_end; };
+  if (x0 == ')') { goto &for_statement_iter_end; }
   # Holding token
   parser_lexer_hold(a0);
 label for_statement_iter_loop;
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 == ')') { goto &for_statement_invalid; };
+  if (x0 == ')') { goto &for_statement_invalid; }
   # Fetching expression
   x5 = expression(a0, x0);
   # Pushing expression to vector
@@ -2308,10 +2308,10 @@ label for_statement_iter_loop;
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for another iteration expressions
-  if (x0 == ',') { goto &for_statement_iter_loop; };
+  if (x0 == ',') { goto &for_statement_iter_loop; }
 label for_statement_iter_end;
   # Checking for correct syntax
-  if (x0 != ')') { goto &for_statement_invalid; };
+  if (x0 != ')') { goto &for_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching block statement
@@ -2320,7 +2320,7 @@ label for_statement_iter_end;
   return(tuple6(STMT_FOR, a1, x1, x2, x3, x4));
 label for_statement_invalid;
   parser_error(a0, a1, "Invalid for statement syntax");
-};
+}
 
 ## Parse do-while statement
 # a0 - parser
@@ -2338,11 +2338,11 @@ do_while_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != TOKEN_WHILE) { goto &do_while_statement_invalid; };
+  if (x0 != TOKEN_WHILE) { goto &do_while_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '(') { goto &do_while_statement_invalid; };
+  if (x0 != '(') { goto &do_while_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching condition expression
@@ -2350,18 +2350,18 @@ do_while_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ')') { goto &do_while_statement_invalid; };
+  if (x0 != ')') { goto &do_while_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &do_while_statement_end_error; };
+  if (x0 != ';') { goto &do_while_statement_end_error; }
   # Return statement
   return(tuple4(STMT_DO_WHILE, a1, x1, x2));
 label do_while_statement_invalid;
   parser_error(a0, a1, "Invalid do-while statement syntax");
 label do_while_statement_end_error;
   parser_error(a0, a1, "Do-while statement is not ended with semicolon");
-};
+}
 
 ## Parse while statement
 # a0 - parser
@@ -2375,7 +2375,7 @@ while_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '(') { goto &while_statement_invalid; };
+  if (x0 != '(') { goto &while_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching condition expression
@@ -2383,7 +2383,7 @@ while_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ')') { goto &while_statement_invalid; };
+  if (x0 != ')') { goto &while_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching block statement
@@ -2392,7 +2392,7 @@ while_statement : (a0, a1) {
   return(tuple4(STMT_WHILE, a1, x1, x2));
 label while_statement_invalid;
   parser_error(a0, a1, "Invalid while statement syntax");
-};
+}
 
 ## Parse allocate statement
 # a0 - parser
@@ -2405,7 +2405,7 @@ allocate_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '(') { goto &allocate_statement_invalid; };
+  if (x0 != '(') { goto &allocate_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching size expression
@@ -2413,18 +2413,18 @@ allocate_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ')') { goto &allocate_statement_invalid; };
+  if (x0 != ')') { goto &allocate_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &loop_jump_statement_end_error; };
+  if (x0 != ';') { goto &loop_jump_statement_end_error; }
   # Return statement
   return(tuple3(STMT_ALLOCATE, a1, x1));
 label allocate_statement_invalid;
   parser_error(a0, a1, "Invalid allocate statement syntax");
 label allocate_statement_end_error;
   parser_error(a0, a1, "Allocate statement is not ended with semicolon");
-};
+}
 
 ## Parse assembly statement
 # a0 - parser
@@ -2440,7 +2440,7 @@ assembly_statement : (a0, a1) {
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != '{') { goto &assembly_statement_invalid; };
+  if (x1 != '{') { goto &assembly_statement_invalid; }
 label assembly_statement_loop;
   # Parsing assembly...
   x2 = parser_lex_asm(a0);
@@ -2451,18 +2451,18 @@ label assembly_statement_loop;
   # Fetching next token
   x1 = parser_lex(a0);
   # This must be a semicolon
-  if (x1 != ';') { goto &assembly_statement_invalid; };
+  if (x1 != ';') { goto &assembly_statement_invalid; }
   # If we have another lines, parsing them
-  if (!x2) { goto &assembly_statement_loop; };
+  if (!x2) { goto &assembly_statement_loop; }
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != '}') { goto &assembly_statement_invalid; };
+  if (x1 != '}') { goto &assembly_statement_invalid; }
   # Returning statement
   return(tuple3(STMT_ASM, a1, x0));
 label assembly_statement_invalid;
   parser_error(a0, a1, "Invalid assembly statement syntax");
-};
+}
 
 ## Parse return statement
 # a0 - parser
@@ -2478,7 +2478,7 @@ return_statement : (a0, a1) {
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if we are returning with no result
-  if (x1 == ';') { parser_lexer_hold(a0); goto &return_statement_end; };
+  if (x1 == ';') { parser_lexer_hold(a0); goto &return_statement_end; }
   # Fetching return expression
   x2 = expression(a0, x1);
   # Pushing expression to operand vector
@@ -2487,12 +2487,12 @@ label return_statement_end;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for semicolon
-  if (x1 != ';') { goto &return_statement_end_error; };
+  if (x1 != ';') { goto &return_statement_end_error; }
   # Return statement
   return(tuple3(STMT_RETURN, a1, x0));
 label return_statement_end_error;
   parser_error(a0, a1, "Return statement is not ended with semicolon");
-};
+}
 
 ## Parse break/continue statement
 # a0 - parser
@@ -2505,12 +2505,12 @@ loop_jump_statement : (a0, a1, a2) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &loop_jump_statement_end_error; };
+  if (x0 != ';') { goto &loop_jump_statement_end_error; }
   # Return statement
   return(tuple2(STMT_BREAK + a2 - TOKEN_BREAK, a1));
 label loop_jump_statement_end_error;
   parser_error(a0, a1, "Break/continue statement is not ended with semicolon");
-};
+}
 
 ## Parse writechar statement
 # a0 - parser
@@ -2525,7 +2525,7 @@ writechar_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '(') { goto &writechar_statement_invalid; };
+  if (x0 != '(') { goto &writechar_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching array expression
@@ -2533,7 +2533,7 @@ writechar_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ',') { goto &writechar_statement_invalid; };
+  if (x0 != ',') { goto &writechar_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching index expression
@@ -2541,7 +2541,7 @@ writechar_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ',') { goto &writechar_statement_invalid; };
+  if (x0 != ',') { goto &writechar_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching value expression
@@ -2549,18 +2549,18 @@ writechar_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ')') { goto &writechar_statement_invalid; };
+  if (x0 != ')') { goto &writechar_statement_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &writechar_statement_end_error; };
+  if (x0 != ';') { goto &writechar_statement_end_error; }
   # Returning statement
   return(tuple5(STMT_WRITECHAR, a1, x1, x2, x3));
 label writechar_statement_invalid;
   parser_error(a0, a1, "Invalid writechar statement");
 label writechar_statement_end_error;
   parser_error(a0, a1, "Writechar statement is not ended with semicolon");
-};
+}
 
 ## Parselabel statement
 # a0 - parser
@@ -2573,20 +2573,20 @@ label_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
+  if (x0 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; }
   # Duplicating identifier
   x1 = strdup(lexer_token_text(parser_lexer(a0)));
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &label_statement_end_error; };
+  if (x0 != ';') { goto &label_statement_end_error; }
   # Returning statement
   return(tuple3(STMT_LABEL, a1, x1));
 label label_statement_invalid;
   parser_error(a0, a1, "Invalidlabel statement syntax");
 label label_statement_end_error;
   parser_error(a0, a1, "Label statement is not ended with semicolon");
-};
+}
 
 ## Parse goto statement
 # a0 - parser
@@ -2603,12 +2603,12 @@ goto_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for semicolon
-  if (x0 != ';') { goto &label_statement_end_error; };
+  if (x0 != ';') { goto &label_statement_end_error; }
   # Returning statement
   return(tuple3(STMT_GOTO, a1, x1));
 label goto_statement_end_error;
   parser_error(a0, a1, "Goto statement is not ended with semicolon");
-};
+}
 
 ## Parse expression
 # a0 - parser
@@ -2620,7 +2620,7 @@ expression : (a0, a1) {
   # Fetching token location
   x0 = parser_token_location(a0);
   return(assignment_expression(a0, a1, x0));
-};
+}
 
 ## Try to parse assignment expression
 # a0 - parser
@@ -2636,22 +2636,22 @@ assignment_expression : (a0, a1, a2) {
   # Fetching next token
   x1 = parser_lex(a0);
   # Parsing assignment
-  if (x1 == '=')        { return(assignment_expr(a0, x0, STMT_EXPR_ASSIGN,     a2)); };
-  if (x1 == TOKEN_AADD) { return(assignment_expr(a0, x0, STMT_EXPR_ADD_ASSIGN, a2)); };
-  if (x1 == TOKEN_ASUB) { return(assignment_expr(a0, x0, STMT_EXPR_SUB_ASSIGN, a2)); };
-  if (x1 == TOKEN_AMUL) { return(assignment_expr(a0, x0, STMT_EXPR_MUL_ASSIGN, a2)); };
-  if (x1 == TOKEN_ADIV) { return(assignment_expr(a0, x0, STMT_EXPR_DIV_ASSIGN, a2)); };
-  if (x1 == TOKEN_AMOD) { return(assignment_expr(a0, x0, STMT_EXPR_MOD_ASSIGN, a2)); };
-  if (x1 == TOKEN_AAND) { return(assignment_expr(a0, x0, STMT_EXPR_AND_ASSIGN, a2)); };
-  if (x1 == TOKEN_AXOR) { return(assignment_expr(a0, x0, STMT_EXPR_XOR_ASSIGN, a2)); };
-  if (x1 == TOKEN_AOR)  { return(assignment_expr(a0, x0, STMT_EXPR_OR_ASSIGN,  a2)); };
-  if (x1 == TOKEN_ASHL) { return(assignment_expr(a0, x0, STMT_EXPR_SHL_ASSIGN, a2)); };
-  if (x1 == TOKEN_ASHR) { return(assignment_expr(a0, x0, STMT_EXPR_SHR_ASSIGN, a2)); };
+  if (x1 == '=')        { return(assignment_expr(a0, x0, STMT_EXPR_ASSIGN,     a2)); }
+  if (x1 == TOKEN_AADD) { return(assignment_expr(a0, x0, STMT_EXPR_ADD_ASSIGN, a2)); }
+  if (x1 == TOKEN_ASUB) { return(assignment_expr(a0, x0, STMT_EXPR_SUB_ASSIGN, a2)); }
+  if (x1 == TOKEN_AMUL) { return(assignment_expr(a0, x0, STMT_EXPR_MUL_ASSIGN, a2)); }
+  if (x1 == TOKEN_ADIV) { return(assignment_expr(a0, x0, STMT_EXPR_DIV_ASSIGN, a2)); }
+  if (x1 == TOKEN_AMOD) { return(assignment_expr(a0, x0, STMT_EXPR_MOD_ASSIGN, a2)); }
+  if (x1 == TOKEN_AAND) { return(assignment_expr(a0, x0, STMT_EXPR_AND_ASSIGN, a2)); }
+  if (x1 == TOKEN_AXOR) { return(assignment_expr(a0, x0, STMT_EXPR_XOR_ASSIGN, a2)); }
+  if (x1 == TOKEN_AOR)  { return(assignment_expr(a0, x0, STMT_EXPR_OR_ASSIGN,  a2)); }
+  if (x1 == TOKEN_ASHL) { return(assignment_expr(a0, x0, STMT_EXPR_SHL_ASSIGN, a2)); }
+  if (x1 == TOKEN_ASHR) { return(assignment_expr(a0, x0, STMT_EXPR_SHR_ASSIGN, a2)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(x0);
-};
+}
 
 ## Parse assignment expression
 # a0 - parser
@@ -2672,7 +2672,7 @@ assignment_expr : (a0, a1, a2, a3) {
   x1 = ternary_expression(a0, x0, x2);
   # Returning expression
   return(tuple4(a2, a3, a1, x1));
-};
+}
 
 ## Try to parse ternary expression
 # a0 - parser
@@ -2688,12 +2688,12 @@ ternary_expression : (a0, a1, a2) {
   # Fetching next token
   x1 = parser_lex(a0);
   # Parsing ternary
-  if (x1 == '?') { return(ternary_expr(a0, x0, a2, x2)); };
+  if (x1 == '?') { return(ternary_expr(a0, x0, a2, x2)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(x0);
-};
+}
 
 ## Parse ternary expression
 # a0 - parser
@@ -2715,7 +2715,7 @@ ternary_expr : (a0, a1, a2) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ':') { goto &ternary_expr_error; };
+  if (x0 != ':') { goto &ternary_expr_error; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching token location
@@ -2726,7 +2726,7 @@ ternary_expr : (a0, a1, a2) {
   return(tuple5(STMT_EXPR_TERNARY, a2, a1, x1, x2));
 label ternary_expr_error;
   parser_error(a0, a2, "Incorrect ternary expression syntax");
-};
+}
 
 ## Try to parse logical or expression
 # a0 - parser
@@ -2738,16 +2738,16 @@ logical_or_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = logical_and_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = logical_and_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing logical or
-  if (x0 == TOKEN_LOR) { return(logical_or_expr(a0, a2, a3)); };
+  if (x0 == TOKEN_LOR) { return(logical_or_expr(a0, a2, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse logical or expression
 # a0 - parser
@@ -2767,7 +2767,7 @@ logical_or_expr : (a0, a1, a2) {
   x1 = logical_and_expression(a0, x0, NULL, x2);
   # Returning expression
   return(logical_or_expression(a0, NULL, tuple4(STMT_EXPR_LOGICAL_OR, a2, a1, x1), a2));
-};
+}
 
 ## Try to parse logical and expression
 # a0 - parser
@@ -2779,16 +2779,16 @@ logical_and_expression : (a0, a1, a2) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = equality_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing logical and
-  if (x0 == TOKEN_LAND) { return(logical_and_expr(a0, a2, a3)); };
+  if (x0 == TOKEN_LAND) { return(logical_and_expr(a0, a2, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse logical and expression
 # a0 - parser
@@ -2808,7 +2808,7 @@ logical_and_expr : (a0, a1, a2) {
   x1 = equality_expression(a0, x0, NULL, x2);
   # Returning expression
   return(logical_and_expression(a0, NULL, tuple4(STMT_EXPR_LOGICAL_AND, a2, a1, x1), a2));
-};
+}
 
 ## Try to parse equality expression
 # a0 - parser
@@ -2820,18 +2820,18 @@ equality_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = relational_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = relational_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing equal
-  if (x0 == TOKEN_EQ) { return(equality_expr(a0, a2, STMT_EXPR_EQ, a3)); };
+  if (x0 == TOKEN_EQ) { return(equality_expr(a0, a2, STMT_EXPR_EQ, a3)); }
   # Parsing not equal
-  if (x0 == TOKEN_NE) { return(equality_expr(a0, a2, STMT_EXPR_NE, a3)); };
+  if (x0 == TOKEN_NE) { return(equality_expr(a0, a2, STMT_EXPR_NE, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse equality expression
 # a0 - parser
@@ -2852,7 +2852,7 @@ equality_expr : (a0, a1, a2, a3) {
   x1 = relational_expression(a0, x0, NULL, x2);
   # Returning expression
   return(equality_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
-};
+}
 
 ## Try to parse relational expression
 # a0 - parser
@@ -2864,22 +2864,22 @@ relational_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = bitwise_or_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing less
-  if (x0 == '<') { return(relational_expr(a0, a2, STMT_EXPR_LESS, a3)); };
+  if (x0 == '<') { return(relational_expr(a0, a2, STMT_EXPR_LESS, a3)); }
   # Parsing greater
-  if (x0 == '>') { return(relational_expr(a0, a2, STMT_EXPR_GREATER, a3)); };
+  if (x0 == '>') { return(relational_expr(a0, a2, STMT_EXPR_GREATER, a3)); }
   # Parsing less or equal
-  if (x0 == TOKEN_LE) { return(relational_expr(a0, a2, STMT_EXPR_LE, a3)); };
+  if (x0 == TOKEN_LE) { return(relational_expr(a0, a2, STMT_EXPR_LE, a3)); }
   # Parsing greater or equal
-  if (x0 == TOKEN_GE) { return(relational_expr(a0, a2, STMT_EXPR_GE, a3)); };
+  if (x0 == TOKEN_GE) { return(relational_expr(a0, a2, STMT_EXPR_GE, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse relational expression
 # a0 - parser
@@ -2900,7 +2900,7 @@ relational_expr : (a0, a1, a2, a3) {
   x1 = bitwise_or_expression(a0, x0, NULL, x2);
   # Returning expression
   return(relational_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
-};
+}
 
 ## Try to parse bitwise or expression
 # a0 - parser
@@ -2912,16 +2912,16 @@ bitwise_or_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = bitwise_xor_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = bitwise_xor_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing bitwise or
-  if (x0 == '|') { return(bitwise_or_expr(a0, a2, a3)); };
+  if (x0 == '|') { return(bitwise_or_expr(a0, a2, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse bitwise or expression
 # a0 - parser
@@ -2941,7 +2941,7 @@ bitwise_or_expr : (a0, a1, a2) {
   x1 = bitwise_xor_expression(a0, x0, NULL, x2);
   # Returning expression
   return(bitwise_or_expression(a0, NULL, tuple4(STMT_EXPR_OR, a2, a1, x1), a2));
-};
+}
 
 ## Try to parse bitwise xor expression
 # a0 - parser
@@ -2953,16 +2953,16 @@ bitwise_xor_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = bitwise_and_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = bitwise_and_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing bitwise xor
-  if (x0 == '^') { return(bitwise_xor_expr(a0, a2, a3)); };
+  if (x0 == '^') { return(bitwise_xor_expr(a0, a2, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse bitwise xor expression
 # a0 - parser
@@ -2982,7 +2982,7 @@ bitwise_xor_expr : (a0, a1, a2) {
   x1 = bitwise_and_expression(a0, x0, NULL, x2);
   # Returning expression
   return(bitwise_xor_expression(a0, NULL, tuple4(STMT_EXPR_XOR, a2, a1, x1), a2));
-};
+}
 
 ## Try to parse bitwise and expression
 # a0 - parser
@@ -2994,16 +2994,16 @@ bitwise_and_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = bitwise_shift_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = bitwise_shift_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing bitwise and
-  if (x0 == '&') { return(bitwise_and_expr(a0, a2, a3)); };
+  if (x0 == '&') { return(bitwise_and_expr(a0, a2, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse bitwise and expression
 # a0 - parser
@@ -3023,7 +3023,7 @@ bitwise_and_expr : (a0, a1, a2) {
   x1 = bitwise_shift_expression(a0, x0, NULL, x2);
   # Returning expression
   return(bitwise_and_expression(a0, NULL, tuple4(STMT_EXPR_AND, a2, a1, x1), a2));
-};
+}
 
 ## Try to parse bitwise shift expression
 # a0 - parser
@@ -3035,18 +3035,18 @@ bitwise_shift_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = additive_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = additive_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing left shift
-  if (x0 == TOKEN_SHL) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHL, a3)); };
+  if (x0 == TOKEN_SHL) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHL, a3)); }
   # Parsing right shift
-  if (x0 == TOKEN_SHR) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHR, a3)); };
+  if (x0 == TOKEN_SHR) { return(bitwise_shift_expr(a0, a2, STMT_EXPR_SHR, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse bitwise shift expression
 # a0 - parser
@@ -3067,7 +3067,7 @@ bitwise_shift_expr : (a0, a1, a2, a3) {
   x1 = additive_expression(a0, x0, NULL, x2);
   # Returning expression
   return(bitwise_shift_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
-};
+}
 
 ## Try to parse additive expression
 # a0 - parser
@@ -3079,18 +3079,18 @@ additive_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = multiplicative_expression(a0, a1, NULL, a3); };
+  if (a2 == NULL) { a2 = multiplicative_expression(a0, a1, NULL, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing addition
-  if (x0 == '+') { return(additive_expr(a0, a2, STMT_EXPR_ADD, a3)); };
+  if (x0 == '+') { return(additive_expr(a0, a2, STMT_EXPR_ADD, a3)); }
   # Parsing subtraction
-  if (x0 == '-') { return(additive_expr(a0, a2, STMT_EXPR_SUB, a3)); };
+  if (x0 == '-') { return(additive_expr(a0, a2, STMT_EXPR_SUB, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse additive expression
 # a0 - parser
@@ -3111,7 +3111,7 @@ additive_expr : (a0, a1, a2, a3) {
   x1 = multiplicative_expression(a0, x0, NULL, x2);
   # Returning expression
   return(additive_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
-};
+}
 
 ## Try to parse multiplicative expression
 # a0 - parser
@@ -3123,20 +3123,20 @@ multiplicative_expression : (a0, a1, a2, a3) {
   # x0 - next token
   allocate(1);
   # Fetching first operand
-  if (a2 == NULL) { a2 = prefix_expression(a0, a1, a3); };
+  if (a2 == NULL) { a2 = prefix_expression(a0, a1, a3); }
   # Fetching next token
   x0 = parser_lex(a0);
   # Parsing multiplication
-  if (x0 == '*') { return(multiplicative_expr(a0, a2, STMT_EXPR_MUL, a3)); };
+  if (x0 == '*') { return(multiplicative_expr(a0, a2, STMT_EXPR_MUL, a3)); }
   # Parsing integer division
-  if (x0 == '/') { return(multiplicative_expr(a0, a2, STMT_EXPR_DIV, a3)); };
+  if (x0 == '/') { return(multiplicative_expr(a0, a2, STMT_EXPR_DIV, a3)); }
   # Parsing modulus division
-  if (x0 == '%') { return(multiplicative_expr(a0, a2, STMT_EXPR_MOD, a3)); };
+  if (x0 == '%') { return(multiplicative_expr(a0, a2, STMT_EXPR_MOD, a3)); }
   # Holding token
   parser_lexer_hold(a0);
   # Returning operand
   return(a2);
-};
+}
 
 ## Parse multiplicative expression
 # a0 - parser
@@ -3157,7 +3157,7 @@ multiplicative_expr : (a0, a1, a2, a3) {
   x1 = prefix_expression(a0, x0, x2);
   # Returning expression
   return(multiplicative_expression(a0, NULL, tuple4(a2, a3, a1, x1), a3));
-};
+}
 
 ## Try to parse prefix expression
 # a0 - parser
@@ -3173,8 +3173,8 @@ prefix_expression : (a0, a1, a2) {
   else if (a1 == '&')       { return(prefix_expr(a0, STMT_EXPR_ADDROF, a2)); }
   else if (a1 == TOKEN_DEC) { return(prefix_expr(a0, STMT_EXPR_PREDEC, a2)); }
   else if (a1 == TOKEN_INC) { return(prefix_expr(a0, STMT_EXPR_PREINC, a2)); }
-  else                      { return(simple_expression(a0, a1, a2)); };
-};
+  else                      { return(simple_expression(a0, a1, a2)); }
+}
 
 ## Parse prefix expression
 # a0 - parser
@@ -3194,7 +3194,7 @@ prefix_expr : (a0, a1, a2) {
   x2 = prefix_expression(a0, x0, x1);
   # Returning expression
   return(tuple3(a1, a2, x2));
-};
+}
 
 ## Try to parse simple expression
 # a0 - parser
@@ -3203,20 +3203,20 @@ prefix_expr : (a0, a1, a2) {
 # @return statement
 simple_expression : (a0, a1, a2) {
   # Parsing identifier
-  if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0, a2)); };
+  if (a1 == TOKEN_IDENTIFIER) { return(simple_identifier_expression(a0, a2)); }
   # Parsing argument
-  if (a1 == TOKEN_ARGUMENT) { return(simple_argvar_expression(a0, TRUE, a2)); };
+  if (a1 == TOKEN_ARGUMENT) { return(simple_argvar_expression(a0, TRUE, a2)); }
   # Parsing variable
-  if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE, a2)); };
+  if (a1 == TOKEN_VARIABLE) { return(simple_argvar_expression(a0, FALSE, a2)); }
   # Parsing syscall
-  if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, a2)); };
+  if (a1 == TOKEN_SYSCALL) { return(simple_syscall_expression(a0, a2)); }
   # Parsing readchar
-  if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a2)); };
+  if (a1 == TOKEN_READCHAR) { return(simple_readchar_expression(a0, a2)); }
   # Parsing parantheses grouping
-  if (a1 == '(') { return(simple_parantheses_expression(a0, a2)); };
+  if (a1 == '(') { return(simple_parantheses_expression(a0, a2)); }
   # Parsing constant expression
   return(simple_postfix_expression(a0, constant_expression(a0, a1, a2)));
-};
+}
 
 ## Parse simple identifier expression
 # a0 - parser
@@ -3229,7 +3229,7 @@ simple_identifier_expression : (a0, a1) {
   x0 = strdup(lexer_token_text(parser_lexer(a0)));
   # Returning expression
   return(simple_postfix_expression(a0, tuple3(STMT_EXPR_IDENTIFIER, a1, x0)));
-};
+}
 
 ## Parse simple argument/variable expression
 # a0 - parser
@@ -3241,10 +3241,10 @@ simple_argvar_expression : (a0, a1, a2) {
   allocate(1);
   # Getting expression type
   x0 = STMT_EXPR_VARIABLE;
-  if (a1) { x0 = STMT_EXPR_ARGUMENT; };
+  if (a1) { x0 = STMT_EXPR_ARGUMENT; }
   # Returning expression
   return(simple_postfix_expression(a0, tuple3(x0, a2, lexer_token_value(parser_lexer(a0)))));
-};
+}
 
 ## Parse simple syscall expression
 # a0 - parser
@@ -3260,7 +3260,7 @@ simple_syscall_expression : (a0, a1) {
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for correct syntax
-  if (x1 != '(') { goto &simple_syscall_expression_invalid; };
+  if (x1 != '(') { goto &simple_syscall_expression_invalid; }
 label simple_syscall_expression_loop;
   # Fetching next token
   x1 = parser_lex(a0);
@@ -3271,18 +3271,18 @@ label simple_syscall_expression_loop;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if there is next expression as argument
-  if (x1 == ',') { goto &simple_syscall_expression_loop; };
+  if (x1 == ',') { goto &simple_syscall_expression_loop; }
   # Checking for correct syntax
-  if (x1 != ')') { goto &simple_syscall_expression_invalid; };
+  if (x1 != ')') { goto &simple_syscall_expression_invalid; }
   # Checking for argument count
-  if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; };
+  if (vector_size(x0) > 7) { goto &simple_syscall_expression_too_many; }
   # Returning expression
   return(simple_postfix_expression(a0, tuple3(STMT_EXPR_SYSCALL, a1, x0)));
 label simple_syscall_expression_invalid;
   parser_error(a0, a1, "Invalid syscall expression");
 label simple_syscall_expression_too_many;
   parser_error(a0, a1, "Too many arguments in syscall expression");
-};
+}
 
 ## Parse simple readchar expression
 # a0 - parser
@@ -3296,7 +3296,7 @@ simple_readchar_expression : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != '(') { goto &simple_readchar_expression_invalid; };
+  if (x0 != '(') { goto &simple_readchar_expression_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching array expression
@@ -3304,7 +3304,7 @@ simple_readchar_expression : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ',') { goto &simple_readchar_expression_invalid; };
+  if (x0 != ',') { goto &simple_readchar_expression_invalid; }
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching index expression
@@ -3312,12 +3312,12 @@ simple_readchar_expression : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ')') { goto &simple_readchar_expression_invalid; };
+  if (x0 != ')') { goto &simple_readchar_expression_invalid; }
   # Returning expression
   return(simple_postfix_expression(a0, tuple4(STMT_EXPR_READCHAR, a1, x1, x2)));
 label simple_readchar_expression_invalid;
   parser_error(a0, a1, "Invalid readchar expression");
-};
+}
 
 ## Parse simple parantheses expression
 # a0 - parser
@@ -3334,12 +3334,12 @@ simple_parantheses_expression : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking parantheses are closed
-  if (x0 != ')') { goto &simple_parantheses_expression_invalid; };
+  if (x0 != ')') { goto &simple_parantheses_expression_invalid; }
   # Returning expression
   return(simple_postfix_expression(a0, x1));
 label simple_parantheses_expression_invalid;
   parser_error(a0, a1, "Parantheses expression is not closed");
-};
+}
 
 ## Parse simple expression postfixes
 # a0 - parser
@@ -3356,14 +3356,14 @@ simple_postfix_expression : (a0, a1) {
        if (x0 == '(')       { return(simple_address_call_expression(a0, a1, x1)); }
   else if (x0 == '[')       { return(simple_address_index_expression(a0, a1, x1)); }
   else if (x0 == TOKEN_DEC) { return(simple_postfix_expression(a0, tuple3(STMT_EXPR_POSTDEC, x1, a1))); }
-  else if (x0 == TOKEN_INC) { return(simple_postfix_expression(a0, tuple3(STMT_EXPR_POSTINC, x1, a1))); };
+  else if (x0 == TOKEN_INC) { return(simple_postfix_expression(a0, tuple3(STMT_EXPR_POSTINC, x1, a1))); }
   # Holding the token
   parser_lexer_hold(a0);
   # Freeing unused token location
   free(x1);
   # Returning expression
   return(a1);
-};
+}
 
 ## Parse simple address call expression
 # a0 - parser
@@ -3383,7 +3383,7 @@ label simple_address_call_expression_loop;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking if arguments ended
-  if (x1 == ')') { goto &simple_address_call_expression_end; };
+  if (x1 == ')') { goto &simple_address_call_expression_end; }
   # Fetching expression
   x2 = expression(a0, x1);
   # Pushing expression to operand vector
@@ -3391,15 +3391,15 @@ label simple_address_call_expression_loop;
   # Fetching next token
   x1 = parser_lex(a0);
   # Checking for next argument
-  if (x1 == ',') { goto &simple_address_call_expression_loop; };
+  if (x1 == ',') { goto &simple_address_call_expression_loop; }
   # Checking for correct syntax
-  if (x1 != ')') { goto &simple_address_call_expression_invalid; };
+  if (x1 != ')') { goto &simple_address_call_expression_invalid; }
 label simple_address_call_expression_end;
   # Returning expression
   return(simple_postfix_expression(a0, tuple3(STMT_EXPR_CALL, a2, x0)));
 label simple_address_call_expression_invalid;
   parser_error(a0, a2, "Call expression is not closed");
-};
+}
 
 ## Parse simple address indexing expression
 # a0 - parser
@@ -3417,12 +3417,12 @@ simple_address_index_expression : (a0, a1, a2) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
-  if (x0 != ']') { goto &simple_address_index_expression_invalid; };
+  if (x0 != ']') { goto &simple_address_index_expression_invalid; }
   # Returning expression
   return(simple_postfix_expression(a0, tuple4(STMT_EXPR_INDEX, a2, a1, x1)));
 label simple_address_index_expression_invalid;
   parser_error(a0, a2, "Index expression is not closed");
-};
+}
 
 ## Try to parse constant expression
 # a0 - parser
@@ -3431,11 +3431,11 @@ label simple_address_index_expression_invalid;
 # @return statement
 constant_expression : (a0, a1, a2) {
   # Parsing integer
-  if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0, a2)); };
+  if (a1 == TOKEN_INTEGER) { return(constant_integer_expression(a0, a2)); }
   # Parsing string
-  if (a1 == TOKEN_STRING) { return(constant_string_expression(a0, a2)); };
+  if (a1 == TOKEN_STRING) { return(constant_string_expression(a0, a2)); }
   parser_error(a0, a2, "Syntax error - none of available expressions matched");
-};
+}
 
 ## Parse constant integer expression
 # a0 - parser
@@ -3444,7 +3444,7 @@ constant_expression : (a0, a1, a2) {
 constant_integer_expression : (a0, a1) {
   # Returning basic integer expression
   return(tuple3(STMT_EXPR_INTEGER, a1, lexer_token_value(parser_lexer(a0))));
-};
+}
 
 ## Parse constant string expression
 # a0 - parser
@@ -3457,7 +3457,7 @@ constant_string_expression : (a0, a1) {
   x0 = lexer_token_text(parser_lexer(a0));
   # Returning expression
   return(tuple3(STMT_EXPR_STRING, a1, string_buffer_push(parser_buffer(a0), x0)));
-};
+}
 
 ### String buffer
 ## String buffer constants
@@ -3469,17 +3469,17 @@ STRBUF_LENGTH => 2;
 
 ## Create new string buffer
 # @return buffer
-string_buffer : () { return(tuple3(calloc(STRBUF_SIZE), 0, 0)); };
+string_buffer : () { return(tuple3(calloc(STRBUF_SIZE), 0, 0)); }
 
 ## Get string buffer offset
 # a0 - string buffer
 # @return offset
-string_buffer_offset : (a0) { return(a0[STRBUF_OFFSET]); };
+string_buffer_offset : (a0) { return(a0[STRBUF_OFFSET]); }
 
 ## Get string buffer length
 # a0 - string buffer
 # @return offset
-string_buffer_length : (a0) { return(a0[STRBUF_LENGTH]); };
+string_buffer_length : (a0) { return(a0[STRBUF_LENGTH]); }
 
 ## Find string in string buffer
 # a0 - string buffer
@@ -3505,15 +3505,15 @@ string_buffer_find : (a0, a1) {
       # Calculating string address
       x4 = x0 + x2;
       # Comparing string. If matched, return offset
-      if (strcmp(x4, a1) == 0) { return(x3); };
+      if (strcmp(x4, a1) == 0) { return(x3); }
       # String didn't match. Moving to next string
       x2 = x2 + strlen(x4) + 1;
       x3 = x3 + stresclen(x4) - 1;
-    };
-  };
+    }
+  }
   # We didn't find the string.
   return(-1);
-};
+}
 
 ## Find or push string to string buffer
 # a0 - string buffer
@@ -3525,7 +3525,7 @@ string_buffer_push : (a0, a1) {
   # Trying to find string in buffer
   x0 = string_buffer_find(a0, a1);
   # If not -1, return offset
-  if (x0 != -1) { return(x0); };
+  if (x0 != -1) { return(x0); }
   ## We are here, because we didn't find string. Pushing string to buffer
   # x0 - old offset
   # x1 - old length
@@ -3542,7 +3542,7 @@ string_buffer_push : (a0, a1) {
   if (x1 + x2 >= STRBUF_SIZE) {
     eputs("ERROR: string buffer is full.\n");
     exit(1);
-  };
+  }
   # Copying string to buffer
   strcpy(a1, a0[STRBUF_BUFFER] + x1);
   # Setting new offset and length (strings are with "")
@@ -3550,7 +3550,7 @@ string_buffer_push : (a0, a1) {
   a0[STRBUF_LENGTH] = x1 + x2 + 1;
   # Returning old offset
   return(x0);
-};
+}
 
 ## Export string buffer to output channel
 # a0 - string buffer
@@ -3578,9 +3578,9 @@ string_buffer_export : (a0, a1) {
       fputc(a1, '\n');
       # Moving to new offset
       x2 = x2 + strlen(x0 + x2) + 1;
-    };
-  };
-};
+    }
+  }
+}
 
 ### Compiler
 ## Compiler parts
@@ -3610,17 +3610,17 @@ registers : [ "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" ];
 # @return compiler
 compiler : (a0, a1) {
   return(tuple6(a0, a1, 0, SEG_TEXT, tuple6(0,0,0,0,0,0), list(NULL)));
-};
+}
 
 ## Get compiler's output channel
 # a0 - compiler
 # @return output channel
-compiler_output_chan : (a0) { return(a0[COM_OCHAN]); };
+compiler_output_chan : (a0) { return(a0[COM_OCHAN]); }
 
 ## Get compiler's current label ID
 # a0 - compiler
 # @return label ID
-compiler_label_id : (a0) { return(a0[COM_LABEL]); };
+compiler_label_id : (a0) { return(a0[COM_LABEL]); }
 
 ## Set new segment if needed
 # a0 - compiler
@@ -3631,14 +3631,14 @@ compiler_set_segment : (a0, a1) {
   # Getting compiler output channel
   x0 = compiler_output_chan(a0);
   # Checking if we already in this segment
-  if (a0[COM_SEGMENT] == a1) { return; };
+  if (a0[COM_SEGMENT] == a1) { return; }
   # Switching segment in compiler
   a0[COM_SEGMENT] = a1;
   # Printing required text, to switch segment
-  if (a1 == SEG_TEXT)   { fputs(x0, ".text\n"); };
-  if (a1 == SEG_DATA)   { fputs(x0, ".data\n"); };
-  if (a1 == SEG_RODATA) { fputs(x0, ".section .rodata\n"); };
-};
+  if (a1 == SEG_TEXT)   { fputs(x0, ".text\n"); }
+  if (a1 == SEG_DATA)   { fputs(x0, ".data\n"); }
+  if (a1 == SEG_RODATA) { fputs(x0, ".section .rodata\n"); }
+}
 
 ## Prepare register for use
 # a0 - compiler
@@ -3659,10 +3659,10 @@ compiler_allocate_register : (a0, a1) {
     fputs(x0, registers[a1]);
     # Printing newline
     fputc(x0, '\n');
-  };
+  }
   # Increment register state by one
   x1[a1] = x1[a1] + 1;
-};
+}
 
 ## Restore register state, if it is needed
 # a0 - compiler
@@ -3685,10 +3685,10 @@ compiler_free_register : (a0, a1) {
     fputs(x0, registers[a1]);
     # Printing newline
     fputc(x0, '\n');
-  };
+  }
   # Decrement register state by one
   x1[a1] = x1[a1] - 1;
-};
+}
 
 ## Set new label ID
 # a0 - compiler
@@ -3702,12 +3702,12 @@ compiler_new_label : (a0) {
   a0[COM_LABEL] = x0 + 1;
   # Returning old label ID
   return(x0);
-};
+}
 
 ## Get current loop
 # a0 - compiler
 # @return loop tuple
-compiler_loop : (a0) { return(list_value(a0[COM_LOOP])); };
+compiler_loop : (a0) { return(list_value(a0[COM_LOOP])); }
 
 ## Push new loop to list
 # a0 - compiler
@@ -3720,7 +3720,7 @@ compiler_push_loop : (a0, a1, a2) {
   x0 = tuple2(a1, a2);
   # Pushing loop to list
   a0[COM_LOOP] = list_insert(a0[COM_LOOP], x0);
-};
+}
 
 ## Pop loop from list
 # a0 - compiler
@@ -3733,7 +3733,7 @@ compiler_pop_loop : (a0, a1, a2) {
   assert(x0 != NULL, "Tried to pop loop from empty list.");
   # Popping
   a0[COM_LOOP] = list_pop(a0[COM_LOOP]);
-};
+}
 
 ## Print label
 # a0 - output chan
@@ -3743,7 +3743,7 @@ fputlabel : (a0, a1) {
   fputs(a0, "_label");
   # Printing the ID of label
   fputd(a0, a1);
-};
+}
 
 ## Print label definition
 # a0 - output chan
@@ -3753,7 +3753,7 @@ fputlabeldef : (a0, a1) {
   fputlabel(a0, a1);
   # Printing definition
   fputs(a0, ":\n");
-};
+}
 
 ## Print compiler error
 # a0 - compiler
@@ -3765,7 +3765,7 @@ compiler_error : (a0, a1, a2) {
   eputs(": ");
   eputs(a2);
   eputc('\n');
-};
+}
 
 ## Compile AST
 # a0 - compiler
@@ -3781,12 +3781,12 @@ compiler_compile : (a0, a1) {
   while (x0 < vector_size(a1)) {
     compile_top_level_statement(a0, vector_get(a1, x0));
     x0 = x0 + 1;
-  };
+  }
   # Changing segment to .rodata
   compiler_set_segment(a0, SEG_RODATA);
   # Exporting string buffer
   string_buffer_export(a0[COM_STRBUF], a0[COM_OCHAN]);
-};
+}
 
 ## Use macros instead of identifiers matching their name
 # a0 - compiler
@@ -3810,12 +3810,12 @@ compiler_use_macros : (a0, a1) {
         # Using macro in statement
         compiler_use_macro(a0, vector_get(a1, x2), x1);
         x2 = x2 + 1;
-      };
-    };
+      }
+    }
     # Moving to next statement
     x0 = x0 + 1;
-  };
-};
+  }
+}
 
 ## Use macro in statement's children
 # a0 - compiler
@@ -3833,43 +3833,43 @@ compiler_use_macro : (a0, a1, a2) {
   x0 = a1[NODE_TYPE];
   ### Checking if we have statement, that has children
   # Vectored expressions
-  if (x0 == STMT_EXPR_SYSCALL) { goto &compiler_use_macro_vector; };
-  if (x0 == STMT_EXPR_CALL)    { goto &compiler_use_macro_vector; };
+  if (x0 == STMT_EXPR_SYSCALL) { goto &compiler_use_macro_vector; }
+  if (x0 == STMT_EXPR_CALL)    { goto &compiler_use_macro_vector; }
   # Not vectored expressions
-  if (x0 == STMT_EXPR_READCHAR) { x2 = 2; goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_EXPR_INDEX)    { x2 = 2; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_EXPR_READCHAR) { x2 = 2; goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_EXPR_INDEX)    { x2 = 2; goto &compiler_use_macro_tuple; }
   # Unary operators
   ## From STMT_EXPR_PLUS to STMT_EXPR_ADDROF
   if (x0 >= STMT_EXPR_PLUS && x0 <= STMT_EXPR_ADDROF) {
     x2 = 1;
     goto &compiler_use_macro_tuple;
-  };
+  }
   # Binary operators
   ## From STMT_EXPR_MUL to STMT_EXPR_SHR_ASSIGN
   if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_SHR_ASSIGN) {
     x2 = 2;
     goto &compiler_use_macro_tuple;
-  };
+  }
   # Ternary operator
-  if (x0 == STMT_EXPR_TERNARY) { x2 = 3; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_EXPR_TERNARY) { x2 = 3; goto &compiler_use_macro_tuple; }
   # Statements
   ## Vectored statements
-  if (x0 == STMT_IF)         {         goto &compiler_use_macro_vector; };
-  if (x0 == STMT_BLOCK)      {         goto &compiler_use_macro_vector; };
-  if (x0 == STMT_RETURN)     {         goto &compiler_use_macro_vector; };
-  if (x0 == STMT_ARRAY_DECL) { x1 = 3; goto &compiler_use_macro_vector; };
+  if (x0 == STMT_IF)         {         goto &compiler_use_macro_vector; }
+  if (x0 == STMT_BLOCK)      {         goto &compiler_use_macro_vector; }
+  if (x0 == STMT_RETURN)     {         goto &compiler_use_macro_vector; }
+  if (x0 == STMT_ARRAY_DECL) { x1 = 3; goto &compiler_use_macro_vector; }
   ## Not vectored statements
-  if (x0 == STMT_ALLOCATE)        { x2 = 1;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_FOR)             { x2 = 4;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_DO_WHILE)        { x2 = 2;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_WHILE)           { x2 = 2;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_WRITECHAR)       { x2 = 3;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_GOTO)            { x2 = 1;         goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_MACRO)           { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_FUN_DECL)        { x1 = 4; x2 = 1; goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_CHAR_ARRAY_DECL) { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_INT_ARRAY_DECL)  { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
-  if (x0 == STMT_VAR_DECL)        { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; };
+  if (x0 == STMT_ALLOCATE)        { x2 = 1;         goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_FOR)             { x2 = 4;         goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_DO_WHILE)        { x2 = 2;         goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_WHILE)           { x2 = 2;         goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_WRITECHAR)       { x2 = 3;         goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_GOTO)            { x2 = 1;         goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_MACRO)           { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_FUN_DECL)        { x1 = 4; x2 = 1; goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_CHAR_ARRAY_DECL) { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_INT_ARRAY_DECL)  { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; }
+  if (x0 == STMT_VAR_DECL)        { x1 = 3; x2 = 1; goto &compiler_use_macro_tuple; }
   # If we are here, we have expression that shouldn't apply macro. Exitting.
 label compiler_use_macro_exit;
   return;
@@ -3885,14 +3885,14 @@ label compiler_use_macro_tuple;
       if (strcmp(x3[2], a2[2]) == 0) {
         # Replacing child with macro
         a1[x1 + x0] = a2[3];
-      };
+      }
     } else {
       # Maybe it's another statement/expression with children?
       compiler_use_macro(a0, x3, a2);
-    };
+    }
     # Moving to next child
     x0 = x0 + 1;
-  };
+  }
   goto &compiler_use_macro_exit;
 label compiler_use_macro_vector;
   # x0 - index
@@ -3906,16 +3906,16 @@ label compiler_use_macro_vector;
       if (strcmp(x3[2], a2[2]) == 0) {
         # Replacing child with macro
         vector_set(a1[x1], x0, a2[3]);
-      };
+      }
     } else {
       # Maybe it's another statement/expression with children?
       compiler_use_macro(a0, x3, a2);
-    };
+    }
     # Moving to next child
     x0 = x0 + 1;
-  };
+  }
   goto &compiler_use_macro_exit;
-};
+}
 
 ## Compile top level statement
 # a0 - compiler
@@ -3930,8 +3930,8 @@ compile_top_level_statement : (a0, a1) {
   else if (x0 == STMT_ARRAY_DECL)      { compile_array_declaration(a0, a1); }
   else if (x0 == STMT_CHAR_ARRAY_DECL) { compile_type_array_declaration(a0, a1, 1); }
   else if (x0 == STMT_INT_ARRAY_DECL)  { compile_type_array_declaration(a0, a1, 4); }
-  else if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); };
-};
+  else if (x0 == STMT_VAR_DECL)        { compile_variable_declaration(a0, a1); }
+}
 
 ## Compile global statement
 # a0 - compiler
@@ -3947,13 +3947,13 @@ compile_global_statement : (a0, a1) {
   # Iterating through identifiers
   x1 = 0;
   while (x1 < vector_size(a1[2])) {
-    if (x1 != 0) { fputc(x0, ','); };
+    if (x1 != 0) { fputc(x0, ','); }
     fputs(x0, vector_get(a1[2], x1));
     x1 = x1 + 1;
-  };
+  }
   # Writing new line to finish macro
   fputc(x0, '\n');
-};
+}
 
 ## Compile function declaration
 # a0 - compiler
@@ -3978,7 +3978,7 @@ compile_function_declaration : (a0, a1) {
   compile_block_statement(a0, x1);
   # `leave` and `ret` if needed
   compile_function_declaration_return(x0, x1);
-};
+}
 
 ## Compile return function instructions, if needed
 # a0 - compiler output channel
@@ -3991,16 +3991,16 @@ compile_function_declaration_return : (a0, a1) {
   # Fetching statements in block
   x0 = a1[2];
   # Checking if statements vector is empty
-  if (vector_size(x0) == 0) { goto &compile_function_declaration_return_print; };
+  if (vector_size(x0) == 0) { goto &compile_function_declaration_return_print; }
   # Fetching last statement in block( we can change AST now, as we compiled it)
   x1 = vector_pop(x0);
   x2 = x1[NODE_TYPE];
   # If last statement is return, returning :D
-  if (x2 == STMT_RETURN) { return; };
+  if (x2 == STMT_RETURN) { return; }
 label compile_function_declaration_return_print;
   # If we are here, we need to print return things :3
   fputs(a0, "\tleave\n\tret\n");
-};
+}
 
 ## Compile array declaration
 # a0 - compiler
@@ -4019,13 +4019,13 @@ compile_array_declaration : (a0, a1) {
   # Compiling array values
   x1 = 0;
   while (x1 < vector_size(a1[3])) {
-    if (x1 != 0) { fputc(x0, ','); };
+    if (x1 != 0) { fputc(x0, ','); }
     compile_simple_value(a0, vector_get(a1[3], x1));
     x1 = x1 + 1;
-  };
+  }
   # Writing newline to end .long macro
   fputc(x0, '\n');
-};
+}
 
 ## Compile type array declaration
 # a0 - compiler
@@ -4042,7 +4042,7 @@ compile_type_array_declaration : (a0, a1, a2) {
   # Checking we have integer in size expression
   if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
     compiler_error(a0, x2, "Only integers can be used for size of array");
-  };
+  }
   # Changing segment to .data, if needed
   compiler_set_segment(a0, SEG_DATA);
   # Writing .comm macro
@@ -4054,7 +4054,7 @@ compile_type_array_declaration : (a0, a1, a2) {
   fputd(x0, x1[2] * a2);
   # Writing new line to finish macro
   fputc(x0, '\n');
-};
+}
 
 ## Compile variable declaration
 # a0 - compiler
@@ -4073,7 +4073,7 @@ compile_variable_declaration : (a0, a1) {
   compile_simple_value(a0, a1[3]);
   # Writing newline to end .long macro
   fputc(x0, '\n');
-};
+}
 
 ## Compile block statement
 # a0 - compiler
@@ -4100,17 +4100,17 @@ compile_block_statement : (a0, a1) {
       } else {
         # Otherwise, erroring
         compiler_error(a0, x2, "Unreachable code.");
-      };
-    };
+      }
+    }
     # Compiling statement
     compile_statement(a0, vector_get(a1[2], x0));
     # Checking if statement is break/continue/goto/return
     if (x3 == STMT_RETURN || x3 == STMT_GOTO
-      || x3 == STMT_BREAK || x3 == STMT_CONTINUE) { x1 = TRUE; };
+      || x3 == STMT_BREAK || x3 == STMT_CONTINUE) { x1 = TRUE; }
     # Moving to next statement
     x0 = x0 + 1;
-  };
-};
+  }
+}
 
 ## Compile statement
 # a0 - compiler
@@ -4134,8 +4134,8 @@ compile_statement : (a0, a1) {
   else if (x0 == STMT_GOTO)                         { compile_goto_statement(a0, a1); }
   else if (x0 == STMT_BLOCK)                        { compile_block_statement(a0, a1); }
   # If none of statements wasn't found, trying to compile expression
-  else { compile_expression(a0, a1); };
-};
+  else { compile_expression(a0, a1); }
+}
 
 ## Compile if statement
 # a0 - compiler
@@ -4162,7 +4162,7 @@ compile_if_statement : (a0, a1) {
       fputc(x0, '\n');
       # Print next label definition
       fputlabeldef(x0, x2);
-    };
+    }
     # Fetching statement
     x4 = vector_get(a1[2], x3);
     # If statement is not a block (thus it's condition)
@@ -4177,15 +4177,15 @@ compile_if_statement : (a0, a1) {
       # Moving to block statement
       x3 = x3 + 1;
       x4 = vector_get(a1[2], x3);
-    };
+    }
     # Compiling block statement
     compile_block_statement(a0, x4);
     # Moving to next statement
     x3 = x3 + 1;
-  };
+  }
   # Printing exit label definition
   fputlabeldef(x0, x1);
-};
+}
 
 ## Compile for statement
 # a0 - compiler
@@ -4202,7 +4202,7 @@ compile_for_statement : (a0, a1) {
   x2 = compiler_new_label(a0);
   x3 = compiler_new_label(a0);
   # Compile init expression if it's not null
-  if (a1[2]) { compile_expression(a0, a1[2]); };
+  if (a1[2]) { compile_expression(a0, a1[2]); }
   # Printing label for "loop start"
   fputlabeldef(x0, x1);
   # Compiling condition if it is not null
@@ -4214,7 +4214,7 @@ compile_for_statement : (a0, a1) {
     fputs(x0, "\tje ");
     fputlabel(x0, x3);
     fputc(x0, '\n');
-  };
+  }
   # Pushing loop to list
   compiler_push_loop(a0, x2, x3);
   # Compiling for block
@@ -4230,14 +4230,14 @@ compile_for_statement : (a0, a1) {
     compile_expression(a0, vector_get(a1[4], x4));
     # Moving to next expression
     x4 = x4 + 1;
-  };
+  }
   # Making next iteration in for loop
   fputs(x0, "\tjmp ");
   fputlabel(x0, x1);
   fputc(x0, '\n');
   # Printing exit label
   fputlabeldef(x0, x3);
-};
+}
 
 ## Compile while statement
 # a0 - compiler
@@ -4255,7 +4255,7 @@ compile_while_statement : (a0, a1, a2) {
   # Printing label for "loop start"
   fputlabeldef(x0, x1);
   # Compiling condition if it's in the start
-  if (!a2) { compile_while_condition(a0, a1[2], a2, x1, x2); };
+  if (!a2) { compile_while_condition(a0, a1[2], a2, x1, x2); }
   # Pushing loop to list
   compiler_push_loop(a0, x1, x2);
   # Compiling while block
@@ -4270,10 +4270,10 @@ compile_while_statement : (a0, a1, a2) {
     fputs(x0, "\tjmp ");
     fputlabel(x0, x1);
     fputc(x0, '\n');
-  };
+  }
   # Printing exit label
   fputlabeldef(x0, x2);
-};
+}
 
 ## Compile while condition
 # a0 - compiler
@@ -4295,7 +4295,7 @@ compile_while_condition : (a0, a1, a2, a3, a4) {
   fputs(x0,     a2 ? "\tjne " : "\tje ");
   fputlabel(x0, a2 ? a3 : a4);
   fputc(x0, '\n');
-};
+}
 
 ## Compile allocate statement
 # a0 - compiler
@@ -4312,18 +4312,18 @@ compile_allocate_statement : (a0, a1) {
   # Expression must be integer
   if (x1[NODE_TYPE] != STMT_EXPR_INTEGER) {
     compiler_error(a0, x1, "Size must be integer in allocate statement.");
-  };
+  }
   # Calculating allocation size (expr value * 4)
   x2 = x1[2] * 4;
   # Allocation size must be bigger than zero
   if (x2 <= 0) {
     compiler_error(a0, x1, "Size must be positive integer.");
-  };
+  }
   # Compiling allocation
   fputs(x0, "\tsubl $");
   fputd(x0, x2);
   fputs(x0, ", %esp\n");
-};
+}
 
 ## Compile assembly statement
 # a0 - compiler
@@ -4340,8 +4340,8 @@ compile_assembly_statement : (a0, a1) {
     fputc(x0, '\t');
     fputs(x0, vector_get(a1[2], x1));
     fputc(x0, '\n');
-  };
-};
+  }
+}
 
 ## Compile return statement
 # a0 - compiler
@@ -4355,10 +4355,10 @@ compile_return_statement : (a0, a1) {
   if (vector_size(x0) != 0) {
     # Compiling return value
     compile_expression(a0, vector_pop(x0));
-  };
+  }
   # Compiling return expression
   fputs(compiler_output_chan(a0), "\tleave\n\tret\n");
-};
+}
 
 ## Compile break/continue statement
 # a0 - compiler
@@ -4382,8 +4382,8 @@ compile_loop_jump_statement : (a0, a1) {
     fputc(x0, '\n');
   } else {
     compiler_error(a0, a1, "Tried to break/continue with no loop there.");
-  };
-};
+  }
+}
 
 ## Compile writechar statement
 # a0 - compiler
@@ -4407,7 +4407,7 @@ compile_writechar_statement : (a0, a1) {
   # Storing byte to address and freeing %edx
   fputs(x0, "\tmovb %al, (%edx)\n");
   compiler_free_register(a0, REG_EDX);
-};
+}
 
 ## Compile label statement
 # a0 - compiler
@@ -4420,7 +4420,7 @@ compile_label_statement : (a0, a1) {
   # Printing label definition
   fputs(x0, a1[2]);
   fputs(x0, ":\n");
-};
+}
 
 ## Compile goto statement
 # a0 - compiler
@@ -4430,7 +4430,7 @@ compile_goto_statement : (a0, a1) {
   compile_expression(a0, a1[2]);
   # Printing jump to this value
   fputs(compiler_output_chan(a0), "\tjmp *%eax\n");
-};
+}
 
 ## Compile expression
 # a0 - compiler
@@ -4482,8 +4482,8 @@ compile_expression : (a0, a1) {
     compile_assignment_expression(a0, a1);
   } else {
     compiler_error(a0, a1, "This expression can't be compiled.");
-  };
-};
+  }
+}
 
 ## Compile address call expression
 # a0 - compiler
@@ -4511,7 +4511,7 @@ compile_address_call_expression : (a0, a1) {
     compile_expression(a0, x4);
     # Moving it in %ebx
     fputs(x0, "\tmovl %eax, %ebx\n");
-  };
+  }
   # Backing up the rest of registers
   compiler_allocate_register(a0, REG_ECX);
   compiler_allocate_register(a0, REG_EDX);
@@ -4522,7 +4522,7 @@ compile_address_call_expression : (a0, a1) {
     fputs(x0, "\tsubl $");
     fputd(x0, 4 * (x2 - 1));
     fputs(x0, ", %esp\n");
-  };
+  }
   # Iterating through arguments
   x3 = 1;
   while (x3 < x2) {
@@ -4534,7 +4534,7 @@ compile_address_call_expression : (a0, a1) {
     fputs(x0, "(%esp)\n");
     # Moving to next argument
     x3 = x3 + 1;
-  };
+  }
   # Printing call instruction
   if (x4[NODE_TYPE] == STMT_EXPR_IDENTIFIER) {
     fputs(x0, "\tcall ");
@@ -4543,20 +4543,20 @@ compile_address_call_expression : (a0, a1) {
   } else {
     # Calling it (it's in %ebx)
     fputs(x0, "\tcall *%ebx\n");
-  };
+  }
   # Restoring stack
   if (x2 > 1) {
     fputs(x0, "\taddl $");
     fputd(x0, 4 * (x2 - 1));
     fputs(x0, ", %esp\n");
-  };
+  }
   # Restoring all backed up registers
   compiler_free_register(a0, REG_EDI);
   compiler_free_register(a0, REG_ESI);
   compiler_free_register(a0, REG_EDX);
   compiler_free_register(a0, REG_ECX);
   compiler_free_register(a0, REG_EBX);
-};
+}
 
 ## Compile address index expression
 # a0 - compiler
@@ -4571,7 +4571,7 @@ compile_address_index_expression : (a0, a1) {
   compile_address_index_address(a0, a1);
   # Loading value from address
   fputs(x0, "\tmovl (%eax), %eax\n");
-};
+}
 
 ## Compile address from address index expression
 # a0 - compiler
@@ -4602,8 +4602,8 @@ compile_address_index_address : (a0, a1) {
       # Moving value to %ebx
       compiler_allocate_register(a0, REG_EDX);
       fputs(x0, "\tmovl %eax, %edx\n");
-    };
-  };
+    }
+  }
   # Compiling second operand
   compile_expression(a0, a1[3]);
   # Calculating address
@@ -4614,8 +4614,8 @@ compile_address_index_address : (a0, a1) {
   } else {
     fputs(x0, "(%edx,%eax,4), %eax\n");
     compiler_free_register(a0, REG_EDX);
-  };
-};
+  }
+}
 
 ## Compile identifier expression
 # a0 - compiler
@@ -4629,7 +4629,7 @@ compile_simple_identifier_expression : (a0, a1) {
   fputs(x0, "\tmovl ");
   fputs(x0, a1[2]);
   fputs(x0, ", %eax\n");
-};
+}
 
 ## Compile argument expression
 # a0 - compiler
@@ -4643,7 +4643,7 @@ compile_simple_argument_expression : (a0, a1) {
   fputs(x0, "\tmovl ");
   fputarg(x0, a1[2]);
   fputs(x0, ", %eax\n");
-};
+}
 
 ## Print argument to output channel
 # a0 - output channel
@@ -4652,7 +4652,7 @@ fputarg : (a0, a1) {
   # Print offset to %ebp
   fputd(a0, 4 * (a1 + 2));
   fputs(a0, "(%ebp)");
-};
+}
 
 ## Compile variable expression
 # a0 - compiler
@@ -4666,7 +4666,7 @@ compile_simple_variable_expression : (a0, a1) {
   fputs(x0, "\tmovl ");
   fputvar(x0, a1[2]);
   fputs(x0, ", %eax\n");
-};
+}
 
 ## Print variable to output channel
 # a0 - output channel
@@ -4676,7 +4676,7 @@ fputvar : (a0, a1) {
   fputc(a0, '-');
   fputd(a0, 4 * (a1 + 1));
   fputs(a0, "(%ebp)");
-};
+}
 
 ## Compile syscall expression
 # a0 - compiler
@@ -4694,12 +4694,12 @@ compile_simple_syscall_expression : (a0, a1) {
   # Fetching arguments count
   x2 = vector_size(x1);
   # Backing up all needed registers
-  if (x2 > 1) { compiler_allocate_register(a0, REG_EBX); };
-  if (x2 > 2) { compiler_allocate_register(a0, REG_ECX); };
-  if (x2 > 3) { compiler_allocate_register(a0, REG_EDX); };
-  if (x2 > 4) { compiler_allocate_register(a0, REG_ESI); };
-  if (x2 > 5) { compiler_allocate_register(a0, REG_EDI); };
-  if (x2 > 6) { fputs(x0, "\tpushl %ebp\n"); };
+  if (x2 > 1) { compiler_allocate_register(a0, REG_EBX); }
+  if (x2 > 2) { compiler_allocate_register(a0, REG_ECX); }
+  if (x2 > 3) { compiler_allocate_register(a0, REG_EDX); }
+  if (x2 > 4) { compiler_allocate_register(a0, REG_ESI); }
+  if (x2 > 5) { compiler_allocate_register(a0, REG_EDI); }
+  if (x2 > 6) { fputs(x0, "\tpushl %ebp\n"); }
   # Iterating through arguments
   x3 = 0;
   while (x3 < x2) {
@@ -4710,25 +4710,25 @@ compile_simple_syscall_expression : (a0, a1) {
       fputs(x0, "\tmovl %eax, ");
       fputs(x0, registers[x3]);
       fputc(x0, '\n');
-    };
+    }
     #  If we have more than one argument, we HAVE to push %eax, as it will be
     # overwritten by compilation of expressions
-    if ((x3 == 0) * (x2 > 1)) { fputs(x0, "\tpushl %eax\n"); };
+    if ((x3 == 0) * (x2 > 1)) { fputs(x0, "\tpushl %eax\n"); }
     # Moving to next argument
     x3 = x3 + 1;
-  };
+  }
   # Restoring %eax, if needed
-  if (x2 > 1) { fputs(x0, "\tpopl %eax\n"); };
+  if (x2 > 1) { fputs(x0, "\tpopl %eax\n"); }
   # Calling syscall
   fputs(x0, "\tint $0x80\n");
   # Restoring all backed up registers
-  if (x2 > 6) { fputs(x0, "\tpopl %ebp\n"); };
-  if (x2 > 5) { compiler_free_register(a0, REG_EDI); };
-  if (x2 > 4) { compiler_free_register(a0, REG_ESI); };
-  if (x2 > 3) { compiler_free_register(a0, REG_EDX); };
-  if (x2 > 2) { compiler_free_register(a0, REG_ECX); };
-  if (x2 > 1) { compiler_free_register(a0, REG_EBX); };
-};
+  if (x2 > 6) { fputs(x0, "\tpopl %ebp\n"); }
+  if (x2 > 5) { compiler_free_register(a0, REG_EDI); }
+  if (x2 > 4) { compiler_free_register(a0, REG_ESI); }
+  if (x2 > 3) { compiler_free_register(a0, REG_EDX); }
+  if (x2 > 2) { compiler_free_register(a0, REG_ECX); }
+  if (x2 > 1) { compiler_free_register(a0, REG_EBX); }
+}
 
 ## Compile readchar expression
 # a0 - compiler
@@ -4750,14 +4750,14 @@ compile_simple_readchar_expression : (a0, a1) {
   # Loading byte from address and freeing %ebx
   fputs(x0, "\tmovsbl (%edx), %eax\n");
   compiler_free_register(a0, REG_EDX);
-};
+}
 
 ## Compile plus prefix expression
 # a0 - compiler
 # a1 - statement
 compile_prefix_plus_expression : (a0, a1) {
   # DO NOTHING :P
-};
+}
 
 ## Compile minus prefix expression
 # a0 - compiler
@@ -4771,7 +4771,7 @@ compile_prefix_minus_expression : (a0, a1) {
   compile_expression(a0, a1[2]);
   # Negating
   fputs(x0, "\tnegl %eax\n");
-};
+}
 
 ## Compile logical not expression
 # a0 - compiler
@@ -4788,7 +4788,7 @@ compile_prefix_logical_not_expression : (a0, a1) {
   # Setting equal flag
   fputs(x0, "\tsete %al\n");
   fputs(x0, "\tmovzbl %al, %eax\n");
-};
+}
 
 ## Compile not expression
 # a0 - compiler
@@ -4802,7 +4802,7 @@ compile_prefix_not_expression : (a0, a1) {
   compile_expression(a0, a1[2]);
   # Bitwise negating
   fputs(x0, "\tnotl %eax\n");
-};
+}
 
 ## Compile dereference expression
 # a0 - compiler
@@ -4816,7 +4816,7 @@ compile_prefix_deref_expression : (a0, a1) {
   compile_expression(a0, a1[2]);
   # Dereferencing
   fputs(x0, "\tmovl (%eax), %eax\n");
-};
+}
 
 ## Compile addressof expression
 # a0 - compiler
@@ -4833,11 +4833,11 @@ compile_prefix_addrof_expression : (a0, a1) {
   # Getting expression type
   x2 = x1[NODE_TYPE];
   # Compiling
-  if (x2 == STMT_EXPR_IDENTIFIER) { fputs(x0, "\tmovl $");  fputs(x0, x1[2]); fputs(x0, ", %eax\n"); return; };
-  if (x2 == STMT_EXPR_ARGUMENT)   { fputs(x0, "\tleal "); fputarg(x0, x1[2]); fputs(x0, ", %eax\n"); return; };
-  if (x2 == STMT_EXPR_VARIABLE)   { fputs(x0, "\tleal "); fputvar(x0, x1[2]); fputs(x0, ", %eax\n"); return; };
+  if (x2 == STMT_EXPR_IDENTIFIER) { fputs(x0, "\tmovl $");  fputs(x0, x1[2]); fputs(x0, ", %eax\n"); return; }
+  if (x2 == STMT_EXPR_ARGUMENT)   { fputs(x0, "\tleal "); fputarg(x0, x1[2]); fputs(x0, ", %eax\n"); return; }
+  if (x2 == STMT_EXPR_VARIABLE)   { fputs(x0, "\tleal "); fputvar(x0, x1[2]); fputs(x0, ", %eax\n"); return; }
   compiler_error(a0, a1, "Can't compile addressof for this expression.");
-};
+}
 
 ## Compile bitwise arithmetic expression
 # a0 - compiler
@@ -4865,7 +4865,7 @@ compile_bitwise_arithmetic_expression : (a0, a1, a2, a3) {
   } else {
     # Move value to %ebx when not SUB, DIV or MOD
     fputs(x0, "\tmovl %eax, %ebx\n");
-  };
+  }
   # Compiling second operand
   compile_expression(a0, a3);
   # Moving it's value
@@ -4887,7 +4887,7 @@ compile_bitwise_arithmetic_expression : (a0, a1, a2, a3) {
     fputs(x0, "\tpopl %eax\n");
     # Clear %edx for division
     fputs(x0, "\tcltd\n");
-  };
+  }
   # Compiling operation
   fputc(x0, '\t');
        if (a1 == STMT_EXPR_MUL) { fputs(x0, "imull %ebx, %eax"); }
@@ -4899,13 +4899,13 @@ compile_bitwise_arithmetic_expression : (a0, a1, a2, a3) {
   else if (a1 == STMT_EXPR_SHR) { fputs(x0, "shlr %cl, %eax"); }
   else if (a1 == STMT_EXPR_AND) { fputs(x0, "andl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_XOR) { fputs(x0, "xorl %ebx, %eax"); }
-  else if (a1 == STMT_EXPR_OR)  { fputs(x0, "orl %ebx, %eax"); };
+  else if (a1 == STMT_EXPR_OR)  { fputs(x0, "orl %ebx, %eax"); }
   fputc(x0, '\n');
   # Freeing used registers
        if (a1 == STMT_EXPR_SHL || a1 == STMT_EXPR_SHR) { compiler_free_register(a0, REG_ECX); }
-  else if (a1 == STMT_EXPR_DIV || a1 == STMT_EXPR_MOD) { compiler_free_register(a0, REG_EDX); };
+  else if (a1 == STMT_EXPR_DIV || a1 == STMT_EXPR_MOD) { compiler_free_register(a0, REG_EDX); }
   compiler_free_register(a0, REG_EBX);
-};
+}
 
 ## Compile comparison expression
 # a0 - compiler
@@ -4931,14 +4931,14 @@ compile_comparison_expression : (a0, a1) {
   compiler_free_register(a0, REG_EDX);
   # Putting (not) equal flag in %eax
   fputc(x0, '\t');
-  if (x1 == STMT_EXPR_EQ)      { fputs(x0, "sete"); };
-  if (x1 == STMT_EXPR_NE)      { fputs(x0, "setne"); };
-  if (x1 == STMT_EXPR_LESS)    { fputs(x0, "setl"); };
-  if (x1 == STMT_EXPR_GREATER) { fputs(x0, "setg"); };
-  if (x1 == STMT_EXPR_LE)      { fputs(x0, "setle"); };
-  if (x1 == STMT_EXPR_GE)      { fputs(x0, "setge"); };
+  if (x1 == STMT_EXPR_EQ)      { fputs(x0, "sete"); }
+  if (x1 == STMT_EXPR_NE)      { fputs(x0, "setne"); }
+  if (x1 == STMT_EXPR_LESS)    { fputs(x0, "setl"); }
+  if (x1 == STMT_EXPR_GREATER) { fputs(x0, "setg"); }
+  if (x1 == STMT_EXPR_LE)      { fputs(x0, "setle"); }
+  if (x1 == STMT_EXPR_GE)      { fputs(x0, "setge"); }
   fputs(x0, " %al\n\tmovzbl %al, %eax\n");
-};
+}
 
 ## Compile logical expression
 # a0 - compiler
@@ -4959,7 +4959,7 @@ compile_logical_expression : (a0, a1, a2) {
   compile_logical_expression_operand(a0, a1[3], a2, x1);
   ## AND -> if we are here, we need to put 1 in %eax
   ## OR  -> if we are here, we need to put 0 in %eax
-  if (a2) { fputs(x0, "\tmovl $0, %eax\n"); } else { fputs(x0, "\tmovl $1, %eax\n"); };
+  if (a2) { fputs(x0, "\tmovl $0, %eax\n"); } else { fputs(x0, "\tmovl $1, %eax\n"); }
   # Jump to second (exit) label
   fputs(x0, "\tjmp ");
   fputlabel(x0, x2);
@@ -4968,10 +4968,10 @@ compile_logical_expression : (a0, a1, a2) {
   fputlabeldef(x0, x1);
   ## AND -> if we are here, we need to put 0 in %eax
   ## OR  -> if we are here, we need to put 1 in %eax
-  if (a2) { fputs(x0, "\tmovl $1, %eax\n"); } else { fputs(x0, "\tmovl $0, %eax\n"); };
+  if (a2) { fputs(x0, "\tmovl $1, %eax\n"); } else { fputs(x0, "\tmovl $0, %eax\n"); }
   # Printing second label definition
   fputlabeldef(x0, x2);
-};
+}
 
 ## Compile logical expression operand
 # a0 - compiler
@@ -4990,7 +4990,7 @@ compile_logical_expression_operand : (a0, a1, a2, a3) {
     # Compiling second operand of logical expression
     compile_logical_expression_operand(a0, a1[3], a2, a3);
     return;
-  };
+  }
 
   # We have non-logical expression. Compiling it by default way.
   compile_expression(a0, a1);
@@ -4998,10 +4998,10 @@ compile_logical_expression_operand : (a0, a1, a2, a3) {
   fputs(x0, "\tcmpl $0, %eax\n");
   ## AND -> jump to first label if zero
   ## OR  -> jump to first label if not zero
-  if (a2) { fputs(x0, "\tjne "); } else { fputs(x0, "\tje "); };
+  if (a2) { fputs(x0, "\tjne "); } else { fputs(x0, "\tje "); }
   fputlabel(x0, a3);
   fputc(x0, '\n');
-};
+}
 
 ## Compile ternary expression
 # a0 - compiler
@@ -5035,7 +5035,7 @@ compile_ternary_expression : (a0, a1) {
   compile_expression(a0, a1[4]);
   # Printing exit label
   fputlabeldef(x0, x2);
-};
+}
 
 ## Compile assignment expression
 # a0 - compiler
@@ -5060,7 +5060,7 @@ compile_assignment_expression : (a0, a1) {
     compile_address_index_address(a0, x2);
     compiler_allocate_register(a0, REG_EBX);
     fputs(x0, "\tmovl %eax, %ebx\n");
-  };
+  }
   # Compiling expression
   if (x1 == STMT_EXPR_ASSIGN) {
     # If we have simple assignment, compile expression
@@ -5075,15 +5075,15 @@ compile_assignment_expression : (a0, a1) {
       compiler_allocate_register(a0, REG_EDX);
       # Storing new value in %edx
       fputs(x0, "\tleal ");
-      if (x1 == STMT_EXPR_POSTDEC) { fputc(x0, '-'); };
+      if (x1 == STMT_EXPR_POSTDEC) { fputc(x0, '-'); }
       fputs(x0, "1(%eax), %edx\n");
-    };
+    }
   } else {
     # If we have complex assignment, calculate value to set
     compile_bitwise_arithmetic_expression(
       a0, x1 - STMT_EXPR_MUL_ASSIGN + STMT_EXPR_MUL, x2, a1[3]
     );
-  };
+  }
   # Compiling assignment
   fputs(x0, "\tmovl ");
   # If we had post{dec,inc} we need to load value from %edx
@@ -5091,19 +5091,19 @@ compile_assignment_expression : (a0, a1) {
     fputs(x0, "%edx");
   } else {
     fputs(x0, "%eax");
-  };
+  }
   # Compiling where to move
   fputs(x0, ", ");
        if (x3 == STMT_EXPR_IDENTIFIER) { fputs(x0,   x2[2]); }
   else if (x3 == STMT_EXPR_ARGUMENT)   { fputarg(x0, x2[2]); }
   else if (x3 == STMT_EXPR_VARIABLE)   { fputvar(x0, x2[2]); }
   else if (x3 == STMT_EXPR_INDEX)      { fputs(x0, "(%ebx)"); }
-  else { compiler_error(a0, a1, "Can't use this as assignable operand."); };
+  else { compiler_error(a0, a1, "Can't use this as assignable operand."); }
   fputc(x0, '\n');
   # Freeing used registers
-  if (x1 == STMT_EXPR_POSTDEC || x1 == STMT_EXPR_POSTINC) { compiler_free_register(a0, REG_EDX); };
-  if (x3 == STMT_EXPR_INDEX) { compiler_free_register(a0, REG_EBX); };
-};
+  if (x1 == STMT_EXPR_POSTDEC || x1 == STMT_EXPR_POSTINC) { compiler_free_register(a0, REG_EDX); }
+  if (x3 == STMT_EXPR_INDEX) { compiler_free_register(a0, REG_EBX); }
+}
 
 ## Compile integer expression
 # a0 - compiler
@@ -5117,7 +5117,7 @@ compile_integer_expression : (a0, a1) {
   fputs(x0, "\tmovl $");
   fputd(x0, a1[2]);
   fputs(x0, ", %eax\n");
-};
+}
 
 ## Compile string expression
 # a0 - compiler
@@ -5131,7 +5131,7 @@ compile_string_expression : (a0, a1) {
   fputs(x0, "\tmovl $strbuf+");
   fputd(x0, a1[2]);
   fputs(x0, ", %eax\n");
-};
+}
 
 ## Compile simple value
 # a0 - compiler
@@ -5151,7 +5151,7 @@ compile_simple_value : (a0, a1) {
     fputd(x0, a1[2]);
     # Returning
     return;
-  };
+  }
 
   if (x1 == STMT_EXPR_STRING) {
     # Writing string buffer address
@@ -5159,17 +5159,17 @@ compile_simple_value : (a0, a1) {
     fputd(x0, a1[2]);
     # Returning
     return;
-  };
+  }
 
   if (x1 == STMT_EXPR_IDENTIFIER) {
     # Writing identifier
     fputs(x0, a1[2]);
     # Returning
     return;
-  };
+  }
 
   compiler_error(a0, a1, "Expression can't be compiled as simple.");
-};
+}
 
 ## Print usage
 # a0 - program name
@@ -5177,7 +5177,7 @@ usage : (a0) {
   eputs("usage: ");
   eputs(a0);
   eputs(" [option]... <file>\n");
-};
+}
 
 ## Main function
 # a0 - argc
@@ -5193,7 +5193,7 @@ main : (a0, a1) {
   # x6 - compiler
   allocate(7);
   # If no additional args - printing usage
-  if (a0 < 2) { usage(a1[0]); return(1); };
+  if (a0 < 2) { usage(a1[0]); return(1); }
   # TODO: implement option parser
   # Creating input channel
   x0 = input_chan_file(a1[1]);
@@ -5212,7 +5212,7 @@ main : (a0, a1) {
   # Compiling AST
   compiler_compile(x6, x5);
   return(0);
-};
+}
 
 # Entry point of the entire program
 global _start;
@@ -5221,4 +5221,4 @@ _start : () {
   initialize_io();
   # argc is located in 4(%esp), argv is located in 8(%esp)
   exit(main(*(&a0 - 4), &a0));
-};
+}
