@@ -1790,27 +1790,12 @@ label parser_parse_continue;
   x1 = parser_lex(a0);
   # Testing until got end of file
   while (x1 != TOKEN_END) {
-    # If token is ;, skipping it as empty statement
-    if (x1 == ';') { goto &parser_parse_continue; };
     # Fetching token location
     x3 = parser_token_location(a0);
     # Parsing statement
     x2 = top_level_statement(a0, x1, x3);
     # Adding statement, if needed
     if (x2) { vector_push(x0, x2); };
-    # Fetching next token
-    x1 = parser_lex(a0);
-    # Checking statement to be ended with ;
-    if (x1 != ';') {
-      # Checking if we switched to new file before
-      if (a0[PARSER_SWITCH] == FALSE) {
-        goto &parser_parse_error;
-      };
-      # Disabling this flag
-      a0[PARSER_SWITCH] = FALSE;
-      # Holding token
-      lexer_hold(parser_lexer(a0));
-    };
     # Fetching next token
     x1 = parser_lex(a0);
   };
@@ -1822,8 +1807,6 @@ label parser_parse_continue;
   if (a0[PARSER_LEX] != NULL) { goto &parser_parse_continue; };
   # Returning statemtents vector
   return(x0);
-label parser_parse_error;
-  parser_error(a0, x3, "Statement is not ended with semicolon");
 };
 
 ## Parse top level statement
@@ -1907,10 +1890,16 @@ label global_statement_next;
       if (x1 != ')') { goto &global_statement_invalid; };
     } else { goto &global_statement_invalid; };
   };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for semicolon
+  if (x1 != ';') { goto &global_statement_end_error; };
   # Returning statement
   return(tuple3(STMT_GLOBAL, a1, x0));
 label global_statement_invalid;
   parser_error(a0, a1, "Invalid global statement");
+label global_statement_end_error;
+  parser_error(a0, a1, "Global statement is not ended with semicolon");
 };
 
 ## Parse include statement
@@ -1953,7 +1942,10 @@ label include_statement_next;
       if (x1 != ')') { goto &include_statement_invalid; };
     } else { goto &include_statement_invalid; };
   };
-
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for semicolon
+  if (x1 != ';') { goto &include_statement_end_error; };
   # Creating lexers for specified files
   x1 = 0;
   while (x1 < vector_size(x0)) {
@@ -1969,6 +1961,8 @@ label include_statement_next;
   return(NULL);
 label include_statement_invalid;
   parser_error(a0, a1, "Invalid include statement");
+label include_statement_end_error;
+  parser_error(a0, a1, "Include statement is not ended with semicolon");
 };
 
 ## Parse macro declaration
@@ -1984,8 +1978,14 @@ macro_declaration : (a0, a1, a2) {
   x0 = parser_lex(a0);
   # Fetching expression
   x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &macro_declaration_end_error; };
   # Returning expression
   return(tuple4(STMT_MACRO, a2, a1, x1));
+label macro_declaration_end_error;
+  parser_error(a0, a1, "Macro declaration is not ended with semicolon");
 };
 
 ## Parse function declaration
@@ -2055,10 +2055,16 @@ label array_declaration_loop;
   if (x1 == ',') { goto &array_declaration_loop; };
   # Checking for correct syntax
   if (x1 != ']') { goto &array_declaration_invalid; };
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for semicolon
+  if (x1 != ';') { goto &array_declaration_end_error; };
   # Returning statement
   return(tuple4(STMT_ARRAY_DECL, a2, a1, x0));
 label array_declaration_invalid;
   parser_error(a0, a2, "Invalid array declaration syntax");
+label array_declaration_end_error;
+  parser_error(a0, a1, "Array statement is not ended with semicolon");
 };
 
 ## Parse type array declaration
@@ -2083,10 +2089,16 @@ type_array_declaration : (a0, a1, a2, a3) {
   x0 = parser_lex(a0);
   # Checking for correct syntax
   if (x0 != ']') { goto &type_array_declaration_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &type_array_declaration_end_error; };
   # Returning statement
   return(tuple4(a2, a3, a1, x1));
 label type_array_declaration_invalid;
-  parser_error(a0, a3, "Invalid char array declaration syntax");
+  parser_error(a0, a3, "Invalid type array declaration syntax");
+label type_array_declaration_end_error;
+  parser_error(a0, a1, "Type array statement is not ended with semicolon");
 };
 
 ## Parse variable declaration
@@ -2097,11 +2109,18 @@ label type_array_declaration_invalid;
 # @return statement
 variable_declaration : (a0, a1, a2, a3) {
   # x0 - expression
-  allocate(1);
+  # x1 - next token
+  allocate(2);
   # Fetching next expression
   x0 = expression(a0, a2);
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for semicolon
+  if (x1 != ';') { goto &variable_declaration_end_error; };
   # Returning statement
   return(tuple4(STMT_VAR_DECL, a3, a1, x0));
+label variable_declaration_end_error;
+  parser_error(a0, a1, "Variable statement is not ended with semicolon");
 };
 
 ## Parse block of statements
@@ -2134,10 +2153,13 @@ label block_statement_loop;
   else { x2 = statement(a0, x1, x4); };
   # Pushing statement to vector
   vector_push(x0, x2);
-  # Fetching next token
-  x1 = parser_lex(a0);
   # Checking if expression is ended with semicolon
-  if (x1 != ';') { goto &block_statement_content_invalid; };
+  if (x2[NODE_TYPE] < STMT_IF) {
+    # Fetching next token
+    x1 = parser_lex(a0);
+    # Checking for semicolon
+    if (x1 != ';') { goto &block_statement_content_invalid; };
+  };
   # So, making next iteration
   goto &block_statement_loop;
 label block_statement_end;
@@ -2146,7 +2168,7 @@ label block_statement_end;
 label block_statement_invalid;
   parser_error(a0, x3, "Invalid block statement syntax");
 label block_statement_content_invalid;
-  parser_error(a0, x4, "Statement inside block is not ended with semicolon");
+  parser_error(a0, x4, "Expression inside block is not ended with semicolon");
 };
 
 ## Parse statement
@@ -2329,10 +2351,16 @@ do_while_statement : (a0, a1) {
   x0 = parser_lex(a0);
   # Checking for correct syntax
   if (x0 != ')') { goto &do_while_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &do_while_statement_end_error; };
   # Return statement
   return(tuple4(STMT_DO_WHILE, a1, x1, x2));
 label do_while_statement_invalid;
   parser_error(a0, a1, "Invalid do-while statement syntax");
+label do_while_statement_end_error;
+  parser_error(a0, a1, "Do-while statement is not ended with semicolon");
 };
 
 ## Parse while statement
@@ -2386,10 +2414,16 @@ allocate_statement : (a0, a1) {
   x0 = parser_lex(a0);
   # Checking for correct syntax
   if (x0 != ')') { goto &allocate_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &loop_jump_statement_end_error; };
   # Return statement
   return(tuple3(STMT_ALLOCATE, a1, x1));
 label allocate_statement_invalid;
   parser_error(a0, a1, "Invalid allocate statement syntax");
+label allocate_statement_end_error;
+  parser_error(a0, a1, "Allocate statement is not ended with semicolon");
 };
 
 ## Parse assembly statement
@@ -2450,7 +2484,14 @@ return_statement : (a0, a1) {
   # Pushing expression to operand vector
   vector_push(x0, x2);
 label return_statement_end;
+  # Fetching next token
+  x1 = parser_lex(a0);
+  # Checking for semicolon
+  if (x1 != ';') { goto &return_statement_end_error; };
+  # Return statement
   return(tuple3(STMT_RETURN, a1, x0));
+label return_statement_end_error;
+  parser_error(a0, a1, "Return statement is not ended with semicolon");
 };
 
 ## Parse break/continue statement
@@ -2459,7 +2500,16 @@ label return_statement_end;
 # a2 - statement token
 # @return statement
 loop_jump_statement : (a0, a1, a2) {
+  # x0 - next token
+  allocate(1);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &loop_jump_statement_end_error; };
+  # Return statement
   return(tuple2(STMT_BREAK + a2 - TOKEN_BREAK, a1));
+label loop_jump_statement_end_error;
+  parser_error(a0, a1, "Break/continue statement is not ended with semicolon");
 };
 
 ## Parse writechar statement
@@ -2500,10 +2550,16 @@ writechar_statement : (a0, a1) {
   x0 = parser_lex(a0);
   # Checking for correct syntax
   if (x0 != ')') { goto &writechar_statement_invalid; };
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &writechar_statement_end_error; };
   # Returning statement
   return(tuple5(STMT_WRITECHAR, a1, x1, x2, x3));
 label writechar_statement_invalid;
   parser_error(a0, a1, "Invalid writechar statement");
+label writechar_statement_end_error;
+  parser_error(a0, a1, "Writechar statement is not ended with semicolon");
 };
 
 ## Parselabel statement
@@ -2520,10 +2576,16 @@ label_statement : (a0, a1) {
   if (x0 != TOKEN_IDENTIFIER) { goto &label_statement_invalid; };
   # Duplicating identifier
   x1 = strdup(lexer_token_text(parser_lexer(a0)));
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &label_statement_end_error; };
   # Returning statement
   return(tuple3(STMT_LABEL, a1, x1));
 label label_statement_invalid;
   parser_error(a0, a1, "Invalidlabel statement syntax");
+label label_statement_end_error;
+  parser_error(a0, a1, "Label statement is not ended with semicolon");
 };
 
 ## Parse goto statement
@@ -2538,8 +2600,14 @@ goto_statement : (a0, a1) {
   x0 = parser_lex(a0);
   # Fetching goto expression
   x1 = expression(a0, x0);
+  # Fetching next token
+  x0 = parser_lex(a0);
+  # Checking for semicolon
+  if (x0 != ';') { goto &label_statement_end_error; };
   # Returning statement
   return(tuple3(STMT_GOTO, a1, x1));
+label goto_statement_end_error;
+  parser_error(a0, a1, "Goto statement is not ended with semicolon");
 };
 
 ## Parse expression

@@ -5238,17 +5238,6 @@ _label118:
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label119
-	movl -8(%ebp), %eax
-	movl %eax, %edx
-	movl $59, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label120
-	movl $parser_parse_continue, %eax
-	jmp *%eax
-_label120:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5267,7 +5256,7 @@ _label120:
 	movl %eax, -12(%ebp)
 	movl -12(%ebp), %eax
 	cmpl $0, %eax
-	je _label121
+	je _label120
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5275,63 +5264,7 @@ _label120:
 	movl %eax, 4(%esp)
 	call vector_push
 	addl $8, %esp
-_label121:
-	subl $4, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	call parser_lex
-	addl $4, %esp
-	movl %eax, -8(%ebp)
-	movl -8(%ebp), %eax
-	movl %eax, %edx
-	movl $59, %eax
-	cmpl %eax, %edx
-	setne %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label122
-	movl 8(%ebp), %eax
-	movl %eax, %edx
-	movl $2, %eax
-	leal (%edx,%eax,4), %eax
-	movl (%eax), %eax
-	movl %eax, %edx
-	movl $0, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label123
-	movl $parser_parse_error, %eax
-	jmp *%eax
-_label123:
-	movl 8(%ebp), %eax
-	movl %eax, %edx
-	movl $2, %eax
-	leal (%edx,%eax,4), %eax
-	movl %eax, %ebx
-	movl $0, %eax
-	movl %eax, (%ebx)
-	subl $4, %esp
-	pushl %ebx
-	pushl %ecx
-	pushl %edx
-	pushl %esi
-	pushl %edi
-	subl $4, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	call parser_lexer
-	addl $4, %esp
-	popl %edi
-	popl %esi
-	popl %edx
-	popl %ecx
-	popl %ebx
-	movl %eax, 0(%esp)
-	call lexer_hold
-	addl $4, %esp
-_label122:
+_label120:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5389,23 +5322,11 @@ _label119:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label124
+	je _label121
 	movl $parser_parse_continue, %eax
 	jmp *%eax
-_label124:
+_label121:
 	movl -4(%ebp), %eax
-	leave
-	ret
-parser_parse_error:
-	subl $12, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl -16(%ebp), %eax
-	movl %eax, 4(%esp)
-	movl $strbuf+620, %eax
-	movl %eax, 8(%esp)
-	call parser_error
-	addl $12, %esp
 	leave
 	ret
 top_level_statement:
@@ -5419,7 +5340,7 @@ top_level_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label125
+	je _label122
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5429,7 +5350,7 @@ top_level_statement:
 	addl $8, %esp
 	leave
 	ret
-_label125:
+_label122:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $288, %eax
@@ -5437,7 +5358,7 @@ _label125:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label126
+	je _label123
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5449,7 +5370,7 @@ _label125:
 	addl $12, %esp
 	leave
 	ret
-_label126:
+_label123:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $289, %eax
@@ -5457,7 +5378,7 @@ _label126:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label127
+	je _label124
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5469,7 +5390,7 @@ _label126:
 	addl $12, %esp
 	leave
 	ret
-_label127:
+_label124:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $258, %eax
@@ -5477,7 +5398,7 @@ _label127:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label128
+	je _label125
 	subl $4, %esp
 	pushl %ebx
 	pushl %ecx
@@ -5525,7 +5446,7 @@ _label127:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label129
+	je _label126
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5537,7 +5458,7 @@ _label127:
 	addl $12, %esp
 	leave
 	ret
-_label129:
+_label126:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $58, %eax
@@ -5545,7 +5466,7 @@ _label129:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label130
+	je _label127
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5559,7 +5480,7 @@ _label129:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label131
+	je _label128
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5571,7 +5492,7 @@ _label129:
 	addl $12, %esp
 	leave
 	ret
-_label131:
+_label128:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $91, %eax
@@ -5579,7 +5500,7 @@ _label131:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label132
+	je _label129
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5591,7 +5512,7 @@ _label131:
 	addl $12, %esp
 	leave
 	ret
-_label132:
+_label129:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $286, %eax
@@ -5599,7 +5520,7 @@ _label132:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label133
+	je _label130
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5613,7 +5534,7 @@ _label132:
 	addl $16, %esp
 	leave
 	ret
-_label133:
+_label130:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $287, %eax
@@ -5621,7 +5542,7 @@ _label133:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label134
+	je _label131
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5635,7 +5556,7 @@ _label133:
 	addl $16, %esp
 	leave
 	ret
-_label134:
+_label131:
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -5649,14 +5570,14 @@ _label134:
 	addl $16, %esp
 	leave
 	ret
-_label130:
-_label128:
+_label127:
+_label125:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+658, %eax
+	movl $strbuf+620, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -5687,7 +5608,7 @@ global_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label136
+	je _label133
 	subl $4, %esp
 	pushl %ebx
 	pushl %ecx
@@ -5729,8 +5650,8 @@ global_statement:
 	movl %eax, 4(%esp)
 	call vector_push
 	addl $8, %esp
-	jmp _label135
-_label136:
+	jmp _label132
+_label133:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $40, %eax
@@ -5738,7 +5659,7 @@ _label136:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label138
+	je _label135
 global_statement_next:
 	subl $4, %esp
 	movl 8(%ebp), %eax
@@ -5753,10 +5674,10 @@ global_statement_next:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label139
+	je _label136
 	movl $global_statement_invalid, %eax
 	jmp *%eax
-_label139:
+_label136:
 	subl $4, %esp
 	pushl %ebx
 	pushl %ecx
@@ -5811,10 +5732,10 @@ _label139:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label140
+	je _label137
 	movl $global_statement_next, %eax
 	jmp *%eax
-_label140:
+_label137:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $41, %eax
@@ -5822,16 +5743,33 @@ _label140:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label141
+	je _label138
 	movl $global_statement_invalid, %eax
 	jmp *%eax
-_label141:
-	jmp _label137
 _label138:
+	jmp _label134
+_label135:
 	movl $global_statement_invalid, %eax
 	jmp *%eax
-_label137:
-_label135:
+_label134:
+_label132:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label139
+	movl $global_statement_end_error, %eax
+	jmp *%eax
+_label139:
 	subl $12, %esp
 	movl $62, %eax
 	movl %eax, 0(%esp)
@@ -5849,7 +5787,17 @@ global_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+720, %eax
+	movl $strbuf+682, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+global_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+707, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -5880,7 +5828,7 @@ include_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label143
+	je _label141
 	subl $4, %esp
 	pushl %ebx
 	pushl %ecx
@@ -5922,8 +5870,8 @@ include_statement:
 	movl %eax, 4(%esp)
 	call vector_push
 	addl $8, %esp
-	jmp _label142
-_label143:
+	jmp _label140
+_label141:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $40, %eax
@@ -5931,7 +5879,7 @@ _label143:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label145
+	je _label143
 include_statement_next:
 	subl $4, %esp
 	movl 8(%ebp), %eax
@@ -5946,10 +5894,10 @@ include_statement_next:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label146
+	je _label144
 	movl $include_statement_invalid, %eax
 	jmp *%eax
-_label146:
+_label144:
 	subl $4, %esp
 	pushl %ebx
 	pushl %ecx
@@ -6004,10 +5952,10 @@ _label146:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label147
+	je _label145
 	movl $include_statement_next, %eax
 	jmp *%eax
-_label147:
+_label145:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $41, %eax
@@ -6015,19 +5963,36 @@ _label147:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label148
+	je _label146
 	movl $include_statement_invalid, %eax
 	jmp *%eax
-_label148:
-	jmp _label144
-_label145:
+_label146:
+	jmp _label142
+_label143:
 	movl $include_statement_invalid, %eax
 	jmp *%eax
-_label144:
 _label142:
+_label140:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label147
+	movl $include_statement_end_error, %eax
+	jmp *%eax
+_label147:
 	movl $0, %eax
 	movl %eax, -8(%ebp)
-_label149:
+_label148:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -6041,7 +6006,7 @@ _label149:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label150
+	je _label149
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6064,8 +6029,8 @@ _label149:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -8(%ebp)
-	jmp _label149
-_label150:
+	jmp _label148
+_label149:
 	movl 8(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -6082,7 +6047,17 @@ include_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+745, %eax
+	movl $strbuf+752, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+include_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+778, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -6106,6 +6081,23 @@ macro_declaration:
 	call expression
 	addl $8, %esp
 	movl %eax, -8(%ebp)
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label150
+	movl $macro_declaration_end_error, %eax
+	jmp *%eax
+_label150:
 	subl $16, %esp
 	movl $63, %eax
 	movl %eax, 0(%esp)
@@ -6117,6 +6109,18 @@ macro_declaration:
 	movl %eax, 12(%esp)
 	call tuple4
 	addl $16, %esp
+	leave
+	ret
+macro_declaration_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+824, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
 	leave
 	ret
 function_declaration:
@@ -6271,7 +6275,7 @@ function_declaration_arg_invalid:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+771, %eax
+	movl $strbuf+870, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -6339,6 +6343,23 @@ _label157:
 	movl $array_declaration_invalid, %eax
 	jmp *%eax
 _label158:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label159
+	movl $array_declaration_end_error, %eax
+	jmp *%eax
+_label159:
 	subl $16, %esp
 	movl $65, %eax
 	movl %eax, 0(%esp)
@@ -6358,7 +6379,17 @@ array_declaration_invalid:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+817, %eax
+	movl $strbuf+916, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+array_declaration_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+949, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -6381,10 +6412,10 @@ type_array_declaration:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label159
+	je _label160
 	movl $type_array_declaration_invalid, %eax
 	jmp *%eax
-_label159:
+_label160:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6412,10 +6443,27 @@ _label159:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label160
+	je _label161
 	movl $type_array_declaration_invalid, %eax
 	jmp *%eax
-_label160:
+_label161:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label162
+	movl $type_array_declaration_end_error, %eax
+	jmp *%eax
+_label162:
 	subl $16, %esp
 	movl 16(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6435,7 +6483,17 @@ type_array_declaration_invalid:
 	movl %eax, 0(%esp)
 	movl 20(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+850, %eax
+	movl $strbuf+993, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+type_array_declaration_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1031, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -6444,7 +6502,7 @@ type_array_declaration_invalid:
 variable_declaration:
 	pushl %ebp
 	movl %esp, %ebp
-	subl $4, %esp
+	subl $8, %esp
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6453,6 +6511,23 @@ variable_declaration:
 	call expression
 	addl $8, %esp
 	movl %eax, -4(%ebp)
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label163
+	movl $variable_declaration_end_error, %eax
+	jmp *%eax
+_label163:
 	subl $16, %esp
 	movl $68, %eax
 	movl %eax, 0(%esp)
@@ -6464,6 +6539,18 @@ variable_declaration:
 	movl %eax, 12(%esp)
 	call tuple4
 	addl $16, %esp
+	leave
+	ret
+variable_declaration_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1080, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
 	leave
 	ret
 block_statement:
@@ -6483,10 +6570,10 @@ block_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label161
+	je _label164
 	movl $block_statement_invalid, %eax
 	jmp *%eax
-_label161:
+_label164:
 	subl $8, %esp
 	movl $0, %eax
 	movl %eax, 0(%esp)
@@ -6515,10 +6602,10 @@ block_statement_loop:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label162
+	je _label165
 	movl $block_statement_end, %eax
 	jmp *%eax
-_label162:
+_label165:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $123, %eax
@@ -6526,7 +6613,7 @@ _label162:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label164
+	je _label167
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6535,8 +6622,8 @@ _label162:
 	call block_statement
 	addl $8, %esp
 	movl %eax, -12(%ebp)
-	jmp _label163
-_label164:
+	jmp _label166
+_label167:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6547,7 +6634,7 @@ _label164:
 	call statement
 	addl $12, %esp
 	movl %eax, -12(%ebp)
-_label163:
+_label166:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6555,6 +6642,18 @@ _label163:
 	movl %eax, 4(%esp)
 	call vector_push
 	addl $8, %esp
+	movl -12(%ebp), %eax
+	movl %eax, %edx
+	movl $0, %eax
+	leal (%edx,%eax,4), %eax
+	movl (%eax), %eax
+	movl %eax, %edx
+	movl $49, %eax
+	cmpl %eax, %edx
+	setl %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label168
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6568,10 +6667,11 @@ _label163:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label165
+	je _label169
 	movl $block_statement_content_invalid, %eax
 	jmp *%eax
-_label165:
+_label169:
+_label168:
 	movl $block_statement_loop, %eax
 	jmp *%eax
 block_statement_end:
@@ -6592,7 +6692,7 @@ block_statement_invalid:
 	movl %eax, 0(%esp)
 	movl -16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+888, %eax
+	movl $strbuf+1127, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -6602,7 +6702,7 @@ block_statement_content_invalid:
 	movl %eax, 0(%esp)
 	movl -20(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+919, %eax
+	movl $strbuf+1158, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -6618,7 +6718,7 @@ statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label167
+	je _label171
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6628,87 +6728,11 @@ statement:
 	addl $8, %esp
 	leave
 	ret
-	jmp _label166
-_label167:
-	movl 12(%ebp), %eax
-	movl %eax, %edx
-	movl $275, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label168
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 16(%ebp), %eax
-	movl %eax, 4(%esp)
-	call for_statement
-	addl $8, %esp
-	leave
-	ret
-	jmp _label166
-_label168:
-	movl 12(%ebp), %eax
-	movl %eax, %edx
-	movl $274, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label169
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 16(%ebp), %eax
-	movl %eax, 4(%esp)
-	call do_while_statement
-	addl $8, %esp
-	leave
-	ret
-	jmp _label166
-_label169:
-	movl 12(%ebp), %eax
-	movl %eax, %edx
-	movl $276, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label170
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 16(%ebp), %eax
-	movl %eax, 4(%esp)
-	call while_statement
-	addl $8, %esp
-	leave
-	ret
-	jmp _label166
-_label170:
-	movl 12(%ebp), %eax
-	movl %eax, %edx
-	movl $277, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label171
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 16(%ebp), %eax
-	movl %eax, 4(%esp)
-	call allocate_statement
-	addl $8, %esp
-	leave
-	ret
-	jmp _label166
+	jmp _label170
 _label171:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
-	movl $278, %eax
+	movl $275, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -6719,15 +6743,15 @@ _label171:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	call assembly_statement
+	call for_statement
 	addl $8, %esp
 	leave
 	ret
-	jmp _label166
+	jmp _label170
 _label172:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
-	movl $279, %eax
+	movl $274, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -6738,12 +6762,88 @@ _label172:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
+	call do_while_statement
+	addl $8, %esp
+	leave
+	ret
+	jmp _label170
+_label173:
+	movl 12(%ebp), %eax
+	movl %eax, %edx
+	movl $276, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label174
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 16(%ebp), %eax
+	movl %eax, 4(%esp)
+	call while_statement
+	addl $8, %esp
+	leave
+	ret
+	jmp _label170
+_label174:
+	movl 12(%ebp), %eax
+	movl %eax, %edx
+	movl $277, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label175
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 16(%ebp), %eax
+	movl %eax, 4(%esp)
+	call allocate_statement
+	addl $8, %esp
+	leave
+	ret
+	jmp _label170
+_label175:
+	movl 12(%ebp), %eax
+	movl %eax, %edx
+	movl $278, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label176
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 16(%ebp), %eax
+	movl %eax, 4(%esp)
+	call assembly_statement
+	addl $8, %esp
+	leave
+	ret
+	jmp _label170
+_label176:
+	movl 12(%ebp), %eax
+	movl %eax, %edx
+	movl $279, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label177
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 16(%ebp), %eax
+	movl %eax, 4(%esp)
 	call return_statement
 	addl $8, %esp
 	leave
 	ret
-	jmp _label166
-_label173:
+	jmp _label170
+_label177:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $272, %eax
@@ -6751,7 +6851,7 @@ _label173:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label174
+	jne _label178
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $273, %eax
@@ -6759,14 +6859,14 @@ _label173:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label174
+	jne _label178
 	movl $0, %eax
-	jmp _label175
-_label174:
+	jmp _label179
+_label178:
 	movl $1, %eax
-_label175:
+_label179:
 	cmpl $0, %eax
-	je _label176
+	je _label180
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6778,8 +6878,8 @@ _label175:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label166
-_label176:
+	jmp _label170
+_label180:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $285, %eax
@@ -6787,7 +6887,7 @@ _label176:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label177
+	je _label181
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6797,8 +6897,8 @@ _label176:
 	addl $8, %esp
 	leave
 	ret
-	jmp _label166
-_label177:
+	jmp _label170
+_label181:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $283, %eax
@@ -6806,7 +6906,7 @@ _label177:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label178
+	je _label182
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6816,8 +6916,8 @@ _label177:
 	addl $8, %esp
 	leave
 	ret
-	jmp _label166
-_label178:
+	jmp _label170
+_label182:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $282, %eax
@@ -6825,7 +6925,7 @@ _label178:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label179
+	je _label183
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6835,8 +6935,8 @@ _label178:
 	addl $8, %esp
 	leave
 	ret
-	jmp _label166
-_label179:
+	jmp _label170
+_label183:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6846,7 +6946,7 @@ _label179:
 	addl $8, %esp
 	leave
 	ret
-_label166:
+_label170:
 	leave
 	ret
 if_statement:
@@ -6875,10 +6975,10 @@ if_statement_parse:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label180
+	je _label184
 	movl $if_statement_invalid, %eax
 	jmp *%eax
-_label180:
+_label184:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6913,10 +7013,10 @@ _label180:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label181
+	je _label185
 	movl $if_statement_invalid, %eax
 	jmp *%eax
-_label181:
+_label185:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6951,7 +7051,7 @@ _label181:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label182
+	je _label186
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6959,7 +7059,7 @@ _label181:
 	addl $4, %esp
 	movl $if_statement_end, %eax
 	jmp *%eax
-_label182:
+_label186:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -6973,10 +7073,10 @@ _label182:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label183
+	je _label187
 	movl $if_statement_parse, %eax
 	jmp *%eax
-_label183:
+_label187:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7005,10 +7105,10 @@ _label183:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label184
+	je _label188
 	movl $if_statement_else_invalid, %eax
 	jmp *%eax
-_label184:
+_label188:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7032,7 +7132,7 @@ if_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+970, %eax
+	movl $strbuf+1210, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7042,7 +7142,7 @@ if_statement_else_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+998, %eax
+	movl $strbuf+1238, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7073,10 +7173,10 @@ for_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label185
+	je _label189
 	movl $for_statement_invalid, %eax
 	jmp *%eax
-_label185:
+_label189:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7090,12 +7190,12 @@ _label185:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label186
+	je _label190
 	movl $0, %eax
 	movl %eax, -8(%ebp)
 	movl $for_statement_skip_init, %eax
 	jmp *%eax
-_label186:
+_label190:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7117,10 +7217,10 @@ _label186:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label187
+	je _label191
 	movl $for_statement_invalid, %eax
 	jmp *%eax
-_label187:
+_label191:
 for_statement_skip_init:
 	subl $4, %esp
 	movl 8(%ebp), %eax
@@ -7135,12 +7235,12 @@ for_statement_skip_init:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label188
+	je _label192
 	movl $0, %eax
 	movl %eax, -12(%ebp)
 	movl $for_statement_skip_cond, %eax
 	jmp *%eax
-_label188:
+_label192:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7162,10 +7262,10 @@ _label188:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label189
+	je _label193
 	movl $for_statement_invalid, %eax
 	jmp *%eax
-_label189:
+_label193:
 for_statement_skip_cond:
 	subl $4, %esp
 	movl 8(%ebp), %eax
@@ -7180,10 +7280,10 @@ for_statement_skip_cond:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label190
+	je _label194
 	movl $for_statement_iter_end, %eax
 	jmp *%eax
-_label190:
+_label194:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7203,10 +7303,10 @@ for_statement_iter_loop:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label191
+	je _label195
 	movl $for_statement_invalid, %eax
 	jmp *%eax
-_label191:
+_label195:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7235,10 +7335,10 @@ _label191:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label192
+	je _label196
 	movl $for_statement_iter_loop, %eax
 	jmp *%eax
-_label192:
+_label196:
 for_statement_iter_end:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
@@ -7247,10 +7347,10 @@ for_statement_iter_end:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label193
+	je _label197
 	movl $for_statement_invalid, %eax
 	jmp *%eax
-_label193:
+_label197:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7288,7 +7388,7 @@ for_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1056, %eax
+	movl $strbuf+1296, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7325,10 +7425,10 @@ do_while_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label194
+	je _label198
 	movl $do_while_statement_invalid, %eax
 	jmp *%eax
-_label194:
+_label198:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7342,10 +7442,10 @@ _label194:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label195
+	je _label199
 	movl $do_while_statement_invalid, %eax
 	jmp *%eax
-_label195:
+_label199:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7373,10 +7473,27 @@ _label195:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label196
+	je _label200
 	movl $do_while_statement_invalid, %eax
 	jmp *%eax
-_label196:
+_label200:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label201
+	movl $do_while_statement_end_error, %eax
+	jmp *%eax
+_label201:
 	subl $16, %esp
 	movl $51, %eax
 	movl %eax, 0(%esp)
@@ -7396,7 +7513,17 @@ do_while_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1085, %eax
+	movl $strbuf+1325, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+do_while_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1359, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7419,10 +7546,10 @@ while_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label197
+	je _label202
 	movl $while_statement_invalid, %eax
 	jmp *%eax
-_label197:
+_label202:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7450,10 +7577,10 @@ _label197:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label198
+	je _label203
 	movl $while_statement_invalid, %eax
 	jmp *%eax
-_label198:
+_label203:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7487,7 +7614,7 @@ while_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1119, %eax
+	movl $strbuf+1406, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7510,10 +7637,10 @@ allocate_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label199
+	je _label204
 	movl $allocate_statement_invalid, %eax
 	jmp *%eax
-_label199:
+_label204:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7541,10 +7668,27 @@ _label199:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label200
+	je _label205
 	movl $allocate_statement_invalid, %eax
 	jmp *%eax
-_label200:
+_label205:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label206
+	movl $loop_jump_statement_end_error, %eax
+	jmp *%eax
+_label206:
 	subl $12, %esp
 	movl $53, %eax
 	movl %eax, 0(%esp)
@@ -7562,7 +7706,17 @@ allocate_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1150, %eax
+	movl $strbuf+1437, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+allocate_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1471, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7593,10 +7747,10 @@ assembly_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label201
+	je _label207
 	movl $assembly_statement_invalid, %eax
 	jmp *%eax
-_label201:
+_label207:
 assembly_statement_loop:
 	subl $4, %esp
 	movl 8(%ebp), %eax
@@ -7658,19 +7812,19 @@ assembly_statement_loop:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label202
+	je _label208
 	movl $assembly_statement_invalid, %eax
 	jmp *%eax
-_label202:
+_label208:
 	movl -12(%ebp), %eax
 	cmpl $0, %eax
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label203
+	je _label209
 	movl $assembly_statement_loop, %eax
 	jmp *%eax
-_label203:
+_label209:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7684,10 +7838,10 @@ _label203:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label204
+	je _label210
 	movl $assembly_statement_invalid, %eax
 	jmp *%eax
-_label204:
+_label210:
 	subl $12, %esp
 	movl $54, %eax
 	movl %eax, 0(%esp)
@@ -7705,7 +7859,7 @@ assembly_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1184, %eax
+	movl $strbuf+1518, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7736,7 +7890,7 @@ return_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label205
+	je _label211
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7744,7 +7898,7 @@ return_statement:
 	addl $4, %esp
 	movl $return_statement_end, %eax
 	jmp *%eax
-_label205:
+_label211:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7761,6 +7915,23 @@ _label205:
 	call vector_push
 	addl $8, %esp
 return_statement_end:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label212
+	movl $return_statement_end_error, %eax
+	jmp *%eax
+_label212:
 	subl $12, %esp
 	movl $55, %eax
 	movl %eax, 0(%esp)
@@ -7772,9 +7943,39 @@ return_statement_end:
 	addl $12, %esp
 	leave
 	ret
+return_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1552, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+	leave
+	ret
 loop_jump_statement:
 	pushl %ebp
 	movl %esp, %ebp
+	subl $4, %esp
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label213
+	movl $loop_jump_statement_end_error, %eax
+	jmp *%eax
+_label213:
 	subl $8, %esp
 	movl $56, %eax
 	pushl %ebx
@@ -7796,6 +7997,18 @@ loop_jump_statement:
 	addl $8, %esp
 	leave
 	ret
+loop_jump_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1597, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+	leave
+	ret
 writechar_statement:
 	pushl %ebp
 	movl %esp, %ebp
@@ -7813,10 +8026,10 @@ writechar_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label206
+	je _label214
 	movl $writechar_statement_invalid, %eax
 	jmp *%eax
-_label206:
+_label214:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7844,10 +8057,10 @@ _label206:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label207
+	je _label215
 	movl $writechar_statement_invalid, %eax
 	jmp *%eax
-_label207:
+_label215:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7875,10 +8088,10 @@ _label207:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label208
+	je _label216
 	movl $writechar_statement_invalid, %eax
 	jmp *%eax
-_label208:
+_label216:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -7906,10 +8119,27 @@ _label208:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label209
+	je _label217
 	movl $writechar_statement_invalid, %eax
 	jmp *%eax
-_label209:
+_label217:
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label218
+	movl $writechar_statement_end_error, %eax
+	jmp *%eax
+_label218:
 	subl $20, %esp
 	movl $58, %eax
 	movl %eax, 0(%esp)
@@ -7931,7 +8161,17 @@ writechar_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1218, %eax
+	movl $strbuf+1650, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+writechar_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1678, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -7954,10 +8194,10 @@ label_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label210
+	je _label219
 	movl $label_statement_invalid, %eax
 	jmp *%eax
-_label210:
+_label219:
 	subl $4, %esp
 	pushl %ebx
 	pushl %ecx
@@ -7992,6 +8232,23 @@ _label210:
 	call strdup
 	addl $4, %esp
 	movl %eax, -8(%ebp)
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label220
+	movl $label_statement_end_error, %eax
+	jmp *%eax
+_label220:
 	subl $12, %esp
 	movl $59, %eax
 	movl %eax, 0(%esp)
@@ -8009,7 +8266,17 @@ label_statement_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1246, %eax
+	movl $strbuf+1726, %eax
+	movl %eax, 8(%esp)
+	call parser_error
+	addl $12, %esp
+label_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1756, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -8033,6 +8300,23 @@ goto_statement:
 	call expression
 	addl $8, %esp
 	movl %eax, -8(%ebp)
+	subl $4, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	call parser_lex
+	addl $4, %esp
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	setne %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label221
+	movl $label_statement_end_error, %eax
+	jmp *%eax
+_label221:
 	subl $12, %esp
 	movl $60, %eax
 	movl %eax, 0(%esp)
@@ -8041,6 +8325,18 @@ goto_statement:
 	movl -8(%ebp), %eax
 	movl %eax, 8(%esp)
 	call tuple3
+	addl $12, %esp
+	leave
+	ret
+goto_statement_end_error:
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $strbuf+1800, %eax
+	movl %eax, 8(%esp)
+	call parser_error
 	addl $12, %esp
 	leave
 	ret
@@ -8092,7 +8388,7 @@ assignment_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label211
+	je _label222
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8106,7 +8402,7 @@ assignment_expression:
 	addl $16, %esp
 	leave
 	ret
-_label211:
+_label222:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $309, %eax
@@ -8114,7 +8410,7 @@ _label211:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label212
+	je _label223
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8128,7 +8424,7 @@ _label211:
 	addl $16, %esp
 	leave
 	ret
-_label212:
+_label223:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $310, %eax
@@ -8136,7 +8432,7 @@ _label212:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label213
+	je _label224
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8150,7 +8446,7 @@ _label212:
 	addl $16, %esp
 	leave
 	ret
-_label213:
+_label224:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $311, %eax
@@ -8158,7 +8454,7 @@ _label213:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label214
+	je _label225
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8172,7 +8468,7 @@ _label213:
 	addl $16, %esp
 	leave
 	ret
-_label214:
+_label225:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $312, %eax
@@ -8180,7 +8476,7 @@ _label214:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label215
+	je _label226
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8194,7 +8490,7 @@ _label214:
 	addl $16, %esp
 	leave
 	ret
-_label215:
+_label226:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $313, %eax
@@ -8202,7 +8498,7 @@ _label215:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label216
+	je _label227
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8216,7 +8512,7 @@ _label215:
 	addl $16, %esp
 	leave
 	ret
-_label216:
+_label227:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $314, %eax
@@ -8224,7 +8520,7 @@ _label216:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label217
+	je _label228
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8238,7 +8534,7 @@ _label216:
 	addl $16, %esp
 	leave
 	ret
-_label217:
+_label228:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $315, %eax
@@ -8246,7 +8542,7 @@ _label217:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label218
+	je _label229
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8260,7 +8556,7 @@ _label217:
 	addl $16, %esp
 	leave
 	ret
-_label218:
+_label229:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $316, %eax
@@ -8268,7 +8564,7 @@ _label218:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label219
+	je _label230
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8282,7 +8578,7 @@ _label218:
 	addl $16, %esp
 	leave
 	ret
-_label219:
+_label230:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $317, %eax
@@ -8290,7 +8586,7 @@ _label219:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label220
+	je _label231
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8304,7 +8600,7 @@ _label219:
 	addl $16, %esp
 	leave
 	ret
-_label220:
+_label231:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $318, %eax
@@ -8312,7 +8608,7 @@ _label220:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label221
+	je _label232
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8326,7 +8622,7 @@ _label220:
 	addl $16, %esp
 	leave
 	ret
-_label221:
+_label232:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8403,7 +8699,7 @@ ternary_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label222
+	je _label233
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8417,7 +8713,7 @@ ternary_expression:
 	addl $16, %esp
 	leave
 	ret
-_label222:
+_label233:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8465,10 +8761,10 @@ ternary_expr:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label223
+	je _label234
 	movl $ternary_expr_error, %eax
 	jmp *%eax
-_label223:
+_label234:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8512,7 +8808,7 @@ ternary_expr_error:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1276, %eax
+	movl $strbuf+1843, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -8529,7 +8825,7 @@ logical_or_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label224
+	je _label235
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8542,7 +8838,7 @@ logical_or_expression:
 	call logical_and_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label224:
+_label235:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8556,7 +8852,7 @@ _label224:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label225
+	je _label236
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8568,7 +8864,7 @@ _label224:
 	addl $12, %esp
 	leave
 	ret
-_label225:
+_label236:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8649,7 +8945,7 @@ logical_and_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label226
+	je _label237
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8662,7 +8958,7 @@ logical_and_expression:
 	call equality_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label226:
+_label237:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8676,7 +8972,7 @@ _label226:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label227
+	je _label238
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8688,7 +8984,7 @@ _label226:
 	addl $12, %esp
 	leave
 	ret
-_label227:
+_label238:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8769,7 +9065,7 @@ equality_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label228
+	je _label239
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8782,7 +9078,7 @@ equality_expression:
 	call relational_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label228:
+_label239:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8796,7 +9092,7 @@ _label228:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label229
+	je _label240
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8810,7 +9106,7 @@ _label228:
 	addl $16, %esp
 	leave
 	ret
-_label229:
+_label240:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $301, %eax
@@ -8818,7 +9114,7 @@ _label229:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label230
+	je _label241
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8832,7 +9128,7 @@ _label229:
 	addl $16, %esp
 	leave
 	ret
-_label230:
+_label241:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8913,7 +9209,7 @@ relational_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label231
+	je _label242
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8926,7 +9222,7 @@ relational_expression:
 	call bitwise_or_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label231:
+_label242:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8940,7 +9236,7 @@ _label231:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label232
+	je _label243
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8954,7 +9250,7 @@ _label231:
 	addl $16, %esp
 	leave
 	ret
-_label232:
+_label243:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $62, %eax
@@ -8962,7 +9258,7 @@ _label232:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label233
+	je _label244
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8976,7 +9272,7 @@ _label232:
 	addl $16, %esp
 	leave
 	ret
-_label233:
+_label244:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $302, %eax
@@ -8984,7 +9280,7 @@ _label233:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label234
+	je _label245
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -8998,7 +9294,7 @@ _label233:
 	addl $16, %esp
 	leave
 	ret
-_label234:
+_label245:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $303, %eax
@@ -9006,7 +9302,7 @@ _label234:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label235
+	je _label246
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9020,7 +9316,7 @@ _label234:
 	addl $16, %esp
 	leave
 	ret
-_label235:
+_label246:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9101,7 +9397,7 @@ bitwise_or_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label236
+	je _label247
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9114,7 +9410,7 @@ bitwise_or_expression:
 	call bitwise_xor_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label236:
+_label247:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9128,7 +9424,7 @@ _label236:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label237
+	je _label248
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9140,7 +9436,7 @@ _label236:
 	addl $12, %esp
 	leave
 	ret
-_label237:
+_label248:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9221,7 +9517,7 @@ bitwise_xor_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label238
+	je _label249
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9234,7 +9530,7 @@ bitwise_xor_expression:
 	call bitwise_and_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label238:
+_label249:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9248,7 +9544,7 @@ _label238:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label239
+	je _label250
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9260,7 +9556,7 @@ _label238:
 	addl $12, %esp
 	leave
 	ret
-_label239:
+_label250:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9341,7 +9637,7 @@ bitwise_and_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label240
+	je _label251
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9354,7 +9650,7 @@ bitwise_and_expression:
 	call bitwise_shift_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label240:
+_label251:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9368,7 +9664,7 @@ _label240:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label241
+	je _label252
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9380,7 +9676,7 @@ _label240:
 	addl $12, %esp
 	leave
 	ret
-_label241:
+_label252:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9461,7 +9757,7 @@ bitwise_shift_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label242
+	je _label253
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9474,7 +9770,7 @@ bitwise_shift_expression:
 	call additive_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label242:
+_label253:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9488,7 +9784,7 @@ _label242:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label243
+	je _label254
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9502,7 +9798,7 @@ _label242:
 	addl $16, %esp
 	leave
 	ret
-_label243:
+_label254:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $306, %eax
@@ -9510,7 +9806,7 @@ _label243:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label244
+	je _label255
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9524,7 +9820,7 @@ _label243:
 	addl $16, %esp
 	leave
 	ret
-_label244:
+_label255:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9605,7 +9901,7 @@ additive_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label245
+	je _label256
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9618,7 +9914,7 @@ additive_expression:
 	call multiplicative_expression
 	addl $16, %esp
 	movl %eax, 16(%ebp)
-_label245:
+_label256:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9632,7 +9928,7 @@ _label245:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label246
+	je _label257
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9646,7 +9942,7 @@ _label245:
 	addl $16, %esp
 	leave
 	ret
-_label246:
+_label257:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $45, %eax
@@ -9654,7 +9950,7 @@ _label246:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label247
+	je _label258
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9668,7 +9964,7 @@ _label246:
 	addl $16, %esp
 	leave
 	ret
-_label247:
+_label258:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9749,7 +10045,7 @@ multiplicative_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label248
+	je _label259
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9760,7 +10056,7 @@ multiplicative_expression:
 	call prefix_expression
 	addl $12, %esp
 	movl %eax, 16(%ebp)
-_label248:
+_label259:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9774,7 +10070,7 @@ _label248:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label249
+	je _label260
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9788,7 +10084,7 @@ _label248:
 	addl $16, %esp
 	leave
 	ret
-_label249:
+_label260:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $47, %eax
@@ -9796,7 +10092,7 @@ _label249:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label250
+	je _label261
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9810,7 +10106,7 @@ _label249:
 	addl $16, %esp
 	leave
 	ret
-_label250:
+_label261:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $37, %eax
@@ -9818,7 +10114,7 @@ _label250:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label251
+	je _label262
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9832,7 +10128,7 @@ _label250:
 	addl $16, %esp
 	leave
 	ret
-_label251:
+_label262:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9910,7 +10206,7 @@ prefix_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label253
+	je _label264
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9922,8 +10218,8 @@ prefix_expression:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label253:
+	jmp _label263
+_label264:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $45, %eax
@@ -9931,7 +10227,7 @@ _label253:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label254
+	je _label265
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9943,8 +10239,8 @@ _label253:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label254:
+	jmp _label263
+_label265:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $33, %eax
@@ -9952,7 +10248,7 @@ _label254:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label255
+	je _label266
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9964,8 +10260,8 @@ _label254:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label255:
+	jmp _label263
+_label266:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $126, %eax
@@ -9973,7 +10269,7 @@ _label255:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label256
+	je _label267
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -9985,8 +10281,8 @@ _label255:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label256:
+	jmp _label263
+_label267:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $42, %eax
@@ -9994,7 +10290,7 @@ _label256:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label257
+	je _label268
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10006,8 +10302,8 @@ _label256:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label257:
+	jmp _label263
+_label268:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $38, %eax
@@ -10015,7 +10311,7 @@ _label257:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label258
+	je _label269
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10027,8 +10323,8 @@ _label257:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label258:
+	jmp _label263
+_label269:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $320, %eax
@@ -10036,7 +10332,7 @@ _label258:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label259
+	je _label270
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10048,8 +10344,8 @@ _label258:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label259:
+	jmp _label263
+_label270:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $319, %eax
@@ -10057,7 +10353,7 @@ _label259:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label260
+	je _label271
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10069,8 +10365,8 @@ _label259:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label252
-_label260:
+	jmp _label263
+_label271:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10082,7 +10378,7 @@ _label260:
 	addl $12, %esp
 	leave
 	ret
-_label252:
+_label263:
 	leave
 	ret
 prefix_expr:
@@ -10132,7 +10428,7 @@ simple_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label261
+	je _label272
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10142,7 +10438,7 @@ simple_expression:
 	addl $8, %esp
 	leave
 	ret
-_label261:
+_label272:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $260, %eax
@@ -10150,7 +10446,7 @@ _label261:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label262
+	je _label273
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10162,7 +10458,7 @@ _label261:
 	addl $12, %esp
 	leave
 	ret
-_label262:
+_label273:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $261, %eax
@@ -10170,7 +10466,7 @@ _label262:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label263
+	je _label274
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10182,7 +10478,7 @@ _label262:
 	addl $12, %esp
 	leave
 	ret
-_label263:
+_label274:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $280, %eax
@@ -10190,7 +10486,7 @@ _label263:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label264
+	je _label275
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10200,7 +10496,7 @@ _label263:
 	addl $8, %esp
 	leave
 	ret
-_label264:
+_label275:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $284, %eax
@@ -10208,7 +10504,7 @@ _label264:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label265
+	je _label276
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10218,7 +10514,7 @@ _label264:
 	addl $8, %esp
 	leave
 	ret
-_label265:
+_label276:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $40, %eax
@@ -10226,7 +10522,7 @@ _label265:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label266
+	je _label277
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10236,7 +10532,7 @@ _label265:
 	addl $8, %esp
 	leave
 	ret
-_label266:
+_label277:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10337,10 +10633,10 @@ simple_argvar_expression:
 	movl %eax, -4(%ebp)
 	movl 12(%ebp), %eax
 	cmpl $0, %eax
-	je _label267
+	je _label278
 	movl $3, %eax
 	movl %eax, -4(%ebp)
-_label267:
+_label278:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10421,10 +10717,10 @@ simple_syscall_expression:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label268
+	je _label279
 	movl $simple_syscall_expression_invalid, %eax
 	jmp *%eax
-_label268:
+_label279:
 simple_syscall_expression_loop:
 	subl $4, %esp
 	movl 8(%ebp), %eax
@@ -10460,10 +10756,10 @@ simple_syscall_expression_loop:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label269
+	je _label280
 	movl $simple_syscall_expression_loop, %eax
 	jmp *%eax
-_label269:
+_label280:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $41, %eax
@@ -10471,10 +10767,10 @@ _label269:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label270
+	je _label281
 	movl $simple_syscall_expression_invalid, %eax
 	jmp *%eax
-_label270:
+_label281:
 	subl $4, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10486,10 +10782,10 @@ _label270:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label271
+	je _label282
 	movl $simple_syscall_expression_too_many, %eax
 	jmp *%eax
-_label271:
+_label282:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10523,7 +10819,7 @@ simple_syscall_expression_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1312, %eax
+	movl $strbuf+1879, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -10533,7 +10829,7 @@ simple_syscall_expression_too_many:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1339, %eax
+	movl $strbuf+1906, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -10556,10 +10852,10 @@ simple_readchar_expression:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label272
+	je _label283
 	movl $simple_readchar_expression_invalid, %eax
 	jmp *%eax
-_label272:
+_label283:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10587,10 +10883,10 @@ _label272:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label273
+	je _label284
 	movl $simple_readchar_expression_invalid, %eax
 	jmp *%eax
-_label273:
+_label284:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10618,10 +10914,10 @@ _label273:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label274
+	je _label285
 	movl $simple_readchar_expression_invalid, %eax
 	jmp *%eax
-_label274:
+_label285:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10657,7 +10953,7 @@ simple_readchar_expression_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1380, %eax
+	movl $strbuf+1947, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -10694,10 +10990,10 @@ simple_parantheses_expression:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label275
+	je _label286
 	movl $simple_parantheses_expression_invalid, %eax
 	jmp *%eax
-_label275:
+_label286:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10713,7 +11009,7 @@ simple_parantheses_expression_invalid:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1408, %eax
+	movl $strbuf+1975, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -10742,7 +11038,7 @@ simple_postfix_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label277
+	je _label288
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10754,8 +11050,8 @@ simple_postfix_expression:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label276
-_label277:
+	jmp _label287
+_label288:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $91, %eax
@@ -10763,7 +11059,7 @@ _label277:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label278
+	je _label289
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10775,8 +11071,8 @@ _label277:
 	addl $12, %esp
 	leave
 	ret
-	jmp _label276
-_label278:
+	jmp _label287
+_label289:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $320, %eax
@@ -10784,7 +11080,7 @@ _label278:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label279
+	je _label290
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10812,8 +11108,8 @@ _label278:
 	addl $8, %esp
 	leave
 	ret
-	jmp _label276
-_label279:
+	jmp _label287
+_label290:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $319, %eax
@@ -10821,7 +11117,7 @@ _label279:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label276
+	je _label287
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10849,7 +11145,7 @@ _label279:
 	addl $8, %esp
 	leave
 	ret
-_label276:
+_label287:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10896,10 +11192,10 @@ simple_address_call_expression_loop:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label280
+	je _label291
 	movl $simple_address_call_expression_end, %eax
 	jmp *%eax
-_label280:
+_label291:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -10928,10 +11224,10 @@ _label280:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label281
+	je _label292
 	movl $simple_address_call_expression_loop, %eax
 	jmp *%eax
-_label281:
+_label292:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $41, %eax
@@ -10939,10 +11235,10 @@ _label281:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label282
+	je _label293
 	movl $simple_address_call_expression_invalid, %eax
 	jmp *%eax
-_label282:
+_label293:
 simple_address_call_expression_end:
 	subl $8, %esp
 	movl 8(%ebp), %eax
@@ -10977,7 +11273,7 @@ simple_address_call_expression_invalid:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1445, %eax
+	movl $strbuf+2012, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -11014,10 +11310,10 @@ simple_address_index_expression:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label283
+	je _label294
 	movl $simple_address_index_expression_invalid, %eax
 	jmp *%eax
-_label283:
+_label294:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -11053,7 +11349,7 @@ simple_address_index_expression_invalid:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1475, %eax
+	movl $strbuf+2042, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -11069,7 +11365,7 @@ constant_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label284
+	je _label295
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -11079,7 +11375,7 @@ constant_expression:
 	addl $8, %esp
 	leave
 	ret
-_label284:
+_label295:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $259, %eax
@@ -11087,7 +11383,7 @@ _label284:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label285
+	je _label296
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -11097,13 +11393,13 @@ _label284:
 	addl $8, %esp
 	leave
 	ret
-_label285:
+_label296:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1506, %eax
+	movl $strbuf+2073, %eax
 	movl %eax, 8(%esp)
 	call parser_error
 	addl $12, %esp
@@ -11281,7 +11577,7 @@ string_buffer_find:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label286
+	je _label297
 	movl 8(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -11292,7 +11588,7 @@ string_buffer_find:
 	movl %eax, -12(%ebp)
 	movl $0, %eax
 	movl %eax, -16(%ebp)
-_label287:
+_label298:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl -8(%ebp), %eax
@@ -11300,7 +11596,7 @@ _label287:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label288
+	je _label299
 	movl -4(%ebp), %eax
 	movl %eax, %ebx
 	movl -12(%ebp), %eax
@@ -11319,11 +11615,11 @@ _label287:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label289
+	je _label300
 	movl -16(%ebp), %eax
 	leave
 	ret
-_label289:
+_label300:
 	movl -12(%ebp), %eax
 	movl %eax, %ebx
 	pushl %ebx
@@ -11354,9 +11650,9 @@ _label289:
 	popl %eax
 	subl %ebx, %eax
 	movl %eax, -16(%ebp)
-	jmp _label287
-_label288:
-_label286:
+	jmp _label298
+_label299:
+_label297:
 	movl $1, %eax
 	negl %eax
 	leave
@@ -11381,11 +11677,11 @@ string_buffer_push:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label290
+	je _label301
 	movl -4(%ebp), %eax
 	leave
 	ret
-_label290:
+_label301:
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -11414,9 +11710,9 @@ _label290:
 	setge %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label291
+	je _label302
 	subl $4, %esp
-	movl $strbuf+1559, %eax
+	movl $strbuf+2126, %eax
 	movl %eax, 0(%esp)
 	call eputs
 	addl $4, %esp
@@ -11425,7 +11721,7 @@ _label290:
 	movl %eax, 0(%esp)
 	call exit
 	addl $4, %esp
-_label291:
+_label302:
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -11506,7 +11802,7 @@ string_buffer_export:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label292
+	je _label303
 	movl 8(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -11516,13 +11812,13 @@ string_buffer_export:
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1590, %eax
+	movl $strbuf+2157, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	movl $0, %eax
 	movl %eax, -12(%ebp)
-_label293:
+_label304:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl -8(%ebp), %eax
@@ -11530,11 +11826,11 @@ _label293:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label294
+	je _label305
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1599, %eax
+	movl $strbuf+2166, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -11576,13 +11872,13 @@ _label293:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -12(%ebp)
-	jmp _label293
-_label294:
-_label292:
+	jmp _label304
+_label305:
+_label303:
 	leave
 	ret
 .data
-registers:.long strbuf+1608,strbuf+1613,strbuf+1618,strbuf+1623,strbuf+1628,strbuf+1633,strbuf+1638
+registers:.long strbuf+2175,strbuf+2180,strbuf+2185,strbuf+2190,strbuf+2195,strbuf+2200,strbuf+2205
 .text
 compiler:
 	pushl %ebp
@@ -11683,10 +11979,10 @@ compiler_set_segment:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label295
+	je _label306
 	leave
 	ret
-_label295:
+_label306:
 	movl 8(%ebp), %eax
 	movl %eax, %edx
 	movl $3, %eax
@@ -11701,15 +11997,15 @@ _label295:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label296
+	je _label307
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1643, %eax
+	movl $strbuf+2210, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label296:
+_label307:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $1, %eax
@@ -11717,15 +12013,15 @@ _label296:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label297
+	je _label308
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1650, %eax
+	movl $strbuf+2217, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label297:
+_label308:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -11733,15 +12029,15 @@ _label297:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label298
+	je _label309
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1657, %eax
+	movl $strbuf+2224, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label298:
+_label309:
 	leave
 	ret
 compiler_allocate_register:
@@ -11771,11 +12067,11 @@ compiler_allocate_register:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label299
+	je _label310
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1675, %eax
+	movl $strbuf+2242, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -11795,7 +12091,7 @@ compiler_allocate_register:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label299:
+_label310:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl 12(%ebp), %eax
@@ -11846,7 +12142,7 @@ compiler_free_register:
 	setne %al
 	movzbl %al, %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1683, %eax
+	movl $strbuf+2250, %eax
 	movl %eax, 4(%esp)
 	call assert
 	addl $8, %esp
@@ -11861,11 +12157,11 @@ compiler_free_register:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label300
+	je _label311
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1716, %eax
+	movl $strbuf+2283, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -11885,7 +12181,7 @@ compiler_free_register:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label300:
+_label311:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl 12(%ebp), %eax
@@ -12008,7 +12304,7 @@ compiler_pop_loop:
 	setne %al
 	movzbl %al, %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1723, %eax
+	movl $strbuf+2290, %eax
 	movl %eax, 4(%esp)
 	call assert
 	addl $8, %esp
@@ -12039,7 +12335,7 @@ fputlabel:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1758, %eax
+	movl $strbuf+2325, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -12065,7 +12361,7 @@ fputlabeldef:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1765, %eax
+	movl $strbuf+2332, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -12075,7 +12371,7 @@ compiler_error:
 	pushl %ebp
 	movl %esp, %ebp
 	subl $4, %esp
-	movl $strbuf+1768, %eax
+	movl $strbuf+2335, %eax
 	movl %eax, 0(%esp)
 	call eputs
 	addl $4, %esp
@@ -12122,7 +12418,7 @@ compiler_compile:
 	addl $8, %esp
 	movl $0, %eax
 	movl %eax, -4(%ebp)
-_label301:
+_label312:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -12136,7 +12432,7 @@ _label301:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label302
+	je _label313
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12165,8 +12461,8 @@ _label301:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -4(%ebp)
-	jmp _label301
-_label302:
+	jmp _label312
+_label313:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12201,7 +12497,7 @@ compiler_use_macros:
 	subl $12, %esp
 	movl $0, %eax
 	movl %eax, -4(%ebp)
-_label303:
+_label314:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -12215,7 +12511,7 @@ _label303:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label304
+	je _label315
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12235,13 +12531,13 @@ _label303:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label305
+	je _label316
 	movl -4(%ebp), %eax
 	movl %eax, %ebx
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -12(%ebp)
-_label306:
+_label317:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -12255,7 +12551,7 @@ _label306:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label307
+	je _label318
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12286,16 +12582,16 @@ _label306:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -12(%ebp)
-	jmp _label306
-_label307:
-_label305:
+	jmp _label317
+_label318:
+_label316:
 	movl -4(%ebp), %eax
 	movl %eax, %ebx
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -4(%ebp)
-	jmp _label303
-_label304:
+	jmp _label314
+_label315:
 	leave
 	ret
 compiler_use_macro:
@@ -12317,130 +12613,13 @@ compiler_use_macro:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label308
-	movl $compiler_use_macro_vector, %eax
-	jmp *%eax
-_label308:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $7, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label309
-	movl $compiler_use_macro_vector, %eax
-	jmp *%eax
-_label309:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $6, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label310
-	movl $2, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label310:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $8, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label311
-	movl $2, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label311:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $9, %eax
-	cmpl %eax, %edx
-	setge %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label313
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $14, %eax
-	cmpl %eax, %edx
-	setle %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label313
-	movl $1, %eax
-	jmp _label314
-_label313:
-	movl $0, %eax
-_label314:
-	cmpl $0, %eax
-	je _label312
-	movl $1, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label312:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $15, %eax
-	cmpl %eax, %edx
-	setge %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label316
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $40, %eax
-	cmpl %eax, %edx
-	setle %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label316
-	movl $1, %eax
-	jmp _label317
-_label316:
-	movl $0, %eax
-_label317:
-	cmpl $0, %eax
-	je _label315
-	movl $2, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label315:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $48, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label318
-	movl $3, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label318:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $49, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
 	je _label319
 	movl $compiler_use_macro_vector, %eax
 	jmp *%eax
 _label319:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $61, %eax
+	movl $7, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -12451,34 +12630,51 @@ _label319:
 _label320:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $55, %eax
+	movl $6, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label321
-	movl $compiler_use_macro_vector, %eax
+	movl $2, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
 	jmp *%eax
 _label321:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $65, %eax
+	movl $8, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label322
-	movl $3, %eax
-	movl %eax, -8(%ebp)
-	movl $compiler_use_macro_vector, %eax
+	movl $2, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
 	jmp *%eax
 _label322:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $53, %eax
+	movl $9, %eax
 	cmpl %eax, %edx
-	sete %al
+	setge %al
 	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label324
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $14, %eax
+	cmpl %eax, %edx
+	setle %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label324
+	movl $1, %eax
+	jmp _label325
+_label324:
+	movl $0, %eax
+_label325:
 	cmpl $0, %eax
 	je _label323
 	movl $1, %eax
@@ -12488,36 +12684,25 @@ _label322:
 _label323:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $50, %eax
+	movl $15, %eax
 	cmpl %eax, %edx
-	sete %al
+	setge %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label324
-	movl $4, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label324:
+	je _label327
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $51, %eax
+	movl $40, %eax
 	cmpl %eax, %edx
-	sete %al
+	setle %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label325
-	movl $2, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label325:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $52, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
+	je _label327
+	movl $1, %eax
+	jmp _label328
+_label327:
+	movl $0, %eax
+_label328:
 	cmpl $0, %eax
 	je _label326
 	movl $2, %eax
@@ -12527,93 +12712,53 @@ _label325:
 _label326:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $58, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label327
-	movl $3, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label327:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $60, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label328
-	movl $1, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
-	jmp *%eax
-_label328:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $63, %eax
+	movl $48, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label329
 	movl $3, %eax
-	movl %eax, -8(%ebp)
-	movl $1, %eax
 	movl %eax, -12(%ebp)
 	movl $compiler_use_macro_tuple, %eax
 	jmp *%eax
 _label329:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $64, %eax
+	movl $49, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label330
-	movl $4, %eax
-	movl %eax, -8(%ebp)
-	movl $1, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
+	movl $compiler_use_macro_vector, %eax
 	jmp *%eax
 _label330:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $66, %eax
+	movl $61, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label331
-	movl $3, %eax
-	movl %eax, -8(%ebp)
-	movl $1, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
+	movl $compiler_use_macro_vector, %eax
 	jmp *%eax
 _label331:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $67, %eax
+	movl $55, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
 	je _label332
-	movl $3, %eax
-	movl %eax, -8(%ebp)
-	movl $1, %eax
-	movl %eax, -12(%ebp)
-	movl $compiler_use_macro_tuple, %eax
+	movl $compiler_use_macro_vector, %eax
 	jmp *%eax
 _label332:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $68, %eax
+	movl $65, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -12621,18 +12766,169 @@ _label332:
 	je _label333
 	movl $3, %eax
 	movl %eax, -8(%ebp)
+	movl $compiler_use_macro_vector, %eax
+	jmp *%eax
+_label333:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $53, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label334
 	movl $1, %eax
 	movl %eax, -12(%ebp)
 	movl $compiler_use_macro_tuple, %eax
 	jmp *%eax
-_label333:
+_label334:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $50, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label335
+	movl $4, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label335:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $51, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label336
+	movl $2, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label336:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $52, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label337
+	movl $2, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label337:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $58, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label338
+	movl $3, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label338:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $60, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label339
+	movl $1, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label339:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $63, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label340
+	movl $3, %eax
+	movl %eax, -8(%ebp)
+	movl $1, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label340:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $64, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label341
+	movl $4, %eax
+	movl %eax, -8(%ebp)
+	movl $1, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label341:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $66, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label342
+	movl $3, %eax
+	movl %eax, -8(%ebp)
+	movl $1, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label342:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $67, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label343
+	movl $3, %eax
+	movl %eax, -8(%ebp)
+	movl $1, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label343:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $68, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label344
+	movl $3, %eax
+	movl %eax, -8(%ebp)
+	movl $1, %eax
+	movl %eax, -12(%ebp)
+	movl $compiler_use_macro_tuple, %eax
+	jmp *%eax
+_label344:
 compiler_use_macro_exit:
 	leave
 	ret
 compiler_use_macro_tuple:
 	movl $0, %eax
 	movl %eax, -4(%ebp)
-_label334:
+_label345:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl -12(%ebp), %eax
@@ -12640,7 +12936,7 @@ _label334:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label335
+	je _label346
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl -8(%ebp), %eax
@@ -12661,7 +12957,7 @@ _label334:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label337
+	je _label348
 	subl $8, %esp
 	movl -16(%ebp), %eax
 	pushl %edx
@@ -12687,7 +12983,7 @@ _label334:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label338
+	je _label349
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl -8(%ebp), %eax
@@ -12702,9 +12998,9 @@ _label334:
 	leal (%edx,%eax,4), %eax
 	movl (%eax), %eax
 	movl %eax, (%ebx)
-_label338:
-	jmp _label336
-_label337:
+_label349:
+	jmp _label347
+_label348:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12714,20 +13010,20 @@ _label337:
 	movl %eax, 8(%esp)
 	call compiler_use_macro
 	addl $12, %esp
-_label336:
+_label347:
 	movl -4(%ebp), %eax
 	movl %eax, %ebx
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -4(%ebp)
-	jmp _label334
-_label335:
+	jmp _label345
+_label346:
 	movl $compiler_use_macro_exit, %eax
 	jmp *%eax
 compiler_use_macro_vector:
 	movl $0, %eax
 	movl %eax, -4(%ebp)
-_label339:
+_label350:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -12747,7 +13043,7 @@ _label339:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label340
+	je _label351
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	pushl %edx
@@ -12773,7 +13069,7 @@ _label339:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label342
+	je _label353
 	subl $8, %esp
 	movl -16(%ebp), %eax
 	pushl %edx
@@ -12799,7 +13095,7 @@ _label339:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label343
+	je _label354
 	subl $12, %esp
 	movl 12(%ebp), %eax
 	pushl %edx
@@ -12821,9 +13117,9 @@ _label339:
 	movl %eax, 8(%esp)
 	call vector_set
 	addl $12, %esp
-_label343:
-	jmp _label341
-_label342:
+_label354:
+	jmp _label352
+_label353:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12833,14 +13129,14 @@ _label342:
 	movl %eax, 8(%esp)
 	call compiler_use_macro
 	addl $12, %esp
-_label341:
+_label352:
 	movl -4(%ebp), %eax
 	movl %eax, %ebx
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -4(%ebp)
-	jmp _label339
-_label340:
+	jmp _label350
+_label351:
 	movl $compiler_use_macro_exit, %eax
 	jmp *%eax
 	leave
@@ -12862,7 +13158,7 @@ compile_top_level_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label345
+	je _label356
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12870,8 +13166,8 @@ compile_top_level_statement:
 	movl %eax, 4(%esp)
 	call compile_global_statement
 	addl $8, %esp
-	jmp _label344
-_label345:
+	jmp _label355
+_label356:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $64, %eax
@@ -12879,7 +13175,7 @@ _label345:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label346
+	je _label357
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12887,8 +13183,8 @@ _label345:
 	movl %eax, 4(%esp)
 	call compile_function_declaration
 	addl $8, %esp
-	jmp _label344
-_label346:
+	jmp _label355
+_label357:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $65, %eax
@@ -12896,7 +13192,7 @@ _label346:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label347
+	je _label358
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12904,8 +13200,8 @@ _label346:
 	movl %eax, 4(%esp)
 	call compile_array_declaration
 	addl $8, %esp
-	jmp _label344
-_label347:
+	jmp _label355
+_label358:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $66, %eax
@@ -12913,7 +13209,7 @@ _label347:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label348
+	je _label359
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12923,8 +13219,8 @@ _label347:
 	movl %eax, 8(%esp)
 	call compile_type_array_declaration
 	addl $12, %esp
-	jmp _label344
-_label348:
+	jmp _label355
+_label359:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $67, %eax
@@ -12932,7 +13228,7 @@ _label348:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label349
+	je _label360
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12942,8 +13238,8 @@ _label348:
 	movl %eax, 8(%esp)
 	call compile_type_array_declaration
 	addl $12, %esp
-	jmp _label344
-_label349:
+	jmp _label355
+_label360:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $68, %eax
@@ -12951,7 +13247,7 @@ _label349:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label344
+	je _label355
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -12959,7 +13255,7 @@ _label349:
 	movl %eax, 4(%esp)
 	call compile_variable_declaration
 	addl $8, %esp
-_label344:
+_label355:
 	leave
 	ret
 compile_global_statement:
@@ -12975,13 +13271,13 @@ compile_global_statement:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1776, %eax
+	movl $strbuf+2343, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	movl $0, %eax
 	movl %eax, -8(%ebp)
-_label350:
+_label361:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -13001,7 +13297,7 @@ _label350:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label351
+	je _label362
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -13009,7 +13305,7 @@ _label350:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label352
+	je _label363
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13017,7 +13313,7 @@ _label350:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label352:
+_label363:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13052,8 +13348,8 @@ _label352:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -8(%ebp)
-	jmp _label350
-_label351:
+	jmp _label361
+_label362:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13102,21 +13398,21 @@ compile_function_declaration:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1765, %eax
+	movl $strbuf+2332, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1785, %eax
+	movl $strbuf+2352, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1798, %eax
+	movl $strbuf+2365, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -13157,10 +13453,10 @@ compile_function_declaration_return:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label353
+	je _label364
 	movl $compile_function_declaration_return_print, %eax
 	jmp *%eax
-_label353:
+_label364:
 	subl $4, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13180,15 +13476,15 @@ _label353:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label354
+	je _label365
 	leave
 	ret
-_label354:
+_label365:
 compile_function_declaration_return_print:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1816, %eax
+	movl $strbuf+2383, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -13227,13 +13523,13 @@ compile_array_declaration:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1829, %eax
+	movl $strbuf+2396, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	movl $0, %eax
 	movl %eax, -8(%ebp)
-_label355:
+_label366:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -13253,7 +13549,7 @@ _label355:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label356
+	je _label367
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -13261,7 +13557,7 @@ _label355:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label357
+	je _label368
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13269,7 +13565,7 @@ _label355:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label357:
+_label368:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13304,8 +13600,8 @@ _label357:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -8(%ebp)
-	jmp _label355
-_label356:
+	jmp _label366
+_label367:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13342,17 +13638,17 @@ compile_type_array_declaration:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label358
+	je _label369
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl -12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1837, %eax
+	movl $strbuf+2404, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label358:
+_label369:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13363,7 +13659,7 @@ _label358:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1881, %eax
+	movl $strbuf+2448, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -13447,7 +13743,7 @@ compile_variable_declaration:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1829, %eax
+	movl $strbuf+2396, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -13481,7 +13777,7 @@ compile_block_statement:
 	movl %eax, -4(%ebp)
 	movl $0, %eax
 	movl %eax, -8(%ebp)
-_label359:
+_label370:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -13501,7 +13797,7 @@ _label359:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label360
+	je _label371
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	pushl %edx
@@ -13524,7 +13820,7 @@ _label359:
 	movl %eax, -16(%ebp)
 	movl -8(%ebp), %eax
 	cmpl $0, %eax
-	je _label361
+	je _label372
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $59, %eax
@@ -13532,22 +13828,22 @@ _label359:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label363
+	je _label374
 	movl $0, %eax
 	movl %eax, -8(%ebp)
-	jmp _label362
-_label363:
+	jmp _label373
+_label374:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl -12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1888, %eax
+	movl $strbuf+2455, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label362:
-_label361:
+_label373:
+_label372:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13584,7 +13880,7 @@ _label361:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label365
+	jne _label376
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $60, %eax
@@ -13592,7 +13888,7 @@ _label361:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label365
+	jne _label376
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $56, %eax
@@ -13600,7 +13896,7 @@ _label361:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label365
+	jne _label376
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $57, %eax
@@ -13608,24 +13904,24 @@ _label361:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label365
+	jne _label376
 	movl $0, %eax
-	jmp _label366
-_label365:
+	jmp _label377
+_label376:
 	movl $1, %eax
-_label366:
+_label377:
 	cmpl $0, %eax
-	je _label364
+	je _label375
 	movl $1, %eax
 	movl %eax, -8(%ebp)
-_label364:
+_label375:
 	movl -4(%ebp), %eax
 	movl %eax, %ebx
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -4(%ebp)
-	jmp _label359
-_label360:
+	jmp _label370
+_label371:
 	leave
 	ret
 compile_statement:
@@ -13645,7 +13941,7 @@ compile_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label368
+	je _label379
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13653,183 +13949,11 @@ compile_statement:
 	movl %eax, 4(%esp)
 	call compile_if_statement
 	addl $8, %esp
-	jmp _label367
-_label368:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $50, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label369
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_for_statement
-	addl $8, %esp
-	jmp _label367
-_label369:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $51, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label370
-	subl $12, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	movl $1, %eax
-	movl %eax, 8(%esp)
-	call compile_while_statement
-	addl $12, %esp
-	jmp _label367
-_label370:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $52, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label371
-	subl $12, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	movl $0, %eax
-	movl %eax, 8(%esp)
-	call compile_while_statement
-	addl $12, %esp
-	jmp _label367
-_label371:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $53, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label372
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_allocate_statement
-	addl $8, %esp
-	jmp _label367
-_label372:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $54, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label373
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_assembly_statement
-	addl $8, %esp
-	jmp _label367
-_label373:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $55, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label374
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_return_statement
-	addl $8, %esp
-	jmp _label367
-_label374:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $56, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	jne _label375
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $57, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	jne _label375
-	movl $0, %eax
-	jmp _label376
-_label375:
-	movl $1, %eax
-_label376:
-	cmpl $0, %eax
-	je _label377
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_loop_jump_statement
-	addl $8, %esp
-	jmp _label367
-_label377:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $58, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label378
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_writechar_statement
-	addl $8, %esp
-	jmp _label367
-_label378:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $59, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label379
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_label_statement
-	addl $8, %esp
-	jmp _label367
+	jmp _label378
 _label379:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $60, %eax
+	movl $50, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -13840,10 +13964,182 @@ _label379:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
+	call compile_for_statement
+	addl $8, %esp
+	jmp _label378
+_label380:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $51, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label381
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $1, %eax
+	movl %eax, 8(%esp)
+	call compile_while_statement
+	addl $12, %esp
+	jmp _label378
+_label381:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $52, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label382
+	subl $12, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	movl $0, %eax
+	movl %eax, 8(%esp)
+	call compile_while_statement
+	addl $12, %esp
+	jmp _label378
+_label382:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $53, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label383
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_allocate_statement
+	addl $8, %esp
+	jmp _label378
+_label383:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $54, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label384
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_assembly_statement
+	addl $8, %esp
+	jmp _label378
+_label384:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $55, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label385
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_return_statement
+	addl $8, %esp
+	jmp _label378
+_label385:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $56, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	jne _label386
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $57, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	jne _label386
+	movl $0, %eax
+	jmp _label387
+_label386:
+	movl $1, %eax
+_label387:
+	cmpl $0, %eax
+	je _label388
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_loop_jump_statement
+	addl $8, %esp
+	jmp _label378
+_label388:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $58, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label389
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_writechar_statement
+	addl $8, %esp
+	jmp _label378
+_label389:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $59, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label390
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_label_statement
+	addl $8, %esp
+	jmp _label378
+_label390:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $60, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label391
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
 	call compile_goto_statement
 	addl $8, %esp
-	jmp _label367
-_label380:
+	jmp _label378
+_label391:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $61, %eax
@@ -13851,7 +14147,7 @@ _label380:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label381
+	je _label392
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13859,8 +14155,8 @@ _label380:
 	movl %eax, 4(%esp)
 	call compile_block_statement
 	addl $8, %esp
-	jmp _label367
-_label381:
+	jmp _label378
+_label392:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -13868,7 +14164,7 @@ _label381:
 	movl %eax, 4(%esp)
 	call compile_expression
 	addl $8, %esp
-_label367:
+_label378:
 	leave
 	ret
 compile_if_statement:
@@ -13889,7 +14185,7 @@ compile_if_statement:
 	movl %eax, -8(%ebp)
 	movl $0, %eax
 	movl %eax, -16(%ebp)
-_label382:
+_label393:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -13909,7 +14205,7 @@ _label382:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label383
+	je _label394
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -13917,11 +14213,11 @@ _label382:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label384
+	je _label395
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1906, %eax
+	movl $strbuf+2473, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -13946,7 +14242,7 @@ _label382:
 	movl %eax, 4(%esp)
 	call fputlabeldef
 	addl $8, %esp
-_label384:
+_label395:
 	subl $8, %esp
 	movl 12(%ebp), %eax
 	pushl %edx
@@ -13972,7 +14268,7 @@ _label384:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label385
+	je _label396
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14002,28 +14298,28 @@ _label384:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label386
+	je _label397
 	subl $4, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	call compiler_new_label
 	addl $4, %esp
-	jmp _label387
-_label386:
+	jmp _label398
+_label397:
 	movl -8(%ebp), %eax
-_label387:
+_label398:
 	movl %eax, -12(%ebp)
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1912, %eax
+	movl $strbuf+2479, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1928, %eax
+	movl $strbuf+2495, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14060,7 +14356,7 @@ _label387:
 	call vector_get
 	addl $8, %esp
 	movl %eax, -20(%ebp)
-_label385:
+_label396:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14073,8 +14369,8 @@ _label385:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -16(%ebp)
-	jmp _label382
-_label383:
+	jmp _label393
+_label394:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14118,7 +14414,7 @@ compile_for_statement:
 	leal (%edx,%eax,4), %eax
 	movl (%eax), %eax
 	cmpl $0, %eax
-	je _label388
+	je _label399
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14132,7 +14428,7 @@ compile_for_statement:
 	movl %eax, 4(%esp)
 	call compile_expression
 	addl $8, %esp
-_label388:
+_label399:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14146,7 +14442,7 @@ _label388:
 	leal (%edx,%eax,4), %eax
 	movl (%eax), %eax
 	cmpl $0, %eax
-	je _label389
+	je _label400
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14163,14 +14459,14 @@ _label388:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1912, %eax
+	movl $strbuf+2479, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1928, %eax
+	movl $strbuf+2495, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14188,7 +14484,7 @@ _label388:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label389:
+_label400:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14225,7 +14521,7 @@ _label389:
 	addl $8, %esp
 	movl $0, %eax
 	movl %eax, -20(%ebp)
-_label390:
+_label401:
 	movl -20(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -14245,7 +14541,7 @@ _label390:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label391
+	je _label402
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14280,12 +14576,12 @@ _label390:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -20(%ebp)
-	jmp _label390
-_label391:
+	jmp _label401
+_label402:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1906, %eax
+	movl $strbuf+2473, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14346,7 +14642,7 @@ compile_while_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label392
+	je _label403
 	subl $20, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14366,7 +14662,7 @@ compile_while_statement:
 	movl %eax, 16(%esp)
 	call compile_while_condition
 	addl $20, %esp
-_label392:
+_label403:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14400,7 +14696,7 @@ _label392:
 	addl $12, %esp
 	movl 16(%ebp), %eax
 	cmpl $0, %eax
-	je _label394
+	je _label405
 	subl $20, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14420,12 +14716,12 @@ _label392:
 	movl %eax, 16(%esp)
 	call compile_while_condition
 	addl $20, %esp
-	jmp _label393
-_label394:
+	jmp _label404
+_label405:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1906, %eax
+	movl $strbuf+2473, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14443,7 +14739,7 @@ _label394:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label393:
+_label404:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14473,7 +14769,7 @@ compile_while_condition:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1912, %eax
+	movl $strbuf+2479, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14482,12 +14778,12 @@ compile_while_condition:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	cmpl $0, %eax
-	je _label395
-	movl $strbuf+1933, %eax
-	jmp _label396
-_label395:
-	movl $strbuf+1928, %eax
-_label396:
+	je _label406
+	movl $strbuf+2500, %eax
+	jmp _label407
+_label406:
+	movl $strbuf+2495, %eax
+_label407:
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14496,12 +14792,12 @@ _label396:
 	movl %eax, 0(%esp)
 	movl 16(%ebp), %eax
 	cmpl $0, %eax
-	je _label397
+	je _label408
 	movl 20(%ebp), %eax
-	jmp _label398
-_label397:
+	jmp _label409
+_label408:
 	movl 24(%ebp), %eax
-_label398:
+_label409:
 	movl %eax, 4(%esp)
 	call fputlabel
 	addl $8, %esp
@@ -14541,17 +14837,17 @@ compile_allocate_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label399
+	je _label410
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl -8(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1939, %eax
+	movl $strbuf+2506, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label399:
+_label410:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -14568,21 +14864,21 @@ _label399:
 	setle %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label400
+	je _label411
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl -8(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+1983, %eax
+	movl $strbuf+2550, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label400:
+_label411:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2014, %eax
+	movl $strbuf+2581, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14596,7 +14892,7 @@ _label400:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2022, %eax
+	movl $strbuf+2589, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14614,7 +14910,7 @@ compile_assembly_statement:
 	movl %eax, -4(%ebp)
 	movl $0, %eax
 	movl %eax, -8(%ebp)
-_label401:
+_label412:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	pushl %edx
@@ -14634,7 +14930,7 @@ _label401:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label403
+	je _label414
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14678,12 +14974,12 @@ _label401:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label402:
+_label413:
 	movl -8(%ebp), %eax
 	leal 1(%eax), %edx
 	movl %edx, -8(%ebp)
-	jmp _label401
-_label403:
+	jmp _label412
+_label414:
 	leave
 	ret
 compile_return_statement:
@@ -14707,7 +15003,7 @@ compile_return_statement:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label404
+	je _label415
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -14729,7 +15025,7 @@ compile_return_statement:
 	movl %eax, 4(%esp)
 	call compile_expression
 	addl $8, %esp
-_label404:
+_label415:
 	subl $8, %esp
 	pushl %ebx
 	pushl %ecx
@@ -14747,7 +15043,7 @@ _label404:
 	popl %ecx
 	popl %ebx
 	movl %eax, 0(%esp)
-	movl $strbuf+1816, %eax
+	movl $strbuf+2383, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14771,7 +15067,7 @@ compile_loop_jump_statement:
 	movl %eax, -8(%ebp)
 	movl -8(%ebp), %eax
 	cmpl $0, %eax
-	je _label406
+	je _label417
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -14783,25 +15079,25 @@ compile_loop_jump_statement:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label407
+	je _label418
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $1, %eax
 	leal (%edx,%eax,4), %eax
 	movl (%eax), %eax
-	jmp _label408
-_label407:
+	jmp _label419
+_label418:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
 	leal (%edx,%eax,4), %eax
 	movl (%eax), %eax
-_label408:
+_label419:
 	movl %eax, -12(%ebp)
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1906, %eax
+	movl $strbuf+2473, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14819,18 +15115,18 @@ _label408:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-	jmp _label405
-_label406:
+	jmp _label416
+_label417:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+2030, %eax
+	movl $strbuf+2597, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label405:
+_label416:
 	leave
 	ret
 compile_writechar_statement:
@@ -14866,7 +15162,7 @@ compile_writechar_statement:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2074, %eax
+	movl $strbuf+2641, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14886,7 +15182,7 @@ compile_writechar_statement:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2092, %eax
+	movl $strbuf+2659, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14906,7 +15202,7 @@ compile_writechar_statement:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2110, %eax
+	movl $strbuf+2677, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14945,7 +15241,7 @@ compile_label_statement:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1765, %eax
+	movl $strbuf+2332, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -14984,7 +15280,7 @@ compile_goto_statement:
 	popl %ecx
 	popl %ebx
 	movl %eax, 0(%esp)
-	movl $strbuf+2129, %eax
+	movl $strbuf+2696, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15007,7 +15303,7 @@ compile_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label410
+	je _label421
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15015,198 +15311,11 @@ compile_expression:
 	movl %eax, 4(%esp)
 	call compile_integer_expression
 	addl $8, %esp
-	jmp _label409
-_label410:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $1, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label411
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_string_expression
-	addl $8, %esp
-	jmp _label409
-_label411:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $7, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label412
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_address_call_expression
-	addl $8, %esp
-	jmp _label409
-_label412:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $8, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label413
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_address_index_expression
-	addl $8, %esp
-	jmp _label409
-_label413:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $2, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label414
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_simple_identifier_expression
-	addl $8, %esp
-	jmp _label409
-_label414:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $3, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label415
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_simple_argument_expression
-	addl $8, %esp
-	jmp _label409
-_label415:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $4, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label416
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_simple_variable_expression
-	addl $8, %esp
-	jmp _label409
-_label416:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $5, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label417
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_simple_syscall_expression
-	addl $8, %esp
-	jmp _label409
-_label417:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $6, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label418
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_simple_readchar_expression
-	addl $8, %esp
-	jmp _label409
-_label418:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $9, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label419
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_prefix_plus_expression
-	addl $8, %esp
-	jmp _label409
-_label419:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $10, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label420
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_prefix_minus_expression
-	addl $8, %esp
-	jmp _label409
-_label420:
-	movl -4(%ebp), %eax
-	movl %eax, %edx
-	movl $11, %eax
-	cmpl %eax, %edx
-	sete %al
-	movzbl %al, %eax
-	cmpl $0, %eax
-	je _label421
-	subl $8, %esp
-	movl 8(%ebp), %eax
-	movl %eax, 0(%esp)
-	movl 12(%ebp), %eax
-	movl %eax, 4(%esp)
-	call compile_prefix_logical_not_expression
-	addl $8, %esp
-	jmp _label409
+	jmp _label420
 _label421:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $12, %eax
+	movl $1, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -15217,13 +15326,13 @@ _label421:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	call compile_prefix_not_expression
+	call compile_string_expression
 	addl $8, %esp
-	jmp _label409
+	jmp _label420
 _label422:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $13, %eax
+	movl $7, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -15234,13 +15343,13 @@ _label422:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	call compile_prefix_deref_expression
+	call compile_address_call_expression
 	addl $8, %esp
-	jmp _label409
+	jmp _label420
 _label423:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
-	movl $14, %eax
+	movl $8, %eax
 	cmpl %eax, %edx
 	sete %al
 	movzbl %al, %eax
@@ -15251,10 +15360,197 @@ _label423:
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
+	call compile_address_index_expression
+	addl $8, %esp
+	jmp _label420
+_label424:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $2, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label425
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_simple_identifier_expression
+	addl $8, %esp
+	jmp _label420
+_label425:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $3, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label426
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_simple_argument_expression
+	addl $8, %esp
+	jmp _label420
+_label426:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $4, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label427
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_simple_variable_expression
+	addl $8, %esp
+	jmp _label420
+_label427:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $5, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label428
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_simple_syscall_expression
+	addl $8, %esp
+	jmp _label420
+_label428:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $6, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label429
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_simple_readchar_expression
+	addl $8, %esp
+	jmp _label420
+_label429:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $9, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label430
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_prefix_plus_expression
+	addl $8, %esp
+	jmp _label420
+_label430:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $10, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label431
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_prefix_minus_expression
+	addl $8, %esp
+	jmp _label420
+_label431:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $11, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label432
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_prefix_logical_not_expression
+	addl $8, %esp
+	jmp _label420
+_label432:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $12, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label433
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_prefix_not_expression
+	addl $8, %esp
+	jmp _label420
+_label433:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $13, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label434
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
+	call compile_prefix_deref_expression
+	addl $8, %esp
+	jmp _label420
+_label434:
+	movl -4(%ebp), %eax
+	movl %eax, %edx
+	movl $14, %eax
+	cmpl %eax, %edx
+	sete %al
+	movzbl %al, %eax
+	cmpl $0, %eax
+	je _label435
+	subl $8, %esp
+	movl 8(%ebp), %eax
+	movl %eax, 0(%esp)
+	movl 12(%ebp), %eax
+	movl %eax, 4(%esp)
 	call compile_prefix_addrof_expression
 	addl $8, %esp
-	jmp _label409
-_label424:
+	jmp _label420
+_label435:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $15, %eax
@@ -15262,7 +15558,7 @@ _label424:
 	setge %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label425
+	je _label436
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $24, %eax
@@ -15270,14 +15566,14 @@ _label424:
 	setle %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label425
+	je _label436
 	movl $1, %eax
-	jmp _label426
-_label425:
+	jmp _label437
+_label436:
 	movl $0, %eax
-_label426:
+_label437:
 	cmpl $0, %eax
-	je _label427
+	je _label438
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15301,8 +15597,8 @@ _label426:
 	movl %eax, 12(%esp)
 	call compile_bitwise_arithmetic_expression
 	addl $16, %esp
-	jmp _label409
-_label427:
+	jmp _label420
+_label438:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $25, %eax
@@ -15310,7 +15606,7 @@ _label427:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label428
+	je _label439
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15318,8 +15614,8 @@ _label427:
 	movl %eax, 4(%esp)
 	call compile_comparison_expression
 	addl $8, %esp
-	jmp _label409
-_label428:
+	jmp _label420
+_label439:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $26, %eax
@@ -15327,7 +15623,7 @@ _label428:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label429
+	je _label440
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15335,8 +15631,8 @@ _label428:
 	movl %eax, 4(%esp)
 	call compile_comparison_expression
 	addl $8, %esp
-	jmp _label409
-_label429:
+	jmp _label420
+_label440:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $27, %eax
@@ -15344,7 +15640,7 @@ _label429:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label430
+	je _label441
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15352,8 +15648,8 @@ _label429:
 	movl %eax, 4(%esp)
 	call compile_comparison_expression
 	addl $8, %esp
-	jmp _label409
-_label430:
+	jmp _label420
+_label441:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $28, %eax
@@ -15361,7 +15657,7 @@ _label430:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label431
+	je _label442
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15369,8 +15665,8 @@ _label430:
 	movl %eax, 4(%esp)
 	call compile_comparison_expression
 	addl $8, %esp
-	jmp _label409
-_label431:
+	jmp _label420
+_label442:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $29, %eax
@@ -15378,7 +15674,7 @@ _label431:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label432
+	je _label443
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15386,8 +15682,8 @@ _label431:
 	movl %eax, 4(%esp)
 	call compile_comparison_expression
 	addl $8, %esp
-	jmp _label409
-_label432:
+	jmp _label420
+_label443:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $30, %eax
@@ -15395,7 +15691,7 @@ _label432:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label433
+	je _label444
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15403,8 +15699,8 @@ _label432:
 	movl %eax, 4(%esp)
 	call compile_comparison_expression
 	addl $8, %esp
-	jmp _label409
-_label433:
+	jmp _label420
+_label444:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $31, %eax
@@ -15412,7 +15708,7 @@ _label433:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label434
+	je _label445
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15422,8 +15718,8 @@ _label433:
 	movl %eax, 8(%esp)
 	call compile_logical_expression
 	addl $12, %esp
-	jmp _label409
-_label434:
+	jmp _label420
+_label445:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $32, %eax
@@ -15431,7 +15727,7 @@ _label434:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label435
+	je _label446
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15441,8 +15737,8 @@ _label434:
 	movl %eax, 8(%esp)
 	call compile_logical_expression
 	addl $12, %esp
-	jmp _label409
-_label435:
+	jmp _label420
+_label446:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $48, %eax
@@ -15450,7 +15746,7 @@ _label435:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label436
+	je _label447
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15458,8 +15754,8 @@ _label435:
 	movl %eax, 4(%esp)
 	call compile_ternary_expression
 	addl $8, %esp
-	jmp _label409
-_label436:
+	jmp _label420
+_label447:
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $33, %eax
@@ -15467,7 +15763,7 @@ _label436:
 	setge %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label437
+	je _label448
 	movl -4(%ebp), %eax
 	movl %eax, %edx
 	movl $47, %eax
@@ -15475,14 +15771,14 @@ _label436:
 	setle %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label437
+	je _label448
 	movl $1, %eax
-	jmp _label438
-_label437:
+	jmp _label449
+_label448:
 	movl $0, %eax
-_label438:
+_label449:
 	cmpl $0, %eax
-	je _label439
+	je _label450
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15490,18 +15786,18 @@ _label438:
 	movl %eax, 4(%esp)
 	call compile_assignment_expression
 	addl $8, %esp
-	jmp _label409
-_label439:
+	jmp _label420
+_label450:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+2141, %eax
+	movl $strbuf+2708, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label409:
+_label420:
 	leave
 	ret
 compile_address_call_expression:
@@ -15552,7 +15848,7 @@ compile_address_call_expression:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label440
+	je _label451
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15563,11 +15859,11 @@ compile_address_call_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2176, %eax
+	movl $strbuf+2743, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label440:
+_label451:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15603,11 +15899,11 @@ _label440:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label441
+	je _label452
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2014, %eax
+	movl $strbuf+2581, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15633,14 +15929,14 @@ _label440:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2022, %eax
+	movl $strbuf+2589, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label441:
+_label452:
 	movl $1, %eax
 	movl %eax, -16(%ebp)
-_label442:
+_label453:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl -12(%ebp), %eax
@@ -15648,7 +15944,7 @@ _label442:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label443
+	je _label454
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15675,7 +15971,7 @@ _label442:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2194, %eax
+	movl $strbuf+2761, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15701,7 +15997,7 @@ _label442:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2207, %eax
+	movl $strbuf+2774, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15710,8 +16006,8 @@ _label442:
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -16(%ebp)
-	jmp _label442
-_label443:
+	jmp _label453
+_label454:
 	movl -20(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -15723,11 +16019,11 @@ _label443:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label445
+	je _label456
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2215, %eax
+	movl $strbuf+2782, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15751,16 +16047,16 @@ _label443:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-	jmp _label444
-_label445:
+	jmp _label455
+_label456:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2222, %eax
+	movl $strbuf+2789, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label444:
+_label455:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $1, %eax
@@ -15768,11 +16064,11 @@ _label444:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label446
+	je _label457
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2235, %eax
+	movl $strbuf+2802, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15798,11 +16094,11 @@ _label444:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2022, %eax
+	movl $strbuf+2589, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label446:
+_label457:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15860,7 +16156,7 @@ compile_address_index_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2243, %eax
+	movl $strbuf+2810, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15895,7 +16191,7 @@ compile_address_index_address:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label448
+	je _label459
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15913,12 +16209,12 @@ compile_address_index_address:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2263, %eax
+	movl $strbuf+2830, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label447
-_label448:
+	jmp _label458
+_label459:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -15926,7 +16222,7 @@ _label448:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label449
+	je _label460
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15944,12 +16240,12 @@ _label448:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2074, %eax
+	movl $strbuf+2641, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label449:
-_label447:
+_label460:
+_label458:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15966,7 +16262,7 @@ _label447:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2283, %eax
+	movl $strbuf+2850, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -15977,7 +16273,7 @@ _label447:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label451
+	je _label462
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -15994,16 +16290,16 @@ _label447:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2290, %eax
+	movl $strbuf+2857, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label450
-_label451:
+	jmp _label461
+_label462:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2307, %eax
+	movl $strbuf+2874, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16014,7 +16310,7 @@ _label451:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label450:
+_label461:
 	leave
 	ret
 compile_simple_identifier_expression:
@@ -16030,7 +16326,7 @@ compile_simple_identifier_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2328, %eax
+	movl $strbuf+2895, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16050,7 +16346,7 @@ compile_simple_identifier_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16069,7 +16365,7 @@ compile_simple_argument_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2328, %eax
+	movl $strbuf+2895, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16089,7 +16385,7 @@ compile_simple_argument_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16118,7 +16414,7 @@ fputarg:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2343, %eax
+	movl $strbuf+2910, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16137,7 +16433,7 @@ compile_simple_variable_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2328, %eax
+	movl $strbuf+2895, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16157,7 +16453,7 @@ compile_simple_variable_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16193,7 +16489,7 @@ fputvar:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2343, %eax
+	movl $strbuf+2910, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16228,7 +16524,7 @@ compile_simple_syscall_expression:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label452
+	je _label463
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16236,7 +16532,7 @@ compile_simple_syscall_expression:
 	movl %eax, 4(%esp)
 	call compiler_allocate_register
 	addl $8, %esp
-_label452:
+_label463:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -16244,7 +16540,7 @@ _label452:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label453
+	je _label464
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16252,7 +16548,7 @@ _label452:
 	movl %eax, 4(%esp)
 	call compiler_allocate_register
 	addl $8, %esp
-_label453:
+_label464:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $3, %eax
@@ -16260,7 +16556,7 @@ _label453:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label454
+	je _label465
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16268,7 +16564,7 @@ _label453:
 	movl %eax, 4(%esp)
 	call compiler_allocate_register
 	addl $8, %esp
-_label454:
+_label465:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $4, %eax
@@ -16276,7 +16572,7 @@ _label454:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label455
+	je _label466
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16284,7 +16580,7 @@ _label454:
 	movl %eax, 4(%esp)
 	call compiler_allocate_register
 	addl $8, %esp
-_label455:
+_label466:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $5, %eax
@@ -16292,7 +16588,7 @@ _label455:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label456
+	je _label467
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16300,7 +16596,7 @@ _label455:
 	movl %eax, 4(%esp)
 	call compiler_allocate_register
 	addl $8, %esp
-_label456:
+_label467:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $6, %eax
@@ -16308,18 +16604,18 @@ _label456:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label457
+	je _label468
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1785, %eax
+	movl $strbuf+2352, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label457:
+_label468:
 	movl $0, %eax
 	movl %eax, -16(%ebp)
-_label458:
+_label469:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl -12(%ebp), %eax
@@ -16327,7 +16623,7 @@ _label458:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label459
+	je _label470
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16358,11 +16654,11 @@ _label458:
 	setne %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label460
+	je _label471
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2194, %eax
+	movl $strbuf+2761, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16382,7 +16678,7 @@ _label458:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label460:
+_label471:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $0, %eax
@@ -16398,22 +16694,22 @@ _label460:
 	movzbl %al, %eax
 	imull %ebx, %eax
 	cmpl $0, %eax
-	je _label461
+	je _label472
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2350, %eax
+	movl $strbuf+2917, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label461:
+_label472:
 	movl -16(%ebp), %eax
 	movl %eax, %ebx
 	movl $1, %eax
 	addl %ebx, %eax
 	movl %eax, -16(%ebp)
-	jmp _label458
-_label459:
+	jmp _label469
+_label470:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $1, %eax
@@ -16421,19 +16717,19 @@ _label459:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label462
+	je _label473
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2363, %eax
+	movl $strbuf+2930, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label462:
+_label473:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2375, %eax
+	movl $strbuf+2942, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16444,15 +16740,15 @@ _label462:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label463
+	je _label474
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2387, %eax
+	movl $strbuf+2954, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label463:
+_label474:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $5, %eax
@@ -16460,7 +16756,7 @@ _label463:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label464
+	je _label475
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16468,7 +16764,7 @@ _label463:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label464:
+_label475:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $4, %eax
@@ -16476,7 +16772,7 @@ _label464:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label465
+	je _label476
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16484,7 +16780,7 @@ _label464:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label465:
+_label476:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $3, %eax
@@ -16492,7 +16788,7 @@ _label465:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label466
+	je _label477
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16500,7 +16796,7 @@ _label465:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label466:
+_label477:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -16508,7 +16804,7 @@ _label466:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label467
+	je _label478
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16516,7 +16812,7 @@ _label466:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label467:
+_label478:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $1, %eax
@@ -16524,7 +16820,7 @@ _label467:
 	setg %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label468
+	je _label479
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16532,7 +16828,7 @@ _label467:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label468:
+_label479:
 	leave
 	ret
 compile_simple_readchar_expression:
@@ -16568,7 +16864,7 @@ compile_simple_readchar_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2074, %eax
+	movl $strbuf+2641, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16588,14 +16884,14 @@ compile_simple_readchar_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2092, %eax
+	movl $strbuf+2659, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2399, %eax
+	movl $strbuf+2966, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16639,7 +16935,7 @@ compile_prefix_minus_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2421, %eax
+	movl $strbuf+2988, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16671,21 +16967,21 @@ compile_prefix_logical_not_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1912, %eax
+	movl $strbuf+2479, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2433, %eax
+	movl $strbuf+3000, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2444, %eax
+	movl $strbuf+3011, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16717,7 +17013,7 @@ compile_prefix_not_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2463, %eax
+	movl $strbuf+3030, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16749,7 +17045,7 @@ compile_prefix_deref_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2243, %eax
+	movl $strbuf+2810, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16784,11 +17080,11 @@ compile_prefix_addrof_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label469
+	je _label480
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2475, %eax
+	movl $strbuf+3042, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16808,13 +17104,13 @@ compile_prefix_addrof_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	leave
 	ret
-_label469:
+_label480:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $3, %eax
@@ -16822,11 +17118,11 @@ _label469:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label470
+	je _label481
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2283, %eax
+	movl $strbuf+2850, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16846,13 +17142,13 @@ _label469:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	leave
 	ret
-_label470:
+_label481:
 	movl -12(%ebp), %eax
 	movl %eax, %edx
 	movl $4, %eax
@@ -16860,11 +17156,11 @@ _label470:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label471
+	je _label482
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2283, %eax
+	movl $strbuf+2850, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -16884,19 +17180,19 @@ _label470:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	leave
 	ret
-_label471:
+_label482:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+2483, %eax
+	movl $strbuf+3050, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
@@ -16933,16 +17229,16 @@ compile_bitwise_arithmetic_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label473
+	je _label484
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2350, %eax
+	movl $strbuf+2917, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label472
-_label473:
+	jmp _label483
+_label484:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $16, %eax
@@ -16950,7 +17246,7 @@ _label473:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label474
+	jne _label485
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $17, %eax
@@ -16958,14 +17254,14 @@ _label473:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label474
+	jne _label485
 	movl $0, %eax
-	jmp _label475
-_label474:
+	jmp _label486
+_label485:
 	movl $1, %eax
-_label475:
+_label486:
 	cmpl $0, %eax
-	je _label476
+	je _label487
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -16976,20 +17272,20 @@ _label475:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2350, %eax
+	movl $strbuf+2917, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label472
-_label476:
+	jmp _label483
+_label487:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2176, %eax
+	movl $strbuf+2743, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label472:
+_label483:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17004,7 +17300,7 @@ _label472:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label478
+	jne _label489
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $21, %eax
@@ -17012,14 +17308,14 @@ _label472:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label478
+	jne _label489
 	movl $0, %eax
-	jmp _label479
-_label478:
+	jmp _label490
+_label489:
 	movl $1, %eax
-_label479:
+_label490:
 	cmpl $0, %eax
-	je _label480
+	je _label491
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17030,19 +17326,19 @@ _label479:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2528, %eax
+	movl $strbuf+3095, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2546, %eax
+	movl $strbuf+3113, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label477
-_label480:
+	jmp _label488
+_label491:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $19, %eax
@@ -17050,23 +17346,23 @@ _label480:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label481
+	je _label492
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2176, %eax
+	movl $strbuf+2743, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2363, %eax
+	movl $strbuf+2930, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label477
-_label481:
+	jmp _label488
+_label492:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $16, %eax
@@ -17074,7 +17370,7 @@ _label481:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label482
+	jne _label493
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $17, %eax
@@ -17082,36 +17378,36 @@ _label481:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label482
+	jne _label493
 	movl $0, %eax
-	jmp _label483
-_label482:
+	jmp _label494
+_label493:
 	movl $1, %eax
-_label483:
+_label494:
 	cmpl $0, %eax
-	je _label477
+	je _label488
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2176, %eax
+	movl $strbuf+2743, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2363, %eax
+	movl $strbuf+2930, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2564, %eax
+	movl $strbuf+3131, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label477:
+_label488:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17126,16 +17422,16 @@ _label477:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label485
+	je _label496
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2571, %eax
+	movl $strbuf+3138, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label485:
+	jmp _label495
+_label496:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $16, %eax
@@ -17143,16 +17439,16 @@ _label485:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label486
+	je _label497
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2588, %eax
+	movl $strbuf+3155, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label486:
+	jmp _label495
+_label497:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $17, %eax
@@ -17160,16 +17456,16 @@ _label486:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label487
+	je _label498
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2599, %eax
+	movl $strbuf+3166, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label487:
+	jmp _label495
+_label498:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $18, %eax
@@ -17177,16 +17473,16 @@ _label487:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label488
+	je _label499
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2627, %eax
+	movl $strbuf+3194, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label488:
+	jmp _label495
+_label499:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $19, %eax
@@ -17194,16 +17490,16 @@ _label488:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label489
+	je _label500
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2643, %eax
+	movl $strbuf+3210, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label489:
+	jmp _label495
+_label500:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $20, %eax
@@ -17211,16 +17507,16 @@ _label489:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label490
+	je _label501
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2659, %eax
+	movl $strbuf+3226, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label490:
+	jmp _label495
+_label501:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $21, %eax
@@ -17228,16 +17524,16 @@ _label490:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label491
+	je _label502
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2674, %eax
+	movl $strbuf+3241, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label491:
+	jmp _label495
+_label502:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $22, %eax
@@ -17245,16 +17541,16 @@ _label491:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label492
+	je _label503
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2689, %eax
+	movl $strbuf+3256, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label492:
+	jmp _label495
+_label503:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $23, %eax
@@ -17262,16 +17558,16 @@ _label492:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label493
+	je _label504
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2705, %eax
+	movl $strbuf+3272, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label484
-_label493:
+	jmp _label495
+_label504:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $24, %eax
@@ -17279,15 +17575,15 @@ _label493:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label484
+	je _label495
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2721, %eax
+	movl $strbuf+3288, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label484:
+_label495:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17302,7 +17598,7 @@ _label484:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label495
+	jne _label506
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $21, %eax
@@ -17310,14 +17606,14 @@ _label484:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label495
+	jne _label506
 	movl $0, %eax
-	jmp _label496
-_label495:
+	jmp _label507
+_label506:
 	movl $1, %eax
-_label496:
+_label507:
 	cmpl $0, %eax
-	je _label497
+	je _label508
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17325,8 +17621,8 @@ _label496:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-	jmp _label494
-_label497:
+	jmp _label505
+_label508:
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $16, %eax
@@ -17334,7 +17630,7 @@ _label497:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label498
+	jne _label509
 	movl 12(%ebp), %eax
 	movl %eax, %edx
 	movl $17, %eax
@@ -17342,14 +17638,14 @@ _label497:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label498
+	jne _label509
 	movl $0, %eax
-	jmp _label499
-_label498:
+	jmp _label510
+_label509:
 	movl $1, %eax
-_label499:
+_label510:
 	cmpl $0, %eax
-	je _label494
+	je _label505
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17357,7 +17653,7 @@ _label499:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label494:
+_label505:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17406,7 +17702,7 @@ compile_comparison_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2074, %eax
+	movl $strbuf+2641, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -17426,7 +17722,7 @@ compile_comparison_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2736, %eax
+	movl $strbuf+3303, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -17451,15 +17747,15 @@ compile_comparison_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label500
+	je _label511
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2754, %eax
+	movl $strbuf+3321, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label500:
+_label511:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $30, %eax
@@ -17467,15 +17763,15 @@ _label500:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label501
+	je _label512
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2759, %eax
+	movl $strbuf+3326, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label501:
+_label512:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $25, %eax
@@ -17483,15 +17779,15 @@ _label501:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label502
+	je _label513
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2765, %eax
+	movl $strbuf+3332, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label502:
+_label513:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $26, %eax
@@ -17499,15 +17795,15 @@ _label502:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label503
+	je _label514
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2770, %eax
+	movl $strbuf+3337, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label503:
+_label514:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $27, %eax
@@ -17515,15 +17811,15 @@ _label503:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label504
+	je _label515
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2775, %eax
+	movl $strbuf+3342, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label504:
+_label515:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $28, %eax
@@ -17531,19 +17827,19 @@ _label504:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label505
+	je _label516
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2781, %eax
+	movl $strbuf+3348, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label505:
+_label516:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2787, %eax
+	movl $strbuf+3354, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -17607,28 +17903,28 @@ compile_logical_expression:
 	addl $16, %esp
 	movl 16(%ebp), %eax
 	cmpl $0, %eax
-	je _label507
+	je _label518
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2811, %eax
+	movl $strbuf+3378, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label506
-_label507:
+	jmp _label517
+_label518:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2827, %eax
+	movl $strbuf+3394, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label506:
+_label517:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1906, %eax
+	movl $strbuf+2473, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -17655,24 +17951,24 @@ _label506:
 	addl $8, %esp
 	movl 16(%ebp), %eax
 	cmpl $0, %eax
-	je _label509
+	je _label520
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2827, %eax
+	movl $strbuf+3394, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label508
-_label509:
+	jmp _label519
+_label520:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2811, %eax
+	movl $strbuf+3378, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label508:
+_label519:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17708,7 +18004,7 @@ compile_logical_expression_operand:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label510
+	je _label521
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17745,7 +18041,7 @@ compile_logical_expression_operand:
 	addl $16, %esp
 	leave
 	ret
-_label510:
+_label521:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17756,30 +18052,30 @@ _label510:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1912, %eax
+	movl $strbuf+2479, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	movl 16(%ebp), %eax
 	cmpl $0, %eax
-	je _label512
+	je _label523
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1933, %eax
+	movl $strbuf+2500, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label511
-_label512:
+	jmp _label522
+_label523:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1928, %eax
+	movl $strbuf+2495, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label511:
+_label522:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17834,14 +18130,14 @@ compile_ternary_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1912, %eax
+	movl $strbuf+2479, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1928, %eax
+	movl $strbuf+2495, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -17875,7 +18171,7 @@ compile_ternary_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1906, %eax
+	movl $strbuf+2473, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -17957,7 +18253,7 @@ compile_assignment_expression:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label513
+	je _label524
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -17975,11 +18271,11 @@ compile_assignment_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2176, %eax
+	movl $strbuf+2743, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label513:
+_label524:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $33, %eax
@@ -17987,7 +18283,7 @@ _label513:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label515
+	je _label526
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18001,8 +18297,8 @@ _label513:
 	movl %eax, 4(%esp)
 	call compile_expression
 	addl $8, %esp
-	jmp _label514
-_label515:
+	jmp _label525
+_label526:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $44, %eax
@@ -18010,7 +18306,7 @@ _label515:
 	setge %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label516
+	je _label527
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $47, %eax
@@ -18018,14 +18314,14 @@ _label515:
 	setle %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label516
+	je _label527
 	movl $1, %eax
-	jmp _label517
-_label516:
+	jmp _label528
+_label527:
 	movl $0, %eax
-_label517:
+_label528:
 	cmpl $0, %eax
-	je _label518
+	je _label529
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18040,16 +18336,16 @@ _label517:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label520
+	je _label531
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2843, %eax
+	movl $strbuf+3410, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label519
-_label520:
+	jmp _label530
+_label531:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $45, %eax
@@ -18057,16 +18353,16 @@ _label520:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label521
+	je _label532
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2859, %eax
+	movl $strbuf+3426, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label519
-_label521:
+	jmp _label530
+_label532:
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18077,7 +18373,7 @@ _label521:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2283, %eax
+	movl $strbuf+2850, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18088,7 +18384,7 @@ _label521:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label522
+	je _label533
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18096,17 +18392,17 @@ _label521:
 	movl %eax, 4(%esp)
 	call fputc
 	addl $8, %esp
-_label522:
+_label533:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2875, %eax
+	movl $strbuf+3442, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label519:
-	jmp _label514
-_label518:
+_label530:
+	jmp _label525
+_label529:
 	subl $16, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18136,11 +18432,11 @@ _label518:
 	movl %eax, 12(%esp)
 	call compile_bitwise_arithmetic_expression
 	addl $16, %esp
-_label514:
+_label525:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2328, %eax
+	movl $strbuf+2895, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18151,7 +18447,7 @@ _label514:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label524
+	jne _label535
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $47, %eax
@@ -18159,35 +18455,35 @@ _label514:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label524
+	jne _label535
 	movl $0, %eax
-	jmp _label525
-_label524:
+	jmp _label536
+_label535:
 	movl $1, %eax
-_label525:
+_label536:
 	cmpl $0, %eax
-	je _label526
+	je _label537
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1623, %eax
+	movl $strbuf+2190, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label523
-_label526:
+	jmp _label534
+_label537:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+1608, %eax
+	movl $strbuf+2175, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-_label523:
+_label534:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2890, %eax
+	movl $strbuf+3457, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18198,7 +18494,7 @@ _label523:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label528
+	je _label539
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18212,8 +18508,8 @@ _label523:
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label527
-_label528:
+	jmp _label538
+_label539:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $3, %eax
@@ -18221,7 +18517,7 @@ _label528:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label529
+	je _label540
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18235,8 +18531,8 @@ _label528:
 	movl %eax, 4(%esp)
 	call fputarg
 	addl $8, %esp
-	jmp _label527
-_label529:
+	jmp _label538
+_label540:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $4, %eax
@@ -18244,7 +18540,7 @@ _label529:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label530
+	je _label541
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18258,8 +18554,8 @@ _label529:
 	movl %eax, 4(%esp)
 	call fputvar
 	addl $8, %esp
-	jmp _label527
-_label530:
+	jmp _label538
+_label541:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $8, %eax
@@ -18267,26 +18563,26 @@ _label530:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label531
+	je _label542
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2893, %eax
+	movl $strbuf+3460, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
-	jmp _label527
-_label531:
+	jmp _label538
+_label542:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+2900, %eax
+	movl $strbuf+3467, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
-_label527:
+_label538:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18301,7 +18597,7 @@ _label527:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label533
+	jne _label544
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $47, %eax
@@ -18309,14 +18605,14 @@ _label527:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	jne _label533
+	jne _label544
 	movl $0, %eax
-	jmp _label534
-_label533:
+	jmp _label545
+_label544:
 	movl $1, %eax
-_label534:
+_label545:
 	cmpl $0, %eax
-	je _label532
+	je _label543
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18324,7 +18620,7 @@ _label534:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label532:
+_label543:
 	movl -16(%ebp), %eax
 	movl %eax, %edx
 	movl $8, %eax
@@ -18332,7 +18628,7 @@ _label532:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label535
+	je _label546
 	subl $8, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18340,7 +18636,7 @@ _label532:
 	movl %eax, 4(%esp)
 	call compiler_free_register
 	addl $8, %esp
-_label535:
+_label546:
 	leave
 	ret
 compile_integer_expression:
@@ -18356,7 +18652,7 @@ compile_integer_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2475, %eax
+	movl $strbuf+3042, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18376,7 +18672,7 @@ compile_integer_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18395,7 +18691,7 @@ compile_string_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2938, %eax
+	movl $strbuf+3505, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18415,7 +18711,7 @@ compile_string_expression:
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2335, %eax
+	movl $strbuf+2902, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18444,7 +18740,7 @@ compile_simple_value:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label536
+	je _label547
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18460,7 +18756,7 @@ compile_simple_value:
 	addl $8, %esp
 	leave
 	ret
-_label536:
+_label547:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $1, %eax
@@ -18468,11 +18764,11 @@ _label536:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label537
+	je _label548
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
-	movl $strbuf+2953, %eax
+	movl $strbuf+3520, %eax
 	movl %eax, 4(%esp)
 	call fputs
 	addl $8, %esp
@@ -18491,7 +18787,7 @@ _label536:
 	addl $8, %esp
 	leave
 	ret
-_label537:
+_label548:
 	movl -8(%ebp), %eax
 	movl %eax, %edx
 	movl $2, %eax
@@ -18499,7 +18795,7 @@ _label537:
 	sete %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label538
+	je _label549
 	subl $8, %esp
 	movl -4(%ebp), %eax
 	movl %eax, 0(%esp)
@@ -18515,13 +18811,13 @@ _label537:
 	addl $8, %esp
 	leave
 	ret
-_label538:
+_label549:
 	subl $12, %esp
 	movl 8(%ebp), %eax
 	movl %eax, 0(%esp)
 	movl 12(%ebp), %eax
 	movl %eax, 4(%esp)
-	movl $strbuf+2961, %eax
+	movl $strbuf+3528, %eax
 	movl %eax, 8(%esp)
 	call compiler_error
 	addl $12, %esp
@@ -18531,7 +18827,7 @@ usage:
 	pushl %ebp
 	movl %esp, %ebp
 	subl $4, %esp
-	movl $strbuf+3001, %eax
+	movl $strbuf+3568, %eax
 	movl %eax, 0(%esp)
 	call eputs
 	addl $4, %esp
@@ -18541,7 +18837,7 @@ usage:
 	call eputs
 	addl $4, %esp
 	subl $4, %esp
-	movl $strbuf+3009, %eax
+	movl $strbuf+3576, %eax
 	movl %eax, 0(%esp)
 	call eputs
 	addl $4, %esp
@@ -18558,7 +18854,7 @@ main:
 	setl %al
 	movzbl %al, %eax
 	cmpl $0, %eax
-	je _label539
+	je _label550
 	subl $4, %esp
 	movl 12(%ebp), %eax
 	pushl %edx
@@ -18573,7 +18869,7 @@ main:
 	movl $1, %eax
 	leave
 	ret
-_label539:
+_label550:
 	subl $4, %esp
 	movl 12(%ebp), %eax
 	pushl %edx
@@ -18587,7 +18883,7 @@ _label539:
 	addl $4, %esp
 	movl %eax, -4(%ebp)
 	subl $4, %esp
-	movl $strbuf+3030, %eax
+	movl $strbuf+3597, %eax
 	movl %eax, 0(%esp)
 	call output_chan_file
 	addl $4, %esp
@@ -18715,24 +19011,36 @@ strbuf:
 .string "Unterminated string literal"
 .string "Unexpected assembly block close"
 .string "Unexpected end of file"
-.string "Statement is not ended with semicolon"
 .string "Syntax error - none of available top level statements matched"
 .string "Invalid global statement"
+.string "Global statement is not ended with semicolon"
 .string "Invalid include statement"
+.string "Include statement is not ended with semicolon"
+.string "Macro declaration is not ended with semicolon"
 .string "Invalid function arguments declaration syntax"
 .string "Invalid array declaration syntax"
-.string "Invalid char array declaration syntax"
+.string "Array statement is not ended with semicolon"
+.string "Invalid type array declaration syntax"
+.string "Type array statement is not ended with semicolon"
+.string "Variable statement is not ended with semicolon"
 .string "Invalid block statement syntax"
-.string "Statement inside block is not ended with semicolon"
+.string "Expression inside block is not ended with semicolon"
 .string "Invalid if statement syntax"
 .string "Put else branches with condition before last else branch."
 .string "Invalid for statement syntax"
 .string "Invalid do-while statement syntax"
+.string "Do-while statement is not ended with semicolon"
 .string "Invalid while statement syntax"
 .string "Invalid allocate statement syntax"
+.string "Allocate statement is not ended with semicolon"
 .string "Invalid assembly statement syntax"
+.string "Return statement is not ended with semicolon"
+.string "Break/continue statement is not ended with semicolon"
 .string "Invalid writechar statement"
+.string "Writechar statement is not ended with semicolon"
 .string "Invalidlabel statement syntax"
+.string "Label statement is not ended with semicolon"
+.string "Goto statement is not ended with semicolon"
 .string "Incorrect ternary expression syntax"
 .string "Invalid syscall expression"
 .string "Too many arguments in syscall expression"
