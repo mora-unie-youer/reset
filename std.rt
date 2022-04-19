@@ -11,3 +11,9 @@ TRUE => 1;
 NULL => 0;
 ## EOF value
 EOF => -1;
+
+### System calls
+## SYS_exit - exit with code
+# a0 - exit code
+SYS_exit => 1;
+exit : (a0) { syscall(SYS_exit, a0); }
