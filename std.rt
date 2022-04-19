@@ -25,6 +25,21 @@ SYS_brk => 45;
 brk : (a0) { return syscall(SYS_brk, a0); }
 
 #### Memory Manager Module
+### Constants
+## Align size
+MMM_ALIGN_SIZE_LOG2   => 2;
+MMM_ALIGN_SIZE        => 1 << MMM_ALIGN_SIZE_LOG2;
+## Second level index
+MMM_SL_INDEX_MAX_LOG2 => 5;
+MMM_SL_INDEX_MAX      => 1 << MMM_SL_INDEX_MAX_LOG2;
+## First level index
+# Maximum first level index
+MMM_FL_INDEX_MAX      => 30;
+# First level shift
+MMM_FL_INDEX_SHIFT    => MMM_SL_INDEX_MAX_LOG2 + MMM_ALIGN_SIZE_LOG2;
+MMM_FL_INDEX_COUNT    => MMM_FL_INDEX_MAX - MMM_FL_INDEX_SHIFT + 1;
+## Small block size
+MMM_SMALL_BLOCK       => 1 << MMM_FL_INDEX_SHIFT;
 ### Variables
 # Current sbrk heap limit
 sbrk_current : NULL;
