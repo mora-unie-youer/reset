@@ -4896,7 +4896,7 @@ compile_bitwise_arithmetic_expression : (a0, a1, a2, a3) {
   else if (a1 == STMT_EXPR_ADD) { fputs(x0, "addl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_SUB) { fputs(x0, "subl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_SHL) { fputs(x0, "shll %cl, %eax"); }
-  else if (a1 == STMT_EXPR_SHR) { fputs(x0, "shlr %cl, %eax"); }
+  else if (a1 == STMT_EXPR_SHR) { fputs(x0, "shrl %cl, %eax"); }
   else if (a1 == STMT_EXPR_AND) { fputs(x0, "andl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_XOR) { fputs(x0, "xorl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_OR)  { fputs(x0, "orl %ebx, %eax"); }
