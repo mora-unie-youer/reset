@@ -24,11 +24,12 @@ exit : (a0) { syscall(SYS_exit, a0); }
 SYS_brk => 45;
 brk : (a0) { return syscall(SYS_brk, a0); }
 
-### Memory Manager Module
-## Variables
+#### Memory Manager Module
+### Variables
 # Current sbrk heap limit
 sbrk_current : NULL;
 
+### Helper functions
 ## sbrk - increment heap segment limit
 # a0 - size
 # @return previous heap limit
@@ -38,4 +39,24 @@ sbrk : (a0) {
   sbrk_current += a0;
   brk(sbrk_current);
   return sbrk_current - a0;
+}
+
+## ffs - find first bit set in number
+# a0 - number
+# @return bit index numbered from 0
+ffs : (a0) {
+  asm {
+    movl 8(%ebp), %eax;
+    bsrl %eax, %eax;
+  }
+}
+
+## fls - find last bit set in number
+# a0 - number
+# @return bit index numbered from 0
+fls : (a0) {
+  asm {
+    movl 8(%ebp), %eax;
+    bsfl %eax, %eax;
+  }
 }
