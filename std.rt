@@ -1,0 +1,13 @@
+###### STD for Reset language
+# This file is designed monolithic to be easy to copy and include in any
+# project. Contains everything to create anything.
+######
+
+### Constants
+## Boolean values
+FALSE => 0;
+TRUE => 1;
+## Null value
+NULL => 0;
+## EOF value
+EOF => -1;
