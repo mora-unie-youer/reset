@@ -17,3 +17,25 @@ EOF => -1;
 # a0 - exit code
 SYS_exit => 1;
 exit : (a0) { syscall(SYS_exit, a0); }
+
+## SYS_brk - set heap segment limit
+# a0 - address or NULL
+# @return current heap limit
+SYS_brk => 45;
+brk : (a0) { return syscall(SYS_brk, a0); }
+
+### Memory Manager Module
+## Variables
+# Current sbrk heap limit
+sbrk_current : NULL;
+
+## sbrk - increment heap segment limit
+# a0 - size
+# @return previous heap limit
+sbrk : (a0) {
+  if (!sbrk_current) { sbrk_current = brk(NULL); }
+  if (a0 <= 0) { return sbrk_current; }
+  sbrk_current += a0;
+  brk(sbrk_current);
+  return sbrk_current - a0;
+}
