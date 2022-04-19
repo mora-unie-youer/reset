@@ -5060,6 +5060,10 @@ compile_assignment_expression : (a0, a1) {
     compile_address_index_address(a0, x2);
     compiler_allocate_register(a0, REG_EBX);
     fputs(x0, "\tmovl %eax, %ebx\n");
+  } else if (x3 == STMT_EXPR_DEREF) {
+    compile_expression(a0, x2[2]);
+    compiler_allocate_register(a0, REG_EBX);
+    fputs(x0, "\tmovl %eax, %ebx\n");
   }
   # Compiling expression
   if (x1 == STMT_EXPR_ASSIGN) {
@@ -5097,12 +5101,13 @@ compile_assignment_expression : (a0, a1) {
        if (x3 == STMT_EXPR_IDENTIFIER) { fputs(x0,   x2[2]); }
   else if (x3 == STMT_EXPR_ARGUMENT)   { fputarg(x0, x2[2]); }
   else if (x3 == STMT_EXPR_VARIABLE)   { fputvar(x0, x2[2]); }
-  else if (x3 == STMT_EXPR_INDEX)      { fputs(x0, "(%ebx)"); }
+  else if (x3 == STMT_EXPR_INDEX ||
+           x3 == STMT_EXPR_DEREF)      { fputs(x0, "(%ebx)"); }
   else { compiler_error(a0, a1, "Can't use this as assignable operand."); }
   fputc(x0, '\n');
   # Freeing used registers
   if (x1 == STMT_EXPR_POSTDEC || x1 == STMT_EXPR_POSTINC) { compiler_free_register(a0, REG_EDX); }
-  if (x3 == STMT_EXPR_INDEX) { compiler_free_register(a0, REG_EBX); }
+  if (x3 == STMT_EXPR_INDEX || x3 == STMT_EXPR_DEREF)     { compiler_free_register(a0, REG_EBX); }
 }
 
 ## Compile integer expression
