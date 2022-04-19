@@ -2023,7 +2023,7 @@ label function_declaration_arg_end;
   # Fetching next token
   x1 = parser_lex(a0);
   # Fetching block statement
-  x2 = block_statement(a0, x1);
+  x2 = block_statement(a0, x1, TRUE);
   # Returning statement
   return(tuple5(STMT_FUN_DECL, a2, a1, x0, x2));
 label function_declaration_arg_invalid;
@@ -2126,20 +2126,37 @@ label variable_declaration_end_error;
 ## Parse block of statements
 # a0 - parser
 # a1 - current token
+# a2 - strict
 # @return statement
-block_statement : (a0, a1) {
+block_statement : (a0, a1, a2) {
   # x0 - ops vector
   # x1 - next token
   # x2 - expression
   # x3 - token location
   # x4 - statement token location
   allocate(5);
+  # Allocating operand (statements) vector
+  x0 = vector(0, 1);
   # Fetching token location
   x3 = parser_token_location(a0);
   # Checking for correct syntax
-  if (a1 != '{') { goto &block_statement_invalid; }
-  # Allocating operand (statements) vector
-  x0 = vector(0, 1);
+  if (a1 != '{') {
+    if (!a2) {
+      # Fetching statement
+      x2 = statement(a0, a1, x3);
+      # Checking if expression is ended with semicolon
+      if (x2[NODE_TYPE] < STMT_IF) {
+        # Fetching next token
+        x1 = parser_lex(a0);
+        # Checking for semicolon
+        if (x1 != ';') { goto &block_statement_content_invalid; }
+      }
+      # Pushing statement to vector
+      vector_push(x0, x2);
+      # Ending block statement
+      goto &block_statement_end;
+    } else { goto &block_statement_invalid; }
+  }
 label block_statement_loop;
   # Fetching next token
   x1 = parser_lex(a0);
@@ -2148,7 +2165,7 @@ label block_statement_loop;
   # Checking if we need to exit the loop
   if (x1 == '}') { goto &block_statement_end; }
   # Checking if we have next block inside this
-  if (x1 == '{') { x2 = block_statement(a0, x1); }
+  if (x1 == '{') { x2 = block_statement(a0, x1, TRUE); }
   # Else fetching statement
   else { x2 = statement(a0, x1, x4); }
   # Pushing statement to vector
@@ -2220,7 +2237,7 @@ label if_statement_parse;
   # Fetching next token
   x1 = parser_lex(a0);
   # Fetching block statement
-  x2 = block_statement(a0, x1);
+  x2 = block_statement(a0, x1, FALSE);
   # Append if block to vector
   vector_push(x0, x2);
   # Fetching next token
@@ -2232,7 +2249,7 @@ label if_statement_parse;
   # If this else have condition, parsing as if statement
   if (x1 == TOKEN_IF) { goto &if_statement_parse; }
   # Fetching else block statement
-  x2 = block_statement(a0, x1);
+  x2 = block_statement(a0, x1, FALSE);
   # Append else block to vector
   vector_push(x0, x2);
   # Fetching next token
@@ -2315,7 +2332,7 @@ label for_statement_iter_end;
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching block statement
-  x4 = block_statement(a0, x0);
+  x4 = block_statement(a0, x0, FALSE);
   # Returning statement
   return(tuple6(STMT_FOR, a1, x1, x2, x3, x4));
 label for_statement_invalid;
@@ -2334,7 +2351,7 @@ do_while_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching block statement
-  x2 = block_statement(a0, x0);
+  x2 = block_statement(a0, x0, FALSE);
   # Fetching next token
   x0 = parser_lex(a0);
   # Checking for correct syntax
@@ -2387,7 +2404,7 @@ while_statement : (a0, a1) {
   # Fetching next token
   x0 = parser_lex(a0);
   # Fetching block statement
-  x2 = block_statement(a0, x0);
+  x2 = block_statement(a0, x0, FALSE);
   # Return statement
   return(tuple4(STMT_WHILE, a1, x1, x2));
 label while_statement_invalid;
