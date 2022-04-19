@@ -49,8 +49,8 @@ sbrk_current : NULL;
 # a0 - size
 # @return previous heap limit
 sbrk : (a0) {
-  if (!sbrk_current) { sbrk_current = brk(NULL); }
-  if (a0 <= 0) { return sbrk_current; }
+  if (!sbrk_current) sbrk_current = brk(NULL);
+  if (a0 <= 0) return sbrk_current;
   sbrk_current += a0;
   brk(sbrk_current);
   return sbrk_current - a0;
