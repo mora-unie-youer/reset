@@ -43,6 +43,7 @@ MMM_SMALL_BLOCK       => 1 << MMM_FL_INDEX_SHIFT;
 ### Variables
 # Current sbrk heap limit
 sbrk_current : NULL;
+default_memory_pool : NULL;
 
 ### Helper functions
 ## sbrk - increment heap segment limit
