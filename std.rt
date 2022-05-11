@@ -76,3 +76,13 @@ fls : (a0) {
     bsfl %eax, %eax;
   }
 }
+
+### TLSF structure
+# 4 bytes                                   - linked list holding all existing areas
+# 4 bytes                                   - first level bitmap
+# 4 * MMM_FL_INDEX_COUNT                    - second level bitmap
+# 4 * MMM_FL_INDEX_COUNT * MMM_SL_INDEX_MAX - matrix with free blocks
+MMM_TLSF_STRUCT_AREA   => 0;
+MMM_TLSF_STRUCT_FL_MAP => 1;
+MMM_TLSF_STRUCT_SL_MAP => 2;
+MMM_TLSF_STRUCT_MATRIX => 2 + MMM_FL_INDEX_COUNT;
