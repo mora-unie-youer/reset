@@ -86,3 +86,17 @@ MMM_TLSF_STRUCT_AREA   => 0;
 MMM_TLSF_STRUCT_FL_MAP => 1;
 MMM_TLSF_STRUCT_SL_MAP => 2;
 MMM_TLSF_STRUCT_MATRIX => 2 + MMM_FL_INDEX_COUNT;
+
+### TLSF block header structure
+# 4 bytes - pointer to previous block header
+# 4 bytes - size of block + bits for availability of previous/this block
+# 4 bytes - pointer to previous free block header (here starts data if used)
+# 4 bytes - pointer to next free block header
+MMM_TLSF_BLOCK_PREV          => 0;
+MMM_TLSF_BLOCK_SIZE          => 1;
+MMM_TLSF_BLOCK_SIZE_MASK     => 0xfffffffc;
+MMM_TLSF_BLOCK_FREE_BIT      => 1 << 0;
+MMM_TLSF_BLOCK_PREV_FREE_BIT => 1 << 1;
+MMM_TLSF_BLOCK_DATA          => 2;
+MMM_TLSF_BLOCK_PREV_FREE     => 2;
+MMM_TLSF_BLOCK_NEXT_FREE     => 3;
