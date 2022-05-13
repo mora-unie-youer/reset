@@ -100,3 +100,15 @@ MMM_TLSF_BLOCK_PREV_FREE_BIT => 1 << 1;
 MMM_TLSF_BLOCK_DATA          => 2;
 MMM_TLSF_BLOCK_PREV_FREE     => 2;
 MMM_TLSF_BLOCK_NEXT_FREE     => 3;
+
+mmm_tlsf_block_size : (a0) {
+  return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_SIZE_MASK;
+};
+
+mmm_tlsf_is_block_free : (a0) {
+  return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_FREE_BIT;
+}
+
+mmm_tlsf_is_prev_block_free : (a0) {
+  return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_PREV_FREE_BIT;
+}
