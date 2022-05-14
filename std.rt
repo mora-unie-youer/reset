@@ -112,3 +112,26 @@ mmm_tlsf_is_block_free : (a0) {
 mmm_tlsf_is_prev_block_free : (a0) {
   return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_PREV_FREE_BIT;
 }
+
+### TLSF utility functions
+## mmm_tlsf_mapping_insert - compute first and second level indices
+# a0 - size
+# a1 - first level index pointer
+# a2 - second level index pointer
+mmm_tlsf_mapping_insert : (a0, a1, a2) {
+  # x0 - first level index
+  # x1 - second level index
+  allocate(2);
+  # Calculating first level and second level indices
+  if (a0 < MMM_SMALL_BLOCK) {
+    x0 = 0;
+    x1 = a0 / (MMM_SMALL_BLOCK / MMM_SL_INDEX_MAX);
+  } else {
+    x0 = fls(a0);
+    x1 = (a0 >> (x0 - MMM_SL_INDEX_MAX_LOG2)) - MMM_SL_INDEX_MAX;
+    x0 -= MMM_FL_INDEX_SHIFT;
+  }
+  # Storing results to pointers
+  *a1 = x0;
+  *a2 = x1;
+}
