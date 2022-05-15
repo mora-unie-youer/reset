@@ -135,3 +135,13 @@ mmm_tlsf_mapping_insert : (a0, a1, a2) {
   *a1 = x0;
   *a2 = x1;
 }
+
+## mmm_tlsf_mapping_search - compute first and second level indices with round up
+# a0 - size
+# a1 - first level index pointer
+# a2 - second level index pointer
+mmm_tlsf_mapping_search : (a0, a1, a2) {
+  if (a0 >= MMM_SMALL_BLOCK)
+    a0 += (1 << fls(a0) - MMM_SL_INDEX_MAX_LOG2) - 1;
+  mmm_tlsf_mapping_insert(a0, a1, a2);
+}
