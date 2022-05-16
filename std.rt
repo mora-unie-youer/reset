@@ -145,3 +145,38 @@ mmm_tlsf_mapping_search : (a0, a1, a2) {
     a0 += (1 << fls(a0) - MMM_SL_INDEX_MAX_LOG2) - 1;
   mmm_tlsf_mapping_insert(a0, a1, a2);
 }
+
+## mmm_tlsf_find_suitable_block - find a suitable free block
+# a0 - TLSF structure
+# a1 - first level index pointer
+# a2 - second level index pointer
+# @return block header
+mmm_tlsf_find_suitable_block : (a0, a1, a2) {
+  # x0 - first level index
+  # x1 - second level index
+  # x2 - first level bitmap
+  # x3 - second level bitmap
+  allocate(4);
+  # Fetching first level and second level indices
+  x0 = *a1;
+  x1 = *a2;
+  # Fetching second level bitmap
+  x3 = a0[MMM_TLSF_STRUCT_SL_MAP + x0] & (~0 << x1);
+  # If second level bitmap is NULL
+  if (!x3) {
+    # Then no block exists. Search in the next largest first-level list
+    x2 = a0[MMM_TLSF_STRUCT_FL_MAP] & (~0 << (x0 + 1));
+    # If first level bitmap is NULL, no free blocks available
+    if (!x2) return NULL;
+    # We have free blocks, calculating first level index for them
+    x0 = ffs(x2);
+    # *a1 = x0;
+    # Calculating second level bitmap
+    x3 = a0[MMM_TLSF_STRUCT_SL_MAP + x0];
+  }
+  # Calculating second level index
+  x1 = ffs(x3);
+  # *a2 = x1;
+  # Returning first block in free list
+  return a0[MMM_TLSF_STRUCT_MATRIX + x0 * MMM_SL_INDEX_MAX + x1];
+}
