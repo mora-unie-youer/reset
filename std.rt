@@ -180,3 +180,36 @@ mmm_tlsf_find_suitable_block : (a0, a1, a2) {
   # Returning first block in free list
   return a0[MMM_TLSF_STRUCT_MATRIX + x0 * MMM_SL_INDEX_MAX + x1];
 }
+
+## mmm_tlsf_remove_free_block - remove free block from matrix
+# a0 - TLSF structure
+# a1 - TLSF block
+# a2 - first level index
+# a3 - second level index
+mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
+  # x0 - previous free block
+  # x1 - next free block
+  allocate(2);
+  # Fetching free blocks
+  x0 = a1[MMM_TLSF_BLOCK_PREV_FREE];
+  x1 = a1[MMM_TLSF_BLOCK_NEXT_FREE];
+  # Updating free blocks
+  if (x0) x0[MMM_TLSF_BLOCK_NEXT_FREE] = x1;
+  if (x1) x1[MMM_TLSF_BLOCK_PREV_FREE] = x0;
+  # If block is the head of the free list, set new head
+  if (a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_SL_INDEX_MAX + a3] == a1) {
+    # New head is next free block
+    a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_SL_INDEX_MAX + a3] = x1;
+    # If the new head is NULL, clear second level bitmap
+    if (!x1) {
+      # Clearing second level bitmap
+      a0[MMM_TLSF_STRUCT_SL_MAP + a2] &= ~(1 << a3);
+      # If second level bitmap is NULL, clear first level bitmap
+      if (!a0[MMM_TLSF_STRUCT_SL_MAP + a2])
+        a0[MMM_TLSF_STRUCT_FL_MAP] &= ~(1 << a2);
+    }
+  }
+  # Clearing pointers to free blocks
+  # a1[MMM_TLSF_BLOCK_PREV_FREE] = NULL;
+  # a1[MMM_TLSF_BLOCK_NEXT_FREE] = NULL;
+}
