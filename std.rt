@@ -213,3 +213,25 @@ mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
   # a1[MMM_TLSF_BLOCK_PREV_FREE] = NULL;
   # a1[MMM_TLSF_BLOCK_NEXT_FREE] = NULL;
 }
+
+## mmm_tlsf_insert_free_block - insert free block to matrix
+# a0 - TLSF structure
+# a1 - TLSF block
+# a2 - first level index
+# a3 - second level index
+mmm_tlsf_insert_free_block : (a0, a1, a2, a3) {
+  # x0 - current free block
+  allocate(1);
+  # Fetching current free list head
+  x0 = a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_SL_INDEX_MAX + a3];
+  # Updating free block
+  a1[MMM_TLSF_BLOCK_PREV_FREE] = NULL;
+  a1[MMM_TLSF_BLOCK_NEXT_FREE] = x0;
+  x0[MMM_TLSF_BLOCK_PREV_FREE] = a1;
+  # Making new block a head of free blocks list
+  a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_SL_INDEX_MAX + a3] = a1;
+  # Setting first level bitmap
+  a0[MMM_TLSF_STRUCT_FL_MAP] |= 1 << a2;
+  # Setting second level bitmap
+  a0[MMM_TLSF_STRUCT_SL_MAP + a2] |= 1 << a3;
+}
