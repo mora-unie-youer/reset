@@ -92,12 +92,12 @@ align_down : (a0, a1) {
 }
 
 ### Conversions
-## Int to string
+## Unsigned int to string
 # a0 - value
 # a1 - result buffer
 # a2 - base
-itoa_digits : "0123456789abcdefghijklmnopqrstuvwxyz";
-itoa : (a0, a1, a2) {
+utoa_digits : "0123456789abcdefghijklmnopqrstuvwxyz";
+utoa : (a0, a1, a2) {
   # x0 - i
   # x1 - j
   # x2 - tmp
@@ -106,7 +106,7 @@ itoa : (a0, a1, a2) {
   x1 = 0;
 
   # Writing first digit
-  writechar(a1, x0, readchar(itoa_digits, a0 % a2));
+  writechar(a1, x0, readchar(utoa_digits, a0 % a2));
   # Going to next unit
   a0 = a0 / a2;
   # Going to next char position
@@ -115,7 +115,7 @@ itoa : (a0, a1, a2) {
   # Iterating while value is not zero
   while (a0 != 0) {
     # Writing needed char to result buffer
-    writechar(a1, x0, readchar(itoa_digits, a0 % a2));
+    writechar(a1, x0, readchar(utoa_digits, a0 % a2));
     # Going to next unit
     a0 = a0 / a2;
     # Going to next char position
@@ -138,6 +138,24 @@ itoa : (a0, a1, a2) {
   }
   # Returning result buffer
   return(a1);
+}
+
+## Signed int to string
+# a0 - value
+# a1 - result buffer
+# a2 - base
+itoa : (a0, a1, a2) {
+  # x0 - offset
+  allocate(1);
+  x0 = 0;
+  # Printing minus sign if number is negative and we want base 10
+  if (a0 < 0 && a2 == 10) {
+    writechar(a1, 0, '-');
+    a0 *= -1;
+    x0 = 1;
+  }
+  # Converting unsigned int to string
+  return(utoa(a0, a1 + x0, a2));
 }
 
 ### Memory Management
