@@ -3880,8 +3880,8 @@ compiler_use_macro : (a0, a1, a2) {
     goto &compiler_use_macro_tuple;
   }
   # Binary operators
-  ## From STMT_EXPR_MUL to STMT_EXPR_SHR_ASSIGN
-  if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_SHR_ASSIGN) {
+  ## From STMT_EXPR_MUL to STMT_EXPR_OR_ASSIGN
+  if (x0 >= STMT_EXPR_MUL && x0 <= STMT_EXPR_OR_ASSIGN) {
     x2 = 2;
     goto &compiler_use_macro_tuple;
   }
