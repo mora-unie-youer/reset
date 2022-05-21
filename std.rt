@@ -27,19 +27,19 @@ brk : (a0) { return syscall(SYS_brk, a0); }
 #### Memory Manager Module
 ### Constants
 ## Align size
-MMM_TLSF_ALIGN_SIZE_LOG2   => 2;
-MMM_TLSF_ALIGN_SIZE        => 1 << MMM_TLSF_ALIGN_SIZE_LOG2;
+MMM_TLSF_ALIGN_SIZE_LOG2     => 2;
+MMM_TLSF_ALIGN_SIZE          => 1 << MMM_TLSF_ALIGN_SIZE_LOG2;
 ## Second level index
-MMM_TLSF_SL_INDEX_MAX_LOG2 => 5;
-MMM_TLSF_SL_INDEX_MAX      => 1 << MMM_TLSF_SL_INDEX_MAX_LOG2;
+MMM_TLSF_SL_INDEX_COUNT_LOG2 => 5;
+MMM_TLSF_SL_INDEX_COUNT      => 1 << MMM_TLSF_SL_INDEX_COUNT_LOG2;
 ## First level index
 # Maximum first level index
-MMM_TLSF_FL_INDEX_MAX      => 30;
+MMM_TLSF_FL_INDEX_MAX        => 30;
 # First level shift
-MMM_TLSF_FL_INDEX_SHIFT    => MMM_TLSF_SL_INDEX_MAX_LOG2 + MMM_TLSF_ALIGN_SIZE_LOG2;
-MMM_TLSF_FL_INDEX_COUNT    => MMM_TLSF_FL_INDEX_MAX - MMM_TLSF_FL_INDEX_SHIFT + 1;
+MMM_TLSF_FL_INDEX_SHIFT      => MMM_TLSF_SL_INDEX_COUNT_LOG2 + MMM_TLSF_ALIGN_SIZE_LOG2;
+MMM_TLSF_FL_INDEX_COUNT      => MMM_TLSF_FL_INDEX_MAX - MMM_TLSF_FL_INDEX_SHIFT + 1;
 ## Small block size
-MMM_TLSF_SMALL_BLOCK       => 1 << MMM_TLSF_FL_INDEX_SHIFT;
+MMM_TLSF_SMALL_BLOCK         => 1 << MMM_TLSF_FL_INDEX_SHIFT;
 ### Variables
 # Current sbrk heap limit
 sbrk_current : NULL;
@@ -78,10 +78,10 @@ fls : (a0) {
 }
 
 ### TLSF structure
-# 4 bytes                                             - linked list holding all existing areas
-# 4 bytes                                             - first level bitmap
-# 4 * MMM_TLSF_FL_INDEX_COUNT                         - second level bitmap
-# 4 * MMM_TLSF_FL_INDEX_COUNT * MMM_TLSF_SL_INDEX_MAX - matrix with free blocks
+# 4 bytes                                               - linked list holding all existing areas
+# 4 bytes                                               - first level bitmap
+# 4 * MMM_TLSF_FL_INDEX_COUNT                           - second level bitmap
+# 4 * MMM_TLSF_FL_INDEX_COUNT * MMM_TLSF_SL_INDEX_COUNT - matrix with free blocks
 MMM_TLSF_STRUCT_AREA   => 0;
 MMM_TLSF_STRUCT_FL_MAP => 1;
 MMM_TLSF_STRUCT_SL_MAP => 2;
@@ -125,10 +125,10 @@ mmm_tlsf_mapping_insert : (a0, a1, a2) {
   # Calculating first level and second level indices
   if (a0 < MMM_TLSF_SMALL_BLOCK) {
     x0 = 0;
-    x1 = a0 / (MMM_TLSF_SMALL_BLOCK / MMM_TLSF_SL_INDEX_MAX);
+    x1 = a0 / (MMM_TLSF_SMALL_BLOCK / MMM_TLSF_SL_INDEX_COUNT);
   } else {
     x0 = fls(a0);
-    x1 = (a0 >> (x0 - MMM_TLSF_SL_INDEX_MAX_LOG2)) - MMM_TLSF_SL_INDEX_MAX;
+    x1 = (a0 >> (x0 - MMM_TLSF_SL_INDEX_COUNT_LOG2)) - MMM_TLSF_SL_INDEX_COUNT;
     x0 -= MMM_TLSF_FL_INDEX_SHIFT;
   }
   # Storing results to pointers
@@ -142,7 +142,7 @@ mmm_tlsf_mapping_insert : (a0, a1, a2) {
 # a2 - second level index pointer
 mmm_tlsf_mapping_search : (a0, a1, a2) {
   if (a0 >= MMM_TLSF_SMALL_BLOCK)
-    a0 += (1 << fls(a0) - MMM_TLSF_SL_INDEX_MAX_LOG2) - 1;
+    a0 += (1 << fls(a0) - MMM_TLSF_SL_INDEX_COUNT_LOG2) - 1;
   mmm_tlsf_mapping_insert(a0, a1, a2);
 }
 
@@ -178,12 +178,12 @@ mmm_tlsf_find_suitable_block : (a0, a1, a2) {
   x1 = ffs(x3);
   # *a2 = x1;
   # Returning first block in free list
-  return a0[MMM_TLSF_STRUCT_MATRIX + x0 * MMM_TLSF_SL_INDEX_MAX + x1];
+  return a0[MMM_TLSF_STRUCT_MATRIX + x0 * MMM_TLSF_SL_INDEX_COUNT + x1];
 }
 
 ## mmm_tlsf_remove_free_block - remove free block from matrix
 # a0 - TLSF structure
-# a1 - TLSF block
+# a1 - block
 # a2 - first level index
 # a3 - second level index
 mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
@@ -197,9 +197,9 @@ mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
   if (x0) x0[MMM_TLSF_BLOCK_NEXT_FREE] = x1;
   if (x1) x1[MMM_TLSF_BLOCK_PREV_FREE] = x0;
   # If block is the head of the free list, set new head
-  if (a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_MAX + a3] == a1) {
+  if (a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3] == a1) {
     # New head is next free block
-    a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_MAX + a3] = x1;
+    a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3] = x1;
     # If the new head is NULL, clear second level bitmap
     if (!x1) {
       # Clearing second level bitmap
@@ -216,20 +216,20 @@ mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
 
 ## mmm_tlsf_insert_free_block - insert free block to matrix
 # a0 - TLSF structure
-# a1 - TLSF block
+# a1 - block
 # a2 - first level index
 # a3 - second level index
 mmm_tlsf_insert_free_block : (a0, a1, a2, a3) {
   # x0 - current free block
   allocate(1);
   # Fetching current free list head
-  x0 = a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_MAX + a3];
+  x0 = a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3];
   # Updating free block
   a1[MMM_TLSF_BLOCK_PREV_FREE] = NULL;
   a1[MMM_TLSF_BLOCK_NEXT_FREE] = x0;
   x0[MMM_TLSF_BLOCK_PREV_FREE] = a1;
   # Making new block a head of free blocks list
-  a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_MAX + a3] = a1;
+  a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3] = a1;
   # Setting first level bitmap
   a0[MMM_TLSF_STRUCT_FL_MAP] |= 1 << a2;
   # Setting second level bitmap
