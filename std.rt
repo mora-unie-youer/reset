@@ -77,6 +77,22 @@ fls : (a0) {
   }
 }
 
+## align_up - align number up to another number (which is power of 2)
+# a0 - number to be aligned
+# a1 - number align to
+# @return aligned number
+align_up : (a0, a1) {
+  return (a0 + a1 - 1) & ~(a1 - 1);
+}
+
+## align_up - align number down to another number (which is power of 2)
+# a0 - number to be aligned
+# a1 - number align to
+# @return aligned number
+align_down : (a0, a1) {
+  return a0 - (a0 & (a1 - 1));
+}
+
 ### TLSF structure
 # 4 bytes                                               - linked list holding all existing areas
 # 4 bytes                                               - first level bitmap
