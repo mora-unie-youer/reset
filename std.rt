@@ -105,6 +105,7 @@ MMM_TLSF_STRUCT_MATRIX => 2 + MMM_TLSF_FL_INDEX_COUNT;
 MMM_TLSF_STRUCT_SIZE   => 4 * (MMM_TLSF_STRUCT_MATRIX + MMM_TLSF_FL_INDEX_COUNT * MMM_TLSF_SL_INDEX_COUNT);
 
 ### TLSF block header structure
+MMM_TLSF_BLOCK_STRUCT_SIZE     => 16;
 # 4 bytes - pointer to previous block header
 # 4 bytes - size of block + bits for availability of previous/this block
 # 4 bytes - pointer to previous free block header (here starts data if used)
