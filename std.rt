@@ -120,14 +120,24 @@ MMM_TLSF_BLOCK_DATA          => 2;
 MMM_TLSF_BLOCK_PREV_FREE     => 2;
 MMM_TLSF_BLOCK_NEXT_FREE     => 3;
 
+### TLSF block functions
+## mmm_tlsf_block_size - get block size
+# a0 - block
+# @return block size
 mmm_tlsf_block_size : (a0) {
   return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_SIZE_MASK;
 }
 
+## mmm_tlsf_is_block_free - is block free?
+# a0 - block
+# @return is block free
 mmm_tlsf_is_block_free : (a0) {
   return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_FREE_BIT;
 }
 
+## mmm_tlsf_is_prev_block_free - is previous block free?
+# a0 - block
+# @return is previous block free
 mmm_tlsf_is_prev_block_free : (a0) {
   return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_PREV_FREE_BIT;
 }
