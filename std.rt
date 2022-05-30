@@ -158,6 +158,18 @@ mmm_tlsf_is_prev_block_free : (a0) {
   return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_PREV_FREE_BIT;
 }
 
+## mmm_tlsf_set_prev_block_free - set previous block free bit
+# a0 - block
+mmm_tlsf_set_prev_block_free : (a0) {
+  a0[MMM_TLSF_BLOCK_SIZE] |= MMM_TLSF_BLOCK_PREV_FREE_BIT;
+}
+
+## mmm_tlsf_set_prev_block_used - unset previous block free bit
+# a0 - block
+mmm_tlsf_set_prev_block_used : (a0) {
+  a0[MMM_TLSF_BLOCK_SIZE] &= ~MMM_TLSF_BLOCK_PREV_FREE_BIT;
+}
+
 ### TLSF utility functions
 ## mmm_tlsf_mapping_insert - compute first and second level indices
 # a0 - size
