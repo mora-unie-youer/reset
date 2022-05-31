@@ -170,6 +170,13 @@ mmm_tlsf_set_prev_block_used : (a0) {
   a0[MMM_TLSF_BLOCK_SIZE] &= ~MMM_TLSF_BLOCK_PREV_FREE_BIT;
 }
 
+## mmm_tlsf_is_block_last - is block last?
+# a0 - block
+# @return is block last
+mmm_tlsf_is_block_last : (a0) {
+  return mmm_tlsf_block_size(a0) == 0;
+}
+
 ### TLSF utility functions
 ## mmm_tlsf_mapping_insert - compute first and second level indices
 # a0 - size
