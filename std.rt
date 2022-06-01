@@ -132,6 +132,18 @@ mmm_tlsf_block_size : (a0) {
   return a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_SIZE_MASK;
 }
 
+## mmm_tlsf_set_block_size - set block size
+# a0 - block
+# a1 - size
+mmm_tlsf_set_block_size : (a0, a1) {
+  # x0 - bits
+  allocate(1);
+  # Fetching bits
+  x0 = a0[MMM_TLSF_BLOCK_SIZE] & MMM_TLSF_BLOCK_BIT_MASK;
+  # Setting bits to new size
+  a0[MMM_TLSF_BLOCK_SIZE] = a1 | x0;
+}
+
 ## mmm_tlsf_is_block_free - is block free?
 # a0 - block
 # @return is block free
