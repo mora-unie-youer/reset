@@ -189,6 +189,20 @@ mmm_tlsf_is_block_last : (a0) {
   return mmm_tlsf_block_size(a0) == 0;
 }
 
+## mmm_tlsf_ptr_to_block - get block from data pointer
+# a0 - pointer
+# @return block
+mmm_tlsf_ptr_to_block : (a0) {
+  return a0 - MMM_TLSF_BLOCK_STRUCT_OFFSET;
+}
+
+## mmm_tlsf_block_to_ptr - get data pointer from block
+# a0 - block
+# @return data pointer
+mmm_tlsf_block_to_ptr : (a0) {
+  return a0 + MMM_TLSF_BLOCK_STRUCT_OFFSET;
+}
+
 ### TLSF utility functions
 ## mmm_tlsf_mapping_insert - compute first and second level indices
 # a0 - size
