@@ -12,6 +12,48 @@ NULL => 0;
 ## EOF value
 EOF => -1;
 
+### Useful functions
+## panic - show panic message and quit
+# a0 - message
+panic : (a0) {
+  # Printing message
+  syscall(4, 1, "PANIC: ", 7);
+  a0 = a0 ? a0 : "Some function generated panic";
+  syscall(4, 1, a0, strlen(a0));
+  syscall(4, 1, "\n", 1);
+  # Exitting
+  exit(1);
+}
+
+## assert - make an assertion
+# a0 - condition
+# a1 - message
+assert : (a0, a1) {
+  # Checking for condition to be NULL
+  if (!a0) {
+    # Printing message
+    syscall(4, 1, "ASSERT: ", 8);
+    a1 = a1 ? a1 : "Some function made assertion";
+    # a1 = "Some function made assertion";
+    syscall(4, 1, a1, strlen(a1));
+    syscall(4, 1, "\n", 1);
+    # Exitting
+    exit(1);
+  }
+}
+
+## max - find maximum integer
+# a0 - first integer
+# a1 - second integer
+# @return maximum integer
+max : (a0, a1) { return a0 < a1 ? a1 : a0; }
+
+## min - find minimum integer
+# a0 - first integer
+# a1 - second integer
+# @return minimum integer
+min : (a0, a1) { return a0 > a1 ? a1 : a0; }
+
 ### System calls
 ## SYS_exit - exit with code
 # a0 - exit code
