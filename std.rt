@@ -217,8 +217,8 @@ mmm_tlsf_mapping_insert : (a0, a1, a2) {
     x0 = 0;
     x1 = a0 / (MMM_TLSF_SMALL_BLOCK / MMM_TLSF_SL_INDEX_COUNT);
   } else {
-    x0 = fls(a0);
-    x1 = (a0 >> (x0 - MMM_TLSF_SL_INDEX_COUNT_LOG2)) - MMM_TLSF_SL_INDEX_COUNT;
+    x0 = ffs(a0);
+    x1 = (a0 >> (x0 - MMM_TLSF_SL_INDEX_COUNT_LOG2)) ^ MMM_TLSF_SL_INDEX_COUNT;
     x0 -= MMM_TLSF_FL_INDEX_SHIFT;
   }
   # Storing results to pointers
@@ -260,13 +260,13 @@ mmm_tlsf_find_suitable_block : (a0, a1, a2) {
     if (!x2) return NULL;
     # We have free blocks, calculating first level index for them
     x0 = ffs(x2);
-    # *a1 = x0;
+    *a1 = x0;
     # Calculating second level bitmap
     x3 = a0[MMM_TLSF_STRUCT_SL_MAP + x0];
   }
   # Calculating second level index
   x1 = ffs(x3);
-  # *a2 = x1;
+  *a2 = x1;
   # Returning first block in free list
   return a0[MMM_TLSF_STRUCT_MATRIX + x0 * MMM_TLSF_SL_INDEX_COUNT + x1];
 }
@@ -291,7 +291,7 @@ mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
     # New head is next free block
     a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3] = x1;
     # If the new head is NULL, clear second level bitmap
-    if (!x1) {
+    if (x1 == a0) {
       # Clearing second level bitmap
       a0[MMM_TLSF_STRUCT_SL_MAP + a2] &= ~(1 << a3);
       # If second level bitmap is NULL, clear first level bitmap
@@ -299,9 +299,6 @@ mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
         a0[MMM_TLSF_STRUCT_FL_MAP] &= ~(1 << a2);
     }
   }
-  # Clearing pointers to free blocks
-  # a1[MMM_TLSF_BLOCK_PREV_FREE] = NULL;
-  # a1[MMM_TLSF_BLOCK_NEXT_FREE] = NULL;
 }
 
 ## mmm_tlsf_insert_free_block - insert free block to matrix
@@ -315,7 +312,7 @@ mmm_tlsf_insert_free_block : (a0, a1, a2, a3) {
   # Fetching current free list head
   x0 = a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3];
   # Updating free block
-  a1[MMM_TLSF_BLOCK_PREV_FREE] = NULL;
+  a1[MMM_TLSF_BLOCK_PREV_FREE] = a0;
   a1[MMM_TLSF_BLOCK_NEXT_FREE] = x0;
   x0[MMM_TLSF_BLOCK_PREV_FREE] = a1;
   # Making new block a head of free blocks list
