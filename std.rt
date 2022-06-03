@@ -94,14 +94,14 @@ align_down : (a0, a1) {
 }
 
 ### TLSF structure
-# 4 bytes                                               - linked list holding all existing areas
+# 16 bytes                                              - null block
 # 4 bytes                                               - first level bitmap
 # 4 * MMM_TLSF_FL_INDEX_COUNT                           - second level bitmap
 # 4 * MMM_TLSF_FL_INDEX_COUNT * MMM_TLSF_SL_INDEX_COUNT - matrix with free blocks
-MMM_TLSF_STRUCT_AREA   => 0;
-MMM_TLSF_STRUCT_FL_MAP => 1;
-MMM_TLSF_STRUCT_SL_MAP => 2;
-MMM_TLSF_STRUCT_MATRIX => 2 + MMM_TLSF_FL_INDEX_COUNT;
+MMM_TLSF_STRUCT_BLOCK  => 0;
+MMM_TLSF_STRUCT_FL_MAP => 4;
+MMM_TLSF_STRUCT_SL_MAP => 5;
+MMM_TLSF_STRUCT_MATRIX => 5 + MMM_TLSF_FL_INDEX_COUNT;
 MMM_TLSF_STRUCT_SIZE   => 4 * (MMM_TLSF_STRUCT_MATRIX + MMM_TLSF_FL_INDEX_COUNT * MMM_TLSF_SL_INDEX_COUNT);
 
 ### TLSF block header structure
