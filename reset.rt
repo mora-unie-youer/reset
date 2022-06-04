@@ -140,24 +140,6 @@ utoa : (a0, a1, a2) {
   return(a1);
 }
 
-## Signed int to string
-# a0 - value
-# a1 - result buffer
-# a2 - base
-itoa : (a0, a1, a2) {
-  # x0 - offset
-  allocate(1);
-  x0 = 0;
-  # Printing minus sign if number is negative and we want base 10
-  if (a0 < 0 && a2 == 10) {
-    writechar(a1, 0, '-');
-    a0 *= -1;
-    x0 = 1;
-  }
-  # Converting unsigned int to string
-  return(utoa(a0, a1 + x0, a2));
-}
-
 ### Memory Management
 ## Memory page size
 PAGE_SIZE => 4096; # 0x1000
@@ -935,7 +917,7 @@ fputn : (a0, a1, a2) {
   # Clearing buffer
   memset(0, fputn_buffer, 33);
   # Converting number to string
-  itoa(a1, fputn_buffer, a2);
+  utoa(a1, fputn_buffer, a2);
   # Putting string
   fputs(a0, fputn_buffer);
 }
@@ -4924,13 +4906,13 @@ compile_bitwise_arithmetic_expression : (a0, a1, a2, a3) {
     # And restore %eax
     fputs(x0, "\tpopl %eax\n");
     # Clear %edx for division
-    fputs(x0, "\tcltd\n");
+    fputs(x0, "\movl $0, %edx\n");
   }
   # Compiling operation
   fputc(x0, '\t');
        if (a1 == STMT_EXPR_MUL) { fputs(x0, "imull %ebx, %eax"); }
-  else if (a1 == STMT_EXPR_DIV) { fputs(x0, "idivl %ebx"); }
-  else if (a1 == STMT_EXPR_MOD) { fputs(x0, "idivl %ebx\n\tmovl %edx, %eax"); }
+  else if (a1 == STMT_EXPR_DIV) { fputs(x0, "divl %ebx"); }
+  else if (a1 == STMT_EXPR_MOD) { fputs(x0, "divl %ebx\n\tmovl %edx, %eax"); }
   else if (a1 == STMT_EXPR_ADD) { fputs(x0, "addl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_SUB) { fputs(x0, "subl %ebx, %eax"); }
   else if (a1 == STMT_EXPR_SHL) { fputs(x0, "shll %cl, %eax"); }
