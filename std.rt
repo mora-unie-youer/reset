@@ -307,6 +307,7 @@ mmm_tlsf_find_suitable_block : (a0, a1, a2) {
     x3 = a0[MMM_TLSF_STRUCT_SL_MAP + x0];
   }
   # Calculating second level index
+  assert(x3, "Second level bitmap is NULL");
   x1 = ffs(x3);
   *a2 = x1;
   # Returning first block in free list
@@ -325,9 +326,11 @@ mmm_tlsf_remove_free_block : (a0, a1, a2, a3) {
   # Fetching free blocks
   x0 = a1[MMM_TLSF_BLOCK_PREV_FREE];
   x1 = a1[MMM_TLSF_BLOCK_NEXT_FREE];
+  assert(x0, "Previous free block cannot be NULL");
+  assert(x1, "Next free block cannot be NULL");
   # Updating free blocks
-  if (x0) x0[MMM_TLSF_BLOCK_NEXT_FREE] = x1;
-  if (x1) x1[MMM_TLSF_BLOCK_PREV_FREE] = x0;
+  x0[MMM_TLSF_BLOCK_NEXT_FREE] = x1;
+  x1[MMM_TLSF_BLOCK_PREV_FREE] = x0;
   # If block is the head of the free list, set new head
   if (a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3] == a1) {
     # New head is next free block
@@ -353,6 +356,8 @@ mmm_tlsf_insert_free_block : (a0, a1, a2, a3) {
   allocate(1);
   # Fetching current free list head
   x0 = a0[MMM_TLSF_STRUCT_MATRIX + a2 * MMM_TLSF_SL_INDEX_COUNT + a3];
+  assert(x0, "Free list cannot have a NULL entry");
+  assert(a1, "Cannot insert a null entry into the free list");
   # Updating free block
   a1[MMM_TLSF_BLOCK_PREV_FREE] = a0;
   a1[MMM_TLSF_BLOCK_NEXT_FREE] = x0;
