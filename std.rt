@@ -135,6 +135,52 @@ align_down : (a0, a1) {
   return a0 - (a0 & (a1 - 1));
 }
 
+### Memory/String operations
+## Fill memory block with value (char)
+# a0 - value
+# a1 - address
+# a2 - size
+memset : (a0, a1, a2) {
+  # x0 - pos
+  allocate(1);
+  x0 = 0;
+  # Writing value to memory block
+  while (x0 < a2) {
+    # Writing byte
+    writechar(a1, x0, a0);
+    # Moving to next byte
+    x0 = x0 + 1;
+  }
+}
+
+## Copy data from one memory block to another
+# a0 - src
+# a1 - dest
+# a2 - size
+memcpy : (a0, a1, a2) {
+  # x0 - pos
+  allocate(1);
+  x0 = 0;
+  while (x0 < a2) {
+    # Writing byte
+    writechar(a1, x0, readchar(a0, x0));
+    # Moving to next byte
+    x0 = x0 + 1;
+  }
+}
+
+## Get length of string
+# a0 - string
+# @return string length
+strlen : (a0) {
+  # x0 - string length
+  allocate(1);
+  x0 = 0;
+  # While char is not NULL, incrementing length
+  while (readchar(a0, x0) != '\0') { x0 = x0 + 1; }
+  return x0;
+}
+
 ### TLSF structure
 # 16 bytes                                              - null block
 # 4 bytes                                               - first level bitmap
