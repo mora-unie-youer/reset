@@ -60,6 +60,36 @@ min : (a0, a1) { return a0 > a1 ? a1 : a0; }
 SYS_exit => 1;
 exit : (a0) { syscall(SYS_exit, a0); }
 
+## SYS_read - read from file
+# a0 - file
+# a1 - buffer
+# a2 - count
+# @return read count
+SYS_read => 3;
+read : (a0, a1, a2) { return syscall(SYS_read, a0, a1, a2); }
+
+## SYS_write - write to file
+# a0 - file
+# a1 - buffer
+# a2 - count
+# @return write count
+SYS_write => 4;
+write : (a0, a1, a2) { return syscall(SYS_write, a0, a1, a2); }
+
+## SYS_open - open file
+# a0 - path
+# a1 - flags
+# a2 - mode
+# @return fd or error
+SYS_open => 5;
+open : (a0, a1, a2) { return syscall(SYS_open, a0, a1, a2); }
+
+## SYS_close - close file
+# a0 - fd
+# @return result code
+SYS_close => 6;
+close : (a0) { return syscall(SYS_close, a0); }
+
 ## SYS_brk - set heap segment limit
 # a0 - address or NULL
 # @return current heap limit
