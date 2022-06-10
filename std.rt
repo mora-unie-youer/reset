@@ -211,6 +211,39 @@ strlen : (a0) {
   return x0;
 }
 
+## Unsigned int to string
+# a0 - value
+# a1 - result buffer
+# a2 - base
+utoa_digits : "0123456789abcdefghijklmnopqrstuvwxyz";
+utoa : (a0, a1, a2) {
+  # x0 - i
+  # x1 - j
+  # x2 - tmp
+  allocate(3);
+  x0 = 0;
+  # Converting number to string of digits
+  do {
+    # Writing needed char to result buffer and moving to next char
+    writechar(a1, x0++, readchar(utoa_digits, a0 % a2));
+    # Going to next unit
+    a0 /= a2;
+  } while (a0 != 0);
+  # Writing '\0' to the end of string and moving to last string char
+  writechar(a1, x0--, '\0');
+  # Reversing string
+  for (x1 = 0; x1 < x0; x0--, x1++) {
+    # Fetching temporary char
+    x2 = readchar(a1, x1);
+    # Writing from end to start
+    writechar(a1, x1, readchar(a1, x0));
+    # Writing temporary char to end
+    writechar(a1, x0, x2);
+  }
+  # Returning result buffer
+  return a1;
+}
+
 ### TLSF structure
 # 16 bytes                                              - null block
 # 4 bytes                                               - first level bitmap
