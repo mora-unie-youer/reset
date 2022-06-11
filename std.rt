@@ -275,6 +275,20 @@ MMM_TLSF_BLOCK_DATA          => 2;
 MMM_TLSF_BLOCK_PREV_FREE     => 2;
 MMM_TLSF_BLOCK_NEXT_FREE     => 3;
 
+## get_new_area - get new memory area
+# a0 - size
+# @return area address
+DEFAULT_AREA_SIZE => 0x1000;
+get_new_area : (a0) {
+  # x0 - area
+  allocate(1);
+  # Fetching area address
+  x0 = sbrk(NULL);
+  # If allocated successfully, returning area address
+  if (sbrk(a0) != 0xffffffff) return x0;
+  return NULL;
+}
+
 ### TLSF block functions
 ## mmm_tlsf_block_size - get block size
 # a0 - block
