@@ -275,6 +275,9 @@ MMM_TLSF_BLOCK_DATA          => 2;
 MMM_TLSF_BLOCK_PREV_FREE     => 2;
 MMM_TLSF_BLOCK_NEXT_FREE     => 3;
 
+### TLSF pool header structure
+MMM_TLSF_POOL_OVERHEAD => 2 * MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+
 ## get_new_area - get new memory area
 # a0 - size
 # @return area address
