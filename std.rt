@@ -379,6 +379,14 @@ mmm_tlsf_block_to_ptr : (a0) {
   return a0 + MMM_TLSF_BLOCK_STRUCT_OFFSET;
 }
 
+## mmm_tlsf_prev_block - get previous block
+# a0 - block
+# @return previous block
+mmm_tlsf_prev_block : (a0) {
+  assert(mmm_tlsf_is_prev_block_free(a0), "Previous TLSF block must be free");
+  return a0[MMM_TLSF_BLOCK_PREV];
+}
+
 ### TLSF utility functions
 ## mmm_tlsf_mapping_insert - compute first and second level indices
 # a0 - size
