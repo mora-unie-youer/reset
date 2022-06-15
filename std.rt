@@ -395,6 +395,20 @@ mmm_tlsf_next_block : (a0) {
   return a0 + mmm_tlsf_block_size(a0) + MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
 }
 
+## mmm_tlsf_link_next_block - get and link next block
+# a0 - block
+# @return next block
+mmm_tlsf_link_next_block : (a0) {
+  # x0 - next block
+  allocate(1);
+  # Fetching next block
+  x0 = mmm_tlsf_next_block(a0);
+  # Linking blocks
+  x0[MMM_TLSF_BLOCK_PREV] = a0;
+  # Returning next block
+  return x0;
+}
+
 ### TLSF utility functions
 ## mmm_tlsf_mapping_insert - compute first and second level indices
 # a0 - size
