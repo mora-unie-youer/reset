@@ -409,6 +409,30 @@ mmm_tlsf_link_next_block : (a0) {
   return x0;
 }
 
+## mmm_tlsf_mark_block_free - mark block as free
+# a0 - block
+mmm_tlsf_mark_block_free : (a0) {
+  # x0 - next block
+  allocate(1);
+  # Fetching next block
+  x0 = mmm_tlsf_next_block(a0);
+  # Setting flags
+  mmm_tlsf_set_prev_block_free(x0);
+  mmm_tlsf_set_block_free(a0);
+}
+
+## mmm_tlsf_mark_block_used - mark block as used
+# a0 - block
+mmm_tlsf_mark_block_used : (a0) {
+  # x0 - next block
+  allocate(1);
+  # Fetching next block
+  x0 = mmm_tlsf_next_block(a0);
+  # Setting flags
+  mmm_tlsf_set_prev_block_used(x0);
+  mmm_tlsf_set_block_used(a0);
+}
+
 ### TLSF utility functions
 ## mmm_tlsf_mapping_insert - compute first and second level indices
 # a0 - size
