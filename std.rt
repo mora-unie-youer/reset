@@ -557,3 +557,26 @@ mmm_tlsf_insert_free_block : (a0, a1, a2, a3) {
   # Setting second level bitmap
   a0[MMM_TLSF_STRUCT_SL_MAP + a2] |= 1 << a3;
 }
+## mmm_tlsf_split_block - split block by size
+# a0 - block
+# a1 - size
+# @return remaining block
+mmm_tlsf_split_block : (a0, a1) {
+  # x0 - remaining block
+  # x1 - remaining size
+  allocate(2);
+  # Fetching remaining block pointer
+  x0 = a0 + MMM_TLSF_BLOCK_STRUCT_OFFSET + a1 - MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+  # Fetching remaining block size
+  x1 = mmm_tlsf_block_size(a0) - a1 - MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+  # TODO: make assert for alignment of address
+  # Setting size for blocks
+  mmm_tlsf_set_block_size(a0, a1);
+  mmm_tlsf_set_block_size(x0, x1);
+  assert(mmm_tlsf_block_size(x0) >= MMM_TLSF_BLOCK_SIZE_MIN, "Block split with incorrect size");
+  # Marking remaining block as free
+  mmm_tlsf_set_block_free(x0);
+  # Returning remaining block
+  return x0;
+}
+
