@@ -557,6 +557,31 @@ mmm_tlsf_insert_free_block : (a0, a1, a2, a3) {
   # Setting second level bitmap
   a0[MMM_TLSF_STRUCT_SL_MAP + a2] |= 1 << a3;
 }
+
+## mmm_tlsf_remove_block - remove block from matrix
+# a0 - TLSF structure
+# a1 - block
+mmm_tlsf_remove_block : (a0, a1) {
+  # x0 - first level index
+  # x1 - second level index
+  allocate(2);
+  # Fetching first level and second level indices
+  mmm_tlsf_mapping_insert(mmm_tlsf_block_size(a1), &x0, &x1);
+  mmm_tlsf_remove_free_block(a0, a1, x0, x1);
+}
+
+## mmm_tlsf_insert_block - insert block to matrix
+# a0 - TLSF structure
+# a1 - block
+mmm_tlsf_insert_block : (a0, a1) {
+  # x0 - first level index
+  # x1 - second level index
+  allocate(2);
+  # Fetching first level and second level indices
+  mmm_tlsf_mapping_insert(mmm_tlsf_block_size(a1), &x0, &x1);
+  mmm_tlsf_insert_free_block(a0, a1, x0, x1);
+}
+
 ## mmm_tlsf_split_block - split block by size
 # a0 - block
 # a1 - size
