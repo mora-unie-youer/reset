@@ -605,3 +605,16 @@ mmm_tlsf_split_block : (a0, a1) {
   return x0;
 }
 
+## mmm_tlsf_join_blocks - join blocks together
+# a0 - prev block
+# a1 - block
+# @return joined previous block
+mmm_tlsf_join_blocks : (a0, a1) {
+  assert(!mmm_tlsf_is_block_last(a0), "Previous TLSF block can't be last");
+  a0[MMM_TLSF_BLOCK_SIZE] += mmm_tlsf_block_size(a1) + MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+  # Linking next block
+  mmm_tlsf_link_next_block(a0);
+  # Returning joined block
+  return a0;
+}
+
