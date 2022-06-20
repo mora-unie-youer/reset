@@ -618,3 +618,24 @@ mmm_tlsf_join_blocks : (a0, a1) {
   return a0;
 }
 
+## mmm_tlsf_merge_prev_block - merge block with previous
+# a0 - TLSF structure
+# a1 - block
+mmm_tlsf_merge_prev_block : (a0, a1) {
+  # x0 - previous block
+  allocate(1);
+  # Merging only if previous block is free
+  if (mmm_tlsf_is_prev_block_free(a1)) {
+    # Fetching previous block
+    x0 = mmm_tlsf_prev_block(a1);
+    assert(x0, "Previous TLSF block can't be NULL");
+    assert(mmm_tlsf_is_block_free(x0), "Previous TLSF block is not free though marked as such");
+    # Removing previous block from matrix
+    mmm_tlsf_remove_block(a0, x0);
+    # Joining blocks
+    a1 = mmm_tlsf_join_blocks(x0, a1);
+  }
+  # Returning block
+  return a1;
+}
+
