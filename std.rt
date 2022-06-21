@@ -639,3 +639,24 @@ mmm_tlsf_merge_prev_block : (a0, a1) {
   return a1;
 }
 
+## mmm_tlsf_merge_next_block - merge block with next
+# a0 - TLSF structure
+# a1 - block
+mmm_tlsf_merge_next_block : (a0, a1) {
+  # x0 - next block
+  allocate(1);
+  # Fetching new block
+  x0 = mmm_tlsf_next_block(a1);
+  assert(x0, "Next TLSF block can't be NULL");
+  # Merging only if next block is free
+  if (mmm_tlsf_is_block_free(x0)) {
+    assert(!mmm_tlsf_is_block_last(a1), "Previous block can't be last");
+    # Removing next block from matrix
+    mmm_tlsf_remove_block(a0, x0);
+    # Joining blocks
+    a1 = mmm_tlsf_join_blocks(a1, x0);
+  }
+  # Returning block
+  return a1;
+}
+
