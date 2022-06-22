@@ -660,3 +660,24 @@ mmm_tlsf_merge_next_block : (a0, a1) {
   return a1;
 }
 
+## mmm_tlsf_trim_free_block - trim space from end of free block
+# a0 - TLSF structure
+# a1 - block
+# a2 - size
+mmm_tlsf_trim_free_block : (a0, a1, a2) {
+  # x0 - remaining block
+  allocate(1);
+  assert(mmm_tlsf_is_block_free(a1), "TLSF block must be free");
+  # We can trim only if we can split block
+  if (mmm_tlsf_can_block_split(a1, a2)) {
+    # Splitting block
+    x0 = mmm_tlsf_split_block(a1, a2);
+    # Linking block
+    mmm_tlsf_link_next_block(a1);
+    # Setting previous block free
+    mmm_tlsf_set_prev_block_free(x0);
+    # Inserting block in matrix
+    mmm_tlsf_insert_block(a0, x0);
+  }
+}
+
