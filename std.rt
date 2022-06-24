@@ -702,3 +702,24 @@ mmm_tlsf_trim_used_block : (a0, a1, a2) {
   }
 }
 
+## mmm_tlsf_trim_free_block_leading - trim space from end of free block
+# a0 - TLSF structure
+# a1 - block
+# a2 - size
+# @return remaining block
+mmm_tlsf_trim_free_block_leading : (a0, a1, a2) {
+  # We can trim only if we can split block
+  if (mmm_tlsf_can_block_split(a1, a2)) {
+    # Splitting block
+    a1 = mmm_tlsf_split_block(a1, a2);
+    # Setting previous block free
+    mmm_tlsf_set_prev_block_free(a1);
+    # Linking block
+    mmm_tlsf_link_next_block(a1);
+    # Inserting block in matrix
+    mmm_tlsf_insert_block(a0, a1);
+  }
+  # Returning block
+  return a1;
+}
+
