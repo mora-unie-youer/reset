@@ -723,3 +723,28 @@ mmm_tlsf_trim_free_block_leading : (a0, a1, a2) {
   return a1;
 }
 
+## mmm_tlsf_locate_free_block - locate free block by size
+# a0 - TLSF structure
+# a1 - size
+# @return block
+mmm_tlsf_locate_free_block : (a0, a1) {
+  # x0 - first level index
+  # x1 - second level index
+  # x2 - block
+  allocate(3);
+  # Resetting variables
+  x0 = NULL; x1 = NULL; x2 = NULL;
+  # Searching indices if size is non-NULL
+  if (a1) {
+    # Computing first and second level indices
+    mmm_tlsf_mapping_search(a1, &x0, &x1);
+    # If first level is fitting, fetching block
+    if (x0 < MMM_TLSF_FL_INDEX_COUNT)
+      x2 = mmm_tlsf_find_suitable_block(a0, &x0, &x1);
+  }
+  # If block is found, removing it from matrix
+  if (x2) mmm_tlsf_remove_free_block(a0, x2, x0, x1);
+  # Returning block
+  return x2;
+}
+
