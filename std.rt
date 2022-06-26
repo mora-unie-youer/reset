@@ -748,3 +748,25 @@ mmm_tlsf_locate_free_block : (a0, a1) {
   return x2;
 }
 
+## mmm_tlsf_prepare_block - prepare block with size
+# a0 - TLSF structure
+# a1 - free block
+# a2 - size
+# @return block
+mmm_tlsf_prepare_block : (a0, a1, a2) {
+  # x0 - block
+  allocate(1);
+  # Trimming block, if free block is non-NULL
+  if (a1) {
+    assert(a2, "Size must be non-NULL");
+    # Trimming block
+    mmm_tlsf_trim_free_block(a0, a1, a2);
+    # Marking block as used
+    mmm_tlsf_mark_block_used(a1);
+    # Returning block
+    return mmm_tlsf_block_to_ptr(a1);
+  }
+  # Returning NULL
+  return NULL;
+}
+
