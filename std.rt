@@ -770,3 +770,25 @@ mmm_tlsf_prepare_block : (a0, a1, a2) {
   return NULL;
 }
 
+## mmm_tlsf_construct - initialize TLSF structure
+# a0 - TLSF structure
+mmm_tlsf_construct : (a0) {
+  # x0 - i
+  # x1 - j
+  # x2 - null block
+  allocate(3);
+  # Fetching null block
+  x2 = a0;
+  # Initializing null block
+  x2[MMM_TLSF_BLOCK_PREV_FREE] = x2;
+  x2[MMM_TLSF_BLOCK_NEXT_FREE] = x2;
+  # Zeroing first level index
+  a0[MMM_TLSF_STRUCT_FL_MAP] = 0;
+  for (x0 = 0; x0 < MMM_TLSF_FL_INDEX_COUNT; x0++) {
+    # Zeroing second level index
+    a0[MMM_TLSF_STRUCT_SL_MAP + x0] = 0;
+    for (x1 = 0; x1 < MMM_TLSF_SL_INDEX_COUNT; x1++)
+      a0[MMM_TLSF_STRUCT_MATRIX + x0 * MMM_TLSF_SL_INDEX_COUNT + x1] = x2;
+  }
+}
+
