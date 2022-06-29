@@ -792,3 +792,32 @@ mmm_tlsf_construct : (a0) {
   }
 }
 
+## mmm_tlsf_add_pool - add pool to TLSF structure
+# a0 - TLSF structure
+# a1 - pointer
+# a2 - pool size
+# @return pool
+mmm_tlsf_add_pool : (a0, a1, a2) {
+  # x0 - pool bytes
+  # x1 - main free block
+  # x2 - next block
+  allocate(3);
+  # Calculate pool bytes
+  x0 = align_down(a2 - MMM_TLSF_POOL_OVERHEAD, MMM_TLSF_ALIGN_SIZE);
+  # assert(a1 % MMM_TLSF_ALIGN_SIZE == 0, "Memory must be aligned by ALIGN_SIZE");
+  # assert(x0 >= MMM_TLSF_BLOCK_SIZE_MIN && x0 <= MMM_TLSF_BLOCK_SIZE_MAX);
+  # First free block is at the start of pool minus overhead
+  x1 = a1 - MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+  mmm_tlsf_set_block_size(x1, x0);
+  mmm_tlsf_set_block_free(x1);
+  mmm_tlsf_set_prev_block_used(x1);
+  mmm_tlsf_insert_block(a0, x1);
+  # Split block to create a zero-size block
+  x2 = mmm_tlsf_link_next_block(x1);
+  mmm_tlsf_set_block_size(x2, 0);
+  mmm_tlsf_set_block_used(x2);
+  mmm_tlsf_set_prev_block_free(x2);
+  # Returning pointer
+  return a1;
+}
+
