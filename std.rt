@@ -821,3 +821,24 @@ mmm_tlsf_add_pool : (a0, a1, a2) {
   return a1;
 }
 
+## mmm_tlsf_remove_pool - remove pool from TLSF structure
+# a0 - TLSF structure
+# a1 - pool
+mmm_tlsf_remove_pool : (a0, a1, a2) {
+  # x0 - block
+  # x1 - first level index
+  # x2 - second level index
+  allocate(3);
+  # Initializing indices
+  x1 = 0; x2 = 0;
+  # Fetching block
+  x0 = a1 - MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+  assert(mmm_tlsf_is_block_free(x0), "TLSF block must be free");
+  assert(!mmm_tlsf_is_block_free(mmm_tlsf_next_block(x0)), "Next TLSF block must be used");
+  assert(mmm_tlsf_block_size(mmm_tlsf_next_block(x0)), "Next TLSF block must have size = 0");
+  # Fetching indices for this block
+  mmm_tlsf_mapping_insert(mmm_tlsf_block_size(x0), &x1, &x2);
+  # Removing block from matrix
+  mmm_tlsf_remove_free_block(a0, x0, x1, x2);
+}
+
