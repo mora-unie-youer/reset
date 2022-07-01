@@ -842,3 +842,14 @@ mmm_tlsf_remove_pool : (a0, a1, a2) {
   mmm_tlsf_remove_free_block(a0, x0, x1, x2);
 }
 
+## mmm_tlsf_create - create TLSF structure at pointer
+# a0 - pointer
+# @return TLSF structure
+mmm_tlsf_create : (a0) {
+  # assert(a0 % MMM_TLSF_ALIGN_SIZE == 0, "Memory must be aligned by ALIGN_SIZE");
+  # Initializing TLSF
+  mmm_tlsf_construct(a0);
+  # Returning TLSF
+  return a0;
+}
+
