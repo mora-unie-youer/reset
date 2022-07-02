@@ -853,3 +853,16 @@ mmm_tlsf_create : (a0) {
   return a0;
 }
 
+## mmm_tlsf_create_with_pool - create TLSF structure with pool at pointer
+# a0 - pointer
+# a1 - bytes count
+# @return TLSF structure
+mmm_tlsf_create_with_pool : (a0, a1) {
+  # Initializing TLSF
+  a0 = mmm_tlsf_create(a0);
+  # Adding pool to TLSF structure
+  mmm_tlsf_add_pool(a0, a0 + MMM_TLSF_STRUCT_SIZE, a1 - MMM_TLSF_STRUCT_SIZE);
+  # Returning TLSF
+  return a0;
+}
+
