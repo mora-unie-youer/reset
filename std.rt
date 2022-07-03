@@ -866,3 +866,35 @@ mmm_tlsf_create_with_pool : (a0, a1) {
   return a0;
 }
 
+## mmm_malloc - allocate block with size from TLSF
+# a0 - TLSF structure
+# a1 - size
+# @return memory address
+mmm_malloc : (a0, a1) {
+  # x0 - adjusted size
+  # x1 - free block
+  # x2 - area size
+  # x3 - area
+  allocate(4);
+  # Adjusting size
+  x0 = align_up(a1, MMM_TLSF_ALIGN_SIZE);
+  # Fetching free block
+  x1 = mmm_tlsf_locate_free_block(a0, x0);
+  # If not found, and TLSF is default memory pool, expanding it and searching again
+  if (!x1 && a0 && a0 == default_memory_pool) {
+    # Calculating area size
+    x2 = x0 + MMM_TLSF_POOL_OVERHEAD;
+    x2 = x2 > DEFAULT_AREA_SIZE ? align_up(x2, DEFAULT_AREA_SIZE) : DEFAULT_AREA_SIZE;
+    # Getting new area
+    x3 = get_new_area(x2);
+    # Panic if new area is NULL
+    if (!x3) panic("Couldn't allocate new area");
+    # Adding pool to TLSF
+    mmm_tlsf_add_pool(a0, x3, x2);
+    # Fetching free block again
+    x1 = mmm_tlsf_locate_free_block(a0, x0);
+  }
+  # Returning new block
+  return mmm_tlsf_prepare_block(a0, x1, x0);
+}
+
