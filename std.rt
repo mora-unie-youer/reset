@@ -898,3 +898,48 @@ mmm_malloc : (a0, a1) {
   return mmm_tlsf_prepare_block(a0, x1, x0);
 }
 
+## mmm_memalign - allocate block with aligned size from TLSF
+# a0 - TLSF structure
+# a1 - alignment
+# a2 - size
+# @return memory address
+mmm_memalign : (a0, a1, a2) {
+  # x0 - adjusted size
+  # x1 - size with gap
+  # x2 - aligned size
+  # x3 - free block
+  # x4 - pointer
+  # x5 - gap size
+  # x6 - next aligned boundary
+  allocate(7);
+  # Adjusting size
+  x0 = align_up(a2, MMM_TLSF_ALIGN_SIZE);
+  # Calculating size with gap
+  x1 = align_up(x0 + a1 + MMM_TLSF_BLOCK_STRUCT_SIZE, a1);
+  # Calculating aligned size
+  x2 = x0 && a1 > MMM_TLSF_ALIGN_SIZE ? x1 : x0;
+  # Fetching free block
+  x3 = mmm_tlsf_locate_free_block(a0, x2);
+  # If block is fetched, aligning
+  if (x3) {
+    # Fetching pointer from block
+    x4 = mmm_tlsf_block_to_ptr(x3);
+    # Calculating gap
+    x5 = align_up(x4, a1) - x4;
+    # If gap is too small, offset to next aligned boundary
+    if (x5 && x5 < MMM_TLSF_BLOCK_STRUCT_SIZE) {
+      # Calculating next aligned boundary
+      x6 = max(MMM_TLSF_BLOCK_STRUCT_SIZE - x5, a1);
+      # Calculating new gap
+      x5 = align_up(x6, a1) - x4;
+    }
+    # If gap is non-NULL, trimming block
+    if (x5) {
+      assert(x5 >= MMM_TLSF_BLOCK_STRUCT_SIZE, "Gap size is too small");
+      x3 = mmm_tlsf_trim_free_block_leading(a0, x3, x5);
+    }
+  }
+  # Returning new block
+  return mmm_tlsf_prepare_block(a0, x2, x0);
+}
+
