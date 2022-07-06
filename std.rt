@@ -963,3 +963,65 @@ mmm_free : (a0, a1) {
   }
 }
 
+## mmm_realloc - reallocate block with size from TLSF
+# a0 - TLSF structure
+# a1 - memory address
+# a2 - new size
+#
+# a1 == NULL && a2 != NULL -> realloc == malloc
+# a1 != NULL && a2 == NULL -> realloc == free
+#
+# @return memory address
+mmm_realloc : (a0, a1, a2) {
+  # x0 - pointer
+  # x1 - block
+  # x2 - next block
+  # x3 - current block size
+  # x4 - combined size
+  # x5 - adjusted size
+  allocate(6);
+  # Initializing pointer
+  x0 = NULL;
+  # Checking use cases
+  if (a1 && !a2) mmm_free(a0, a1);
+  else if (!a1)  mmm_malloc(a0, a2);
+  else {
+    # Fetching block from pointer
+    x1 = mmm_tlsf_ptr_to_block(a1);
+    # Fetching next block
+    x2 = mmm_tlsf_next_block(x1);
+    # Fetching block size
+    x3 = mmm_tlsf_block_size(x1);
+    # Calculating combined size
+    x4 = x3 + mmm_tlsf_block_size(x2) + MMM_TLSF_BLOCK_STRUCT_OVERHEAD;
+    # Calculating adjusted size
+    x5 = align_up(x4, MMM_TLSF_ALIGN_SIZE);
+    assert(!mmm_tlsf_is_block_free(x1), "Block is already marked as free");
+    # If next block is used or when combined doesn't offer enough space, reallocate
+    if (x5 > x3 && (!mmm_tlsf_is_block_free(x2) || x5 > x4)) {
+      # Allocating new block
+      x0 = mmm_malloc(a0, a2);
+      if (x0) {
+        # Copying data to new block
+        memcpy(a1, x0, min(x3, a2));
+        # Freeing old block
+        mmm_free(a0, a1);
+      }
+    } else {
+      # Do we need to expand to next block?
+      if (x5 > x3) {
+        # Merging with next block
+        mmm_tlsf_merge_next_block(a0, x1);
+        # Marking as used
+        mmm_tlsf_set_block_used(x1);
+      }
+      # Trimming block
+      mmm_tlsf_trim_used_block(a0, x1, x5);
+      # Setting pointer to initial
+      x0 = a1;
+    }
+  }
+  # Returning pointer
+  return x0;
+}
+
