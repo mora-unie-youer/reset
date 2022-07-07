@@ -292,6 +292,32 @@ get_new_area : (a0) {
   return NULL;
 }
 
+## get_memory_pool - get or initialize default memory pool
+# @return default memory pool
+get_memory_pool : () {
+  # x0 - memory pool
+  # x1 - area size
+  # x2 - area
+  allocate(3);
+  # Fetching default memory pool
+  x0 = default_memory_pool;
+  # Initializing, if it is NULL
+  if (!x0) {
+    x1 = max(MMM_TLSF_STRUCT_SIZE, DEFAULT_AREA_SIZE);
+    # Fetching new area
+    x2 = get_new_area(x1);
+    # Panic if new area is NULL
+    if (!x2) panic("Couldn't allocate new area");
+    # Initializing memory pool
+    mmm_tlsf_create_with_pool(x2, x1);
+    # Setting variables
+    default_memory_pool = x2;
+    x0 = x2;
+  }
+  # Returning memory pool
+  return x0;
+}
+
 ### TLSF block functions
 ## mmm_tlsf_block_size - get block size
 # a0 - block
