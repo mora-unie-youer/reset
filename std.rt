@@ -1051,3 +1051,24 @@ mmm_realloc : (a0, a1, a2) {
   return x0;
 }
 
+## mmm_calloc - allocate block with N elements size from TLSF
+# a0 - TLSF structure
+# a1 - element size
+# a2 - element count
+# @return memory address
+mmm_calloc : (a0, a1, a2) {
+  # x0 - pointer
+  allocate(1);
+  # Initializing pointer
+  x0 = NULL;
+  # Allocating, when total size is non-NULL
+  if (a1 && a2) {
+    # Allocating block
+    x0 = mmm_malloc(a0, a1 * a2);
+    # Zeroing block content, if allocated block
+    if (x0) memset(0, x0, a1 * a2);
+  }
+  # Returning pointer
+  return x0;
+}
+
