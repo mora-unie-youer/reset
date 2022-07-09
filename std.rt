@@ -1072,3 +1072,24 @@ mmm_calloc : (a0, a1, a2) {
   return x0;
 }
 
+## malloc - allocate block with size
+# a0 - size
+# @return memory address
+malloc : (a0) { return mmm_malloc(get_memory_pool(), a0); }
+
+## free - free block
+# a0 - memory address
+free : (a0) { return mmm_free(get_memory_pool(), a0); }
+
+## realloc - reallocate block with new size
+# a0 - memory address
+# a1 - new size
+# @return memory address
+realloc : (a0, a1) { return mmm_realloc(get_memory_pool(), a0, a1); }
+
+## calloc - allocate block with N elements size
+# a0 - element size
+# a1 - element count
+# @return memory address
+calloc : (a0, a1) { return mmm_calloc(get_memory_pool(), a0, a1); }
+
