@@ -1093,3 +1093,23 @@ realloc : (a0, a1) { return mmm_realloc(get_memory_pool(), a0, a1); }
 # @return memory address
 calloc : (a0, a1) { return mmm_calloc(get_memory_pool(), a0, a1); }
 
+#### Data Structures
+### Tuples
+## tuple - create tuple
+# a0 - number of elements
+# ... - elements
+tuple : (a0, ...) {
+  # x0 - va pointer
+  # x1 - tuple
+  # x2 - i
+  allocate(3);
+  # Initialize variadic argument pointer
+  x0 = &a0 + 4;
+  # Allocate tuple
+  x1 = calloc(4, a0);
+  # Fetching tuple values
+  for (x2 = 0; x2 < a0; x2++) x1[x2] = x0[x2];
+  # Return tuple
+  return x1;
+}
+
