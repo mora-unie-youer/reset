@@ -1113,3 +1113,42 @@ tuple : (a0, ...) {
   return x1;
 }
 
+### Linked List
+## List parts
+LIST_NEXT  => 0;
+LIST_VALUE => 1;
+
+## list - create linked list with value
+# a0 - value
+# @return list
+list : (a0) { return list_insert(NULL, a0); }
+
+## list_insert - insert value in linked list
+# a0 - list
+# a1 - value
+# @return list with new value
+list_insert : (a0, a1) { return tuple(2, a0, a1); }
+
+## list_next - get next element of linked list
+# a0 - list
+# @return list with next value
+list_next : (a0) { return a0[LIST_NEXT]; }
+
+## list_value - get value of current element of linked list
+# a0 - list
+# @return current element value
+list_value : (a0) { return a0[LIST_VALUE]; }
+
+## list_pop - remove this element from list
+# a0 - list
+# @return reduced list
+list_pop : (a0) {
+  # x0 - list continuation
+  allocate(1);
+  # Fetching next element
+  x0 = list_next(a0);
+  # Deallocating current element
+  free(a0);
+  return x0;
+}
+
