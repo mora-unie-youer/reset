@@ -1152,3 +1152,157 @@ list_pop : (a0) {
   return x0;
 }
 
+### Vector
+## Vector parts
+VEC_SIZE => 0;
+VEC_CAP  => 1;
+VEC_BUF  => 2;
+
+## char_vector - create character vector
+# a0 - size
+# a1 - capacity
+# @return character vector
+char_vector : (a0, a1) { return tuple(3, a0, a1, calloc(1, a1)); }
+
+## vector - create vector
+# a0 - size
+# a1 - capacity
+# @return vector
+vector : (a0, a1) { return tuple(3, a0, a1, calloc(4, a1)); }
+
+## vector_buffer - get vector buffer
+# a0 - vector
+# @return vector buffer
+vector_buffer : (a0) { return a0[VEC_BUF]; }
+
+## vector_size - get vector size
+# a0 - vector
+# @return vector size
+vector_size : (a0) { return a0[VEC_SIZE]; }
+
+## char_vector_reserve - reserve more space for char vector buffer
+# a0 - char vector
+# a1 - new capacity
+char_vector_reserve : (a0, a1) {
+  # Reserving, if new capacity is bigger
+  if (a1 > a0[VEC_CAP]) {
+    # Reallocating buffer
+    a0[VEC_BUF] = realloc(a0[VEC_BUF], a1);
+    # Setting new capacity
+    a0[VEC_CAP] = a1;
+  }
+}
+
+## vector_reserve - reserve more space for vector buffer
+# a0 - vector
+# a1 - new capacity
+vector_reserve : (a0, a1) {
+  # Reserving, if new capacity is bigger
+  if (a1 > a0[VEC_CAP]) {
+    # Reallocating buffer
+    a0[VEC_BUF] = realloc(a0[VEC_BUF], 4 * a1);
+    # Setting new capacity
+    a0[VEC_CAP] = a1;
+  }
+}
+
+## char_vector_resize - resize char vector
+# a0 - char vector
+# a1 - new size
+char_vector_resize : (a0, a1) {
+  # Reserving, if required
+  if (a1 > a0[VEC_SIZE]) char_vector_reserve(a0, a1);
+  # Setting new size
+  a0[VEC_SIZE] = a1;
+}
+
+## vector_resize - resize vector
+# a0 - vector
+# a1 - new size
+vector_resize : (a0, a1) {
+  # Reserving, if required
+  if (a1 > a0[VEC_SIZE]) vector_reserve(a0, a1);
+  # Setting new size
+  a0[VEC_SIZE] = a1;
+}
+
+## char_vector_get - get value at index in char vector
+# a0 - char vector
+# a1 - index
+# @return char
+char_vector_get : (a0, a1) { return readchar(a0[VEC_BUF], a1); }
+
+## vector_get - get value at index in vector
+# a0 - vector
+# a1 - index
+# @return value
+vector_get : (a0, a1) { return a0[VEC_BUF][a1]; }
+
+## char_vector_get - set value at index in char vector
+# a0 - char vector
+# a1 - index
+# a2 - char
+char_vector_set : (a0, a1, a2) { writechar(a0[VEC_BUF], a1, a2); }
+
+## vector_set - set value at index in vector
+# a0 - vector
+# a1 - index
+# a2 - value
+vector_set : (a0, a1, a2) {
+  # x0 - buffer
+  allocate(1);
+  x0 = a0[VEC_BUF];
+  x0[a1] = a2;
+}
+
+## char_vector_push - insert value in the end of char vector
+# a0 - char vector
+# a1 - value
+char_vector_push : (a0, a1) {
+  # If vector buffer is full, reserving more
+  if (a0[VEC_SIZE] == a0[VEC_CAP])
+    char_vector_reserve(a0, a0[VEC_CAP] * 2);
+  # Putting new value and incrementing size
+  char_vector_set(a0, a0[VEC_SIZE]++, a1);
+}
+
+## vector_push - insert value in the end of vector
+# a0 - vector
+# a1 - value
+vector_push : (a0, a1) {
+  # If vector buffer is full, reserving more
+  if (a0[VEC_SIZE] == a0[VEC_CAP])
+    vector_reserve(a0, a0[VEC_CAP] * 2);
+  # Putting new value and incrementing size
+  vector_set(a0, a0[VEC_SIZE]++, a1);
+}
+
+## char_vector_pop - remove and return last value from char vector
+# a0 - char vector
+# @return char
+char_vector_pop : (a0) {
+  # Decrementing size
+  a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
+  # Returning the value
+  return char_vector_get(a0, a0[VEC_SIZE]);
+}
+
+## vector_pop - remove and return last value from vector
+# a0 - vector
+# @return value
+vector_pop : (a0) {
+  # Decrementing size
+  a0[VEC_SIZE] = a0[VEC_SIZE] - 1;
+  # Returning the value
+  return vector_get(a0, a0[VEC_SIZE]);
+}
+
+## vector_destroy - destroy vector
+# a0 - vector
+vector_destroy : (a0) {
+  # Deallocating buffer
+  free(a0[VEC_BUF]);
+  # Deallocating vector
+  free(a0);
+}
+
