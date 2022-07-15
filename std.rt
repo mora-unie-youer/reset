@@ -1397,3 +1397,118 @@ initialize_io : () {
   stderr = output_chan(2); # stderr=2
 }
 
+## fill - fill input channel
+# a0 - channel
+fill : (a0) {
+  # x0 - read count
+  allocate(1);
+  # Checking if file is ended
+  if (a0[ICHAN_EOF]) return;
+  # Checking if buffer is exhausted
+  if (a0[CHAN_IDX] == a0[ICHAN_END]) {
+    # Input buffer is empty, refilling
+    x0 = read(a0[CHAN_FD], a0[CHAN_BUF], IBUFFER_SIZE);
+    # Resetting index and setting size
+    a0[CHAN_IDX]  = 0;
+    a0[ICHAN_END] = x0;
+    # Setting EOF flag, if file is ended
+    if (a0[ICHAN_END] == 0) a0[ICHAN_EOF] = TRUE;
+  }
+}
+
+## fgetc - read char
+# a0 - channel
+# @return char
+fgetc : (a0) {
+  # x0 - char
+  allocate(1);
+  # Filling buffer, if needed
+  fill(a0);
+  # Checking if input is ended
+  if (a0[CHAN_IDX] == a0[ICHAN_END]) return EOF;
+  # Fetching char and incrementing index
+  x0 = readchar(a0[CHAN_BUF], a0[CHAN_IDX]++);
+  # Returning char
+  return x0;
+}
+
+## getc - read char from stdin
+# @return char
+getc : () { return fgetc(stdin); }
+
+## fnextc - look ahead next char
+# a0 - channel
+# a1 - offset
+# @return char
+fnextc : (a0, a1) {
+  # Filling buffer, if needed
+  fill(a0);
+  # Checking if input is ended
+  if (a0[CHAN_IDX] + a1 >= a0[ICHAN_END]) return EOF;
+  # Fetching char
+  return readchar(a0[CHAN_BUF], a0[CHAN_IDX] + a1);
+}
+
+## nextc - look ahead next char from stdin
+# a0 - offset
+# @return char
+nextc : (a0) { return fnextc(stdin, a0); }
+
+## flush - flush output channel
+# a0 - channel
+flush : (a0) {
+  # If buffer is not empty
+  if (a0[CHAN_IDX] > 0) {
+    write(a0[CHAN_FD], a0[CHAN_BUF], a0[CHAN_IDX]);
+    a0[CHAN_IDX] = 0;
+  }
+}
+
+## fputc - put character
+# a0 - channel
+# a1 - char
+fputc : (a0, a1) {
+  # Writing to buffer and incrementing index
+  writechar(a0[CHAN_BUF], a0[CHAN_IDX]++, a1);
+  # Checking if need to flush
+  if (a1 == '\n' || a0[CHAN_IDX] == OBUFFER_SIZE) flush(a0);
+}
+
+## putc - put character in stdout
+# a0 - char
+putc  : (a0) { fputc(stdout, a0); }
+## eputc - put character in stderr
+# a0 - char
+eputc : (a0) { fputc(stderr, a0); }
+
+## fputs - put string
+# a0 - channel
+# a1 - string
+fputs : (a0, a1) {
+  # x0 - char
+  allocate(1);
+  # Iterating through chars in string and printing them
+  for (; x0 = readchar(a1, 0); a1++) fputc(a0, x0);
+}
+
+## puts - put string in stdout
+# a0 - char
+puts  : (a0) { fputs(stdout, a0); }
+## eputs - put string in stderr
+# a0 - char
+eputs : (a0) { fputs(stderr, a0); }
+
+## fputd - put number
+# a0 - channel
+# a1 - number
+# a2 - base
+fputn_buffer : char[33];
+fputn : (a0, a1, a2) {
+  # Clearing buffer
+  memset(0, &fputn_buffer, 33);
+  # Converting number to string
+  utoa(a1, &fputn_buffer, a2);
+  # Writing string to channel
+  fputs(a0, &fputn_buffer);
+}
+
