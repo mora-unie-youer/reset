@@ -1512,3 +1512,42 @@ fputn : (a0, a1, a2) {
   fputs(a0, &fputn_buffer);
 }
 
+## vfprintf - format and print data
+# a0 - output channel
+# a1 - format string
+# a2 - va pointer
+vfprintf : (a0, a1, a2) {
+  # x0 - i
+  # x1 - char
+  allocate(2);
+  # Iterating format string char by char
+  for (x0 = 0; x1 = readchar(a1, x0); x0++) {
+    # Searching for some format
+    if (x1 != '%') { fputc(a0, x1); continue; }
+    # Fetching format char
+    x1 = readchar(a1, ++x0);
+    # Picking what to do
+    if      (x1 == 's') fputs(a0, *a2);
+    else if (x1 == 'o') fputn(a0, *a2, 8);
+    else if (x1 == 'd') fputn(a0, *a2, 10);
+    else if (x1 == 'x') fputn(a0, *a2, 16);
+    else if (x1 == 'c') fputc(a0, *a2);
+    else if (x1 == '%') fputc(a0, '%');
+    # If char wasn't %, incrementing va pointer
+    if (x1 != '%') a2 += 4;
+  }
+}
+
+## fprintf - format and print data to output channel
+# a0 - output channel
+# a1 - format string
+# ... - arguments
+fprintf : (a0, a1, ...) { vfprintf(a0, a1, &a1 + 4); }
+## printf - format and print data to stdout
+# a0 - format string
+# ... - arguments
+printf : (a0, ...) { vfprintf(stdout, a0, &a0 + 4); }
+## eprintf - format and print data to stderr
+# a0 - format string
+# ... - arguments
+eprintf : (a0, ...) { vfprintf(stderr, a0, &a0 + 4); }
